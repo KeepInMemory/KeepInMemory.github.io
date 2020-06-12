@@ -150,6 +150,222 @@
           <div id="js-content" class="content-ll">
             
   
+    <article id="post-Spring" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2020/06/12/Spring/">Spring</a>
+    </h1>
+  
+
+        
+        <a href="/2020/06/12/Spring/" class="archive-article-date">
+  	<time datetime="2020-06-12T06:29:04.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2020-06-12</time>
+</a>
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h4 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h4><p>IOC:Inversion Of Control控制反转</p>
+<p>​    控制：资源的获取方式由主动的new变为被动的从容器接收，容器相当于婚介所</p>
+<p>DI：依赖注入</p>
+<p>​    容器能知道哪个组件运行的时候需要另一个组件；容器通过反射的形式，将容器准备好的对象注入（利用反射给属性赋值）</p>
+<p><img src="C:%5CUsers%5C75959%5CAppData%5CRoaming%5CTypora%5Ctypora-user-images%5Cimage-20200612150607383.png" alt="image-20200612150607383"></p>
+<p>1.导入Spring开发的基本包坐标 2.编写Dao接口和实现类 3.创建Spring核心配置文件 4.在Spring配置文件中配置UserDaoImpl 5.使用Spring的API获得Bean实例</p>
+<h4 id="Bean属性"><a href="#Bean属性" class="headerlink" title="Bean属性"></a>Bean属性</h4><p><strong>scope</strong></p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&lt;bean id="userDao" class="com.it.dao.impl.UserDaoImpl" scope="singleton"&gt;&lt;/bean&gt;</span><br></pre></td></tr></table></figure>
+
+<p>singleton单例的实例化是在Spring的xml文件加载时</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&lt;bean id="userDao" class="com.it.dao.impl.UserDaoImpl" scope="prototype"&gt;&lt;/bean&gt;</span><br></pre></td></tr></table></figure>
+
+<p>prototype多例的实例化是在每次getBean时</p>
+<p><strong>init-method&amp;destory-method</strong></p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&lt;bean id="userDao" class="com.it.dao.impl.UserDaoImpl" init-method="init" destroy-method="destory"&gt;&lt;/bean&gt;</span><br></pre></td></tr></table></figure>
+
+<p>指定初始化和销毁方法</p>
+<h4 id="Bean初始化三种方法"><a href="#Bean初始化三种方法" class="headerlink" title="Bean初始化三种方法"></a>Bean初始化三种方法</h4><p><strong>1.无参的构造方法</strong></p>
+<p><strong>2.工厂静态方法</strong></p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&lt;bean id="userDao" class="com.it.factory.StaticFactory" factory-method="getUserDao"&gt;&lt;/bean&gt;</span><br></pre></td></tr></table></figure>
+
+<p>全包名换成静态工厂的名，并指定factory-method属性，否则就找的是静态工厂的无参构造方法了</p>
+<p><strong>3.工厂实例方法</strong></p>
+<p>和静态方法的区别在于工厂的实例化方法去掉了static，这样就需要实例工厂对象，才能调用实例user的函数</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">&lt;bean id="factory" class="com.it.factory.DynamicFactory"&gt;&lt;/bean&gt;</span><br><span class="line">&lt;bean id = "userDao" factory-bean="factory" factory-method="getUserDao"&gt;&lt;/bean&gt;</span><br></pre></td></tr></table></figure>
+
+<p>先用一个bean去实例化工厂对象，再用bean指定userDao的factory-bean和factory-method</p>
+<h4 id="Bean的依赖注入方式"><a href="#Bean的依赖注入方式" class="headerlink" title="Bean的依赖注入方式"></a>Bean的依赖注入方式</h4><p><strong>set方法</strong></p>
+<p>UserServiceImpl的实例的save方法需要调用UserDao的save方法，不是通过在userServiceImpl的save方法里</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">ApplicationContext app = <span class="keyword">new</span> ClassPathXmlApplicationContext(<span class="string">"applicationContext.xml"</span>);</span><br><span class="line">serDao userDao1 = (UserDao) app.getBean(<span class="string">"userDao"</span>);</span><br></pre></td></tr></table></figure>
+
+<p>而是通过在UserServiceImpl类里加一个UserDao的对象，然后通过setUserDao(userDao)方法赋值，这里的userDao的通过Spring容器接收过来的</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&lt;bean id=<span class="string">"userService"</span> <span class="class"><span class="keyword">class</span></span>=<span class="string">"com.it.service.impl.UserServiceImpl"</span>&gt;</span><br></pre></td></tr></table></figure>
+
+<p>在userService的bean下面添加property属性</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">&lt;bean id=<span class="string">"userService"</span> <span class="class"><span class="keyword">class</span></span>=<span class="string">"com.it.service.impl.UserServiceImpl"</span>&gt;</span><br><span class="line">	&lt;property name="userDao" ref="userDao"&gt;&lt;/property&gt;</span><br></pre></td></tr></table></figure>
+
+<p>name的userDao是setUserDao的set后面的，第一个字母要小写</p>
+<p>ref的userDao是上面的</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&lt;bean id="userDao" class="com.it.dao.impl.UserDaoImpl" scope="singleton"&gt;&lt;/bean&gt;</span><br></pre></td></tr></table></figure>
+
+<p>意思是UserServiceImpl有名为userDao的属性，对应setUserDao的UserDao，引用是userDao的Bean的id</p>
+<p><strong>这里的UserServiceImpl内部就有UserDao了，但是UserServiceImpl必须从容器中拿，自己new内部的UserDao会是空指针，因为property是写在UserServiceImpl的Bean下面的，没有Bean的实例化就没有set方法的依赖注入</strong></p>
+<p>set方法的简单方式是使用p命名空间</p>
+<p><strong>构造方法</strong></p>
+<p>在UserServiceImpl类里加有参构造方法</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="title">UserServiceImpl</span><span class="params">(UserDao userDao)</span></span>&#123;</span><br><span class="line">	<span class="keyword">this</span>.userDao = userDao;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">&lt;Bean id=<span class="string">"userService"</span> <span class="class"><span class="keyword">class</span></span>=<span class="string">"com.it.service.impl.UserServiceImpl"</span>&gt;</span><br><span class="line">	&lt;constructor-arg name="userDao" ref="userDao"&gt;&lt;/constructor-arg&gt;</span><br><span class="line">&lt;/Bean&gt;</span><br></pre></td></tr></table></figure>
+
+<p>constructor-arg的意思是构造参数，含义是在userServiceImpl里有一个名为userDao的构造参数，是个引用类型，引用的是XML里的id为userDao的Bean</p>
+<h4 id="Bean的依赖注入的数据类型"><a href="#Bean的依赖注入的数据类型" class="headerlink" title="Bean的依赖注入的数据类型"></a>Bean的依赖注入的数据类型</h4><p><strong>引用数据类型</strong></p>
+<p>上面的内容向UserServiceImpl注入的UserDao都是引用类型</p>
+<p><strong>普通数据类型</strong></p>
+<p>UserDao里添加String username，int age以及相应的Set方法</p>
+<p>XML的Property的ref换成value，后面跟的是要赋的值 </p>
+<p><strong>集合数据类型</strong></p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">&lt;bean id="userDao" class="com.it.dao.impl.UserDaoImpl"&gt;&lt;/bean&gt;</span><br><span class="line">	&lt;property name=<span class="string">"strList"</span>&gt;</span><br><span class="line">		&lt;list&gt;</span><br><span class="line">			&lt;value&gt;aaa&lt;/value&gt;</span><br><span class="line">			&lt;value&gt;bbb&lt;/value&gt;</span><br><span class="line">		&lt;/list&gt;</span><br><span class="line">	&lt;/property&gt;</span><br><span class="line">&lt;/bean&gt;</span><br></pre></td></tr></table></figure>
+
+<p>通过使用property里的子标签，集合是List就用<List>,是Map就用<Map>。类似的是List<String>就用<value>，是List<userDao>就用<ref></p>
+<h4 id="Bean小结"><a href="#Bean小结" class="headerlink" title="Bean小结"></a>Bean小结</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">&lt;bean&gt;标签</span><br><span class="line">	id属性：在容器中Bean实例的唯一标识，不允许重复</span><br><span class="line">	<span class="class"><span class="keyword">class</span>属性：要实例化的<span class="title">Bean</span>的全限定名</span></span><br><span class="line"><span class="class">	<span class="title">scope</span>属性：<span class="title">Bean</span>的作用范围，默认是<span class="title">Singleton</span></span></span><br><span class="line"><span class="class">	&lt;<span class="title">property</span>&gt;标签：属性注入</span></span><br><span class="line"><span class="class">		<span class="title">name</span>属性：属性名称</span></span><br><span class="line"><span class="class">		<span class="title">value</span>属性：普通类型的属性值</span></span><br><span class="line"><span class="class">		<span class="title">ref</span>属性：引用对象的<span class="title">Bean</span>的<span class="title">id</span></span></span><br><span class="line"><span class="class">		&lt;<span class="title">list</span>&gt;标签</span></span><br><span class="line"><span class="class">		&lt;<span class="title">map</span>&gt;标签</span></span><br><span class="line"><span class="class">    	...</span></span><br><span class="line"><span class="class">		&lt;<span class="title">properties</span>&gt;标签</span></span><br><span class="line"><span class="class">	&lt;<span class="title">constructor</span>-<span class="title">arg</span>&gt;标签：带参构造注入</span></span><br><span class="line"><span class="class">    	...</span></span><br><span class="line"><span class="class">	&lt;<span class="title">import</span>&gt;标签：导入其他的<span class="title">xml</span>分文件</span></span><br></pre></td></tr></table></figure>
+
+
+      
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
+	<div class="article-tag tagcloud">
+		<i class="icon-price-tags icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color2">spring</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
+      
+
+      
+        <p class="article-more-link">
+          <a class="article-more-a" href="/2020/06/12/Spring/">展开全文 >></a>
+        </p>
+      
+
+      
+      <div class="clearfix"></div>
+    </div>
+  </div>
+</article>
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+    </div>
+</aside>
+
+
+
+
+  
+    <article id="post-面经整理" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2020/05/30/%E9%9D%A2%E7%BB%8F%E6%95%B4%E7%90%86/">面经整理</a>
+    </h1>
+  
+
+        
+        <a href="/2020/05/30/%E9%9D%A2%E7%BB%8F%E6%95%B4%E7%90%86/" class="archive-article-date">
+  	<time datetime="2020-05-30T11:56:00.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2020-05-30</time>
+</a>
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p><strong>tcp为什么是可靠的？</strong></p>
+<p>1） 应用数据被分割成TCP认为最适合发送的数据块。 2） 确认机制，发送报文后，等待确认。 3） 重传机制，没有收到确认，将重发数据段。 4） 保持它首部和数据的校验和，确认数据的准确性。  5） 根据序号排序，丢弃重复的，流量控制。 </p>
+<p><strong>udp的使用场景</strong></p>
+<p>1）TCP面向连接，UDP面向无连接 。2）TCP面向报文，UDP面向字节流 。3）TCP提供可靠传输服务（数据顺序、正确性），UDP传输不可靠 4）TCP协议传输速度慢，UDP协议传输速度快。5）TCP协议对系统资源要求多（头部开销大），UDP协议要求。</p>
+<p><strong>跑程序时候发现服务器系统内存占用100%怎么办</strong></p>
+<p>1）使用top命令检查是否有程序死锁。2）关闭不必要的服务。3）检查是否是磁盘系统读写故障，IO吞吐错误造成CPU负载上升。</p>
+<p><strong>HashMap、ConcurrentHashMap里的常用方法</strong></p>
+<p><strong>常用的集合</strong></p>
+
+      
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
+	<div class="article-tag tagcloud">
+		<i class="icon-price-tags icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">面经</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
+      
+
+      
+        <p class="article-more-link">
+          <a class="article-more-a" href="/2020/05/30/%E9%9D%A2%E7%BB%8F%E6%95%B4%E7%90%86/">展开全文 >></a>
+        </p>
+      
+
+      
+      <div class="clearfix"></div>
+    </div>
+  </div>
+</article>
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+    </div>
+</aside>
+
+
+
+
+  
     <article id="post-剑指Offer刷题记录" class="article article-type-post  article-index" itemscope itemprop="blogPost">
   <div class="article-inner">
     
@@ -1192,204 +1408,6 @@
 
 
   
-    <article id="post-并发设计模式-单例不变生产者消费者" class="article article-type-post  article-index" itemscope itemprop="blogPost">
-  <div class="article-inner">
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2019/09/18/%E5%B9%B6%E5%8F%91%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F-%E5%8D%95%E4%BE%8B%E4%B8%8D%E5%8F%98%E7%94%9F%E4%BA%A7%E8%80%85%E6%B6%88%E8%B4%B9%E8%80%85/">并发设计模式-单例|不变生产者消费者</a>
-    </h1>
-  
-
-        
-        <a href="/2019/09/18/%E5%B9%B6%E5%8F%91%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F-%E5%8D%95%E4%BE%8B%E4%B8%8D%E5%8F%98%E7%94%9F%E4%BA%A7%E8%80%85%E6%B6%88%E8%B4%B9%E8%80%85/" class="archive-article-date">
-  	<time datetime="2019-09-18T04:00:00.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2019-09-18</time>
-</a>
-        
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <h4 id="单例模式"><a href="#单例模式" class="headerlink" title="单例模式"></a>单例模式</h4><p>单例模式是一种对象创建模式，用于产生一个对象的具体实例，可以确保系统中一个类只产生一个实例。</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Singleton</span></span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">private</span> <span class="title">Singleton</span><span class="params">()</span></span>&#123;</span><br><span class="line">        System.out.println(<span class="string">"Singleton is create"</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> Singleton instance = <span class="keyword">new</span> Singleton();</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> Singleton <span class="title">getInstance</span><span class="params">()</span></span>&#123;</span><br><span class="line">        <span class="keyword">return</span> instance;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>因为无法在别的类中实例化Singleton，所以getInstance工厂方法必须是static的，因此instance也必须是static的。</p>
-<p>但这个单例模式的缺点就是Singleton在什么时候创建是不受控的，它会在类第一次初始化的时候被创建，例如在Singleton类中增加一个static变量a，当在别的类中使用了Singleton.a时就会初始化Singleton，并且实例出Singleton对象instance。</p>
-<p>为了能控制Singleton实例化的时间</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Singleton</span></span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">private</span> <span class="title">Singleton</span><span class="params">()</span></span>&#123;</span><br><span class="line">        System.out.println(<span class="string">"Singleton is create"</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> Singleton instance = <span class="keyword">null</span>;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">synchronized</span> Singleton <span class="title">getInstance</span><span class="params">()</span></span>&#123;</span><br><span class="line">        <span class="keyword">if</span>(instance == <span class="keyword">null</span>)</span><br><span class="line">            instance = <span class="keyword">new</span> Singleton();</span><br><span class="line">        <span class="keyword">return</span> instance;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>上面这个例子在第一次调用getInstance时创建单例对象，加入sync是为了防止多次创建。但缺点是加入了锁，会对性能有影响。</p>
-<p>综上，最好的单例模式为</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">StaticSingleton</span></span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">private</span> <span class="title">StaticSingleton</span><span class="params">()</span></span>&#123;</span><br><span class="line">        System.out.println(<span class="string">"StaticSingleton is create"</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="class"><span class="keyword">class</span> <span class="title">SingletonHolder</span></span>&#123;</span><br><span class="line">        <span class="keyword">private</span> <span class="keyword">static</span> StaticSingleton instance = <span class="keyword">new</span> StaticSingleton();</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> StaticSingleton <span class="title">getInstance</span><span class="params">()</span></span>&#123;</span><br><span class="line">        <span class="keyword">return</span> SingletonHolder.instance;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>上面的单例模式具有前两种的有点，第一getInstance没有锁，高并发下性能优越，第二只在getInstance第一次调用时被实例化。</p>
-<h4 id="不变模式"><a href="#不变模式" class="headerlink" title="不变模式"></a>不变模式</h4><p>不变模式天生就是多线程友好的，核心思想是一个对象一旦被创建，它的内部状态将永远不会发生变化。所有实例方法均不需要进行同步操作，保证了多线程下的性能。</p>
-<p>不变模式需要注意四点：去除setter方法和所有修改自身属性的方法；将所有属性设为private final；确保没有子类可以重载修改行为；有一个可以创建完整对象的构造函数。</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">final</span> <span class="class"><span class="keyword">class</span> <span class="title">Product</span></span>&#123;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">final</span> String no;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">final</span> String name;</span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="title">Product</span><span class="params">(String no,String name)</span></span>&#123;</span><br><span class="line">    <span class="keyword">super</span>();</span><br><span class="line">    <span class="keyword">this</span>.no = no;</span><br><span class="line">    <span class="keyword">this</span>.name = name;</span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="keyword">public</span> String <span class="title">getNo</span><span class="params">()</span></span>&#123;</span><br><span class="line">    <span class="keyword">return</span> no;</span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="keyword">public</span> String <span class="title">getName</span><span class="params">()</span></span>&#123;</span><br><span class="line">    <span class="keyword">return</span> name;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>final类确保没有子类，属性加private确保不会被其他对象获取，属性加final确保属性不会被两次赋值。</p>
-<p>java.lang.String和所有包装类Integer、Double等都是用不变模式实现的。</p>
-<h4 id="生产者-消费者模式"><a href="#生产者-消费者模式" class="headerlink" title="生产者-消费者模式"></a>生产者-消费者模式</h4><p>生产者消费者模式的核心组件是共享内存缓冲区，将生产者消费者进行解耦，同时也可以调节生产者和消费者的速度。</p>
-<p>共享内存缓冲区一般选择BlockingQueue</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//共享数据</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">PCData</span></span>&#123;</span><br><span class="line">	<span class="keyword">private</span> <span class="keyword">final</span> <span class="keyword">int</span> intData;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">PCData</span><span class="params">(String s)</span></span>&#123;</span><br><span class="line">        intData = Integer.valueOf(s);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">PCData</span><span class="params">(<span class="keyword">int</span> i)</span></span>&#123;</span><br><span class="line">        intData = i;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="meta">@override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">toString</span><span class="params">()</span></span>&#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="string">"PCData:"</span>+intdata;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//生产者</span></span><br><span class="line"><span class="keyword">import</span> java.util.concurrent.BlockingQueue;</span><br><span class="line"><span class="keyword">import</span> java.util.concurrent.atomic.AtomicInteger;</span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Producer</span> <span class="keyword">implements</span> <span class="title">Runnable</span></span>&#123;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">volatile</span> <span class="keyword">boolean</span> isRunning = <span class="keyword">true</span>;</span><br><span class="line">    <span class="keyword">private</span> AtomicInteger count = <span class="keyword">new</span> AtomicInteger();</span><br><span class="line">    <span class="keyword">private</span> BlockingQueue&lt;PCData&gt; queue;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">Producer</span><span class="params">(BlockingQueue&lt;PCData&gt; queue)</span></span>&#123;</span><br><span class="line">        <span class="keyword">this</span>.queue = queue;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span><span class="params">()</span></span>&#123;</span><br><span class="line">        <span class="keyword">while</span>(isRunning)&#123;</span><br><span class="line">            PCData data = <span class="keyword">new</span> PCData(count.incrementAndGet());</span><br><span class="line">            <span class="keyword">if</span>(!queue.offer(data))&#123;</span><br><span class="line">                System.out.println(Thread.currentThread().getName() + <span class="string">"failed to put data:"</span> + data);</span><br><span class="line">            &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                System.out.println(Thread.currentThread().getName() + <span class="string">" product data :"</span> + data);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">stop</span><span class="params">()</span></span>&#123;</span><br><span class="line">        isRunning = <span class="keyword">false</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//消费者</span></span><br><span class="line"><span class="keyword">import</span> java.util.concurrent.BlockingQueue;</span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Consumer</span> <span class="keyword">implements</span> <span class="title">Runnable</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> BlockingQueue&lt;PCData&gt; queue;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">Consumer</span><span class="params">(BlockingQueue&lt;PCData&gt; queue)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">this</span>.queue = queue;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            <span class="keyword">while</span> (<span class="keyword">true</span>) &#123;</span><br><span class="line">                PCData pcData = queue.take();</span><br><span class="line">                <span class="keyword">if</span> (pcData != <span class="keyword">null</span>) &#123;</span><br><span class="line">                 System.out.println(Thread.currentThread().getName() + <span class="string">" consumer data "</span> + pcData);</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125; <span class="keyword">catch</span> (InterruptedException e) &#123;</span><br><span class="line">            e.printStackTrace();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//Main函数</span></span><br><span class="line"><span class="keyword">import</span> java.util.concurrent.BlockingQueue;</span><br><span class="line"><span class="keyword">import</span> java.util.concurrent.ExecutorService;</span><br><span class="line"><span class="keyword">import</span> java.util.concurrent.Executors;</span><br><span class="line"><span class="keyword">import</span> java.util.concurrent.LinkedBlockingDeque;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Main</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> InterruptedException </span>&#123;</span><br><span class="line">        BlockingQueue&lt;PCData&gt; blockingQueue = <span class="keyword">new</span> LinkedBlockingDeque&lt;PCData&gt;(<span class="number">10</span>);</span><br><span class="line">        Producer producer1 = <span class="keyword">new</span> Producer(blockingQueue);</span><br><span class="line">        Producer producer2 = <span class="keyword">new</span> Producer(blockingQueue);</span><br><span class="line">        Producer producer3 = <span class="keyword">new</span> Producer(blockingQueue);</span><br><span class="line">        Consumer consumer1 = <span class="keyword">new</span> Consumer(blockingQueue);</span><br><span class="line">        Consumer consumer2 = <span class="keyword">new</span> Consumer(blockingQueue);</span><br><span class="line">        Consumer consumer3 = <span class="keyword">new</span> Consumer(blockingQueue);</span><br><span class="line">        ExecutorService executorService = Executors.newCachedThreadPool();</span><br><span class="line">        executorService.execute(producer1);</span><br><span class="line">        executorService.execute(producer2);</span><br><span class="line">        executorService.execute(producer3);</span><br><span class="line">        executorService.execute(consumer1);</span><br><span class="line">        executorService.execute(consumer2);</span><br><span class="line">        executorService.execute(consumer3);</span><br><span class="line">        Thread.sleep(<span class="number">10000</span>);</span><br><span class="line">        producer1.stop();</span><br><span class="line">        producer2.stop();</span><br><span class="line">        producer3.stop();</span><br><span class="line">        executorService.shutdown();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-
-      
-
-      
-    </div>
-    <div class="article-info article-info-index">
-      
-      
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">实战Java高并发程序设计</a>
-        		</li>
-      		 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color5">设计模式</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-      
-
-      
-        <p class="article-more-link">
-          <a class="article-more-a" href="/2019/09/18/%E5%B9%B6%E5%8F%91%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F-%E5%8D%95%E4%BE%8B%E4%B8%8D%E5%8F%98%E7%94%9F%E4%BA%A7%E8%80%85%E6%B6%88%E8%B4%B9%E8%80%85/">展开全文 >></a>
-        </p>
-      
-
-      
-      <div class="clearfix"></div>
-    </div>
-  </div>
-</article>
-
-<aside class="wrap-side-operation">
-    <div class="mod-side-operation">
-        
-        <div class="jump-container" id="js-jump-container" style="display:none;">
-            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
-                <i class="icon-font icon-back"></i>
-            </a>
-            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
-                <i class="icon-font icon-plane jump-plane"></i>
-            </div>
-        </div>
-        
-        
-    </div>
-</aside>
-
-
-
-
-  
-    <article id="post-锁的优化-ThreadLocal" class="article article-type-post  article-index" itemscope itemprop="blogPost">
-  <div class="article-inner">
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2019/09/17/%E9%94%81%E7%9A%84%E4%BC%98%E5%8C%96-ThreadLocal/">锁的优化-ThreadLocal</a>
-    </h1>
-  
-
-        
-        <a href="/2019/09/17/%E9%94%81%E7%9A%84%E4%BC%98%E5%8C%96-ThreadLocal/" class="archive-article-date">
-  	<time datetime="2019-09-17T04:00:00.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2019-09-17</time>
-</a>
-        
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <p>ThreadLocal是一个线程的局部变量，只有当前线程可以访问，是线程安全的。</p>
-<p>ThreadLocal人手一只笔，指的是</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> java.text.ParseException;</span><br><span class="line"><span class="keyword">import</span> java.text.SimpleDateFormat;</span><br><span class="line"><span class="keyword">import</span> java.util.Date;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Test</span> </span>&#123;</span><br><span class="line">    <span class="keyword">static</span> ThreadLocal&lt;SimpleDateFormat&gt; tl = <span class="keyword">new</span> ThreadLocal&lt;&gt;();</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="class"><span class="keyword">class</span> <span class="title">ParseDate</span> <span class="keyword">implements</span>  <span class="title">Runnable</span></span>&#123;</span><br><span class="line">        <span class="keyword">int</span> i = <span class="number">0</span>;</span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="title">ParseDate</span><span class="params">(<span class="keyword">int</span> i)</span></span>&#123;<span class="keyword">this</span>.i = i;&#125;</span><br><span class="line"></span><br><span class="line">        <span class="meta">@Override</span></span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span><span class="params">()</span> </span>&#123;</span><br><span class="line">            <span class="keyword">try</span> &#123;</span><br><span class="line">                <span class="keyword">if</span>(tl.get() == <span class="keyword">null</span>)&#123;</span><br><span class="line">                    tl.set(<span class="keyword">new</span> SimpleDateFormat(<span class="string">"yyyy-MM-dd HH:mm:ss"</span>));</span><br><span class="line">                    Date t = tl.get().parse(<span class="string">"2019-9-17 8:20"</span>+i%<span class="number">60</span>);</span><br><span class="line">                    System.out.println(i+<span class="string">":"</span>+t);</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;<span class="keyword">catch</span> (ParseException e)&#123;</span><br><span class="line">                e.printStackTrace();</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>下面看一下ThreadLocal的set方法和get方法</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">set</span><span class="params">(T value)</span></span>&#123;</span><br><span class="line">	Thread t = Thread.currentThread();</span><br><span class="line">	ThreadLocalMap map = getMap(t);</span><br><span class="line">	<span class="keyword">if</span>(map != <span class="keyword">null</span>)&#123;</span><br><span class="line">		map.set(<span class="keyword">this</span>,value);</span><br><span class="line">	&#125;<span class="keyword">else</span>&#123;</span><br><span class="line">		createMap(t,value);</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> T <span class="title">get</span><span class="params">()</span></span>&#123;</span><br><span class="line">	Thread t = Thread.currentThread();</span><br><span class="line">	ThreadMap map  = getMap(t);</span><br><span class="line">	<span class="keyword">if</span>(map != <span class="keyword">null</span>)&#123;</span><br><span class="line">		ThreadLocalMap.Entry e = map.getEntry(<span class="keyword">this</span>);</span><br><span class="line">		<span class="keyword">if</span>(e != <span class="keyword">null</span>)</span><br><span class="line">		<span class="keyword">return</span> (T)e.value;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">return</span> setInitialValue();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>ThreadLocal的原理实际上是所有线程构成一张Map，Key为Thread.currentThread每个线程，value为T。每人一支笔即为每个线程一个T。</p>
-<p>那这里就存在了一个问题，ThreadLocal存在于每个线程内，只要线程不结束，该线程的ThreadLocal将一直存在。</p>
-<p>如果设置了固定大小的线程池，线程池中的线程会一直活跃，ThreadLocal也会一直存在占据内存，如果想要移除要使用ThreadLocal.remove()方法。</p>
-<p>另外一个回收方法是将其设置为null，即ThreadLocal tl = null。</p>
-<p>ThreadLocalMap在ThreadLocal的内部。</p>
-<p>因为ThreadLocalMap对ThreadLocal实例是弱引用，而tl变量对ThreadLocal实例是强引用。所以将tl置为null后，失去tl的强引用后可能会导致回收。</p>
-
-      
-
-      
-    </div>
-    <div class="article-info article-info-index">
-      
-      
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">实战Java高并发程序设计</a>
-        		</li>
-      		 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color2">ThreadLocal</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-      
-
-      
-        <p class="article-more-link">
-          <a class="article-more-a" href="/2019/09/17/%E9%94%81%E7%9A%84%E4%BC%98%E5%8C%96-ThreadLocal/">展开全文 >></a>
-        </p>
-      
-
-      
-      <div class="clearfix"></div>
-    </div>
-  </div>
-</article>
-
-<aside class="wrap-side-operation">
-    <div class="mod-side-operation">
-        
-        <div class="jump-container" id="js-jump-container" style="display:none;">
-            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
-                <i class="icon-font icon-back"></i>
-            </a>
-            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
-                <i class="icon-font icon-plane jump-plane"></i>
-            </div>
-        </div>
-        
-        
-    </div>
-</aside>
-
-
-
-
-  
   
     <nav id="page-nav">
       <span class="page-number current">1</span><a class="page-number" href="/page/2/">2</a><a class="page-number" href="/page/3/">3</a><a class="page-number" href="/page/4/">4</a><a class="extend next" rel="next" href="/page/2/">Next &amp;raquo;</a>
@@ -1487,11 +1505,15 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">同步</a>
+              </li>
+             
+              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color3">容器</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">同步</a>
+                <a href="javascript:void(0)" class="js-tag color1">Java8</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -1507,15 +1529,7 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">Java8</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color4">LeetCode</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">StringBuilder</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -1523,11 +1537,11 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">Java基础</a>
+                <a href="javascript:void(0)" class="js-tag color4">StringBuilder</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">反射</a>
+                <a href="javascript:void(0)" class="js-tag color2">spring</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -1535,15 +1549,11 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color2">Java基础</a>
+              </li>
+             
+              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color4">多线程</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">内部类</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">设计模式</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -1555,7 +1565,7 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">抽象类</a>
+                <a href="javascript:void(0)" class="js-tag color3">反射</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -1563,11 +1573,19 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color4">内部类</a>
+              </li>
+             
+              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color3">数组</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">泛型</a>
+                <a href="javascript:void(0)" class="js-tag color5">设计模式</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color4">抽象类</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -1579,11 +1597,19 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">泛型</a>
+              </li>
+             
+              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color2">ThreadLocal</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">无锁</a>
+                <a href="javascript:void(0)" class="js-tag color2">锁</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">面经</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -1595,7 +1621,7 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">锁</a>
+                <a href="javascript:void(0)" class="js-tag color3">无锁</a>
               </li>
             
             <div class="clearfix"></div>
