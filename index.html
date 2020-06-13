@@ -150,19 +150,19 @@
           <div id="js-content" class="content-ll">
             
   
-    <article id="post-Spring" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+    <article id="post-Spring IOC" class="article article-type-post  article-index" itemscope itemprop="blogPost">
   <div class="article-inner">
     
       <header class="article-header">
         
   
     <h1 itemprop="name">
-      <a class="article-title" href="/2020/06/12/Spring/">Spring</a>
+      <a class="article-title" href="/2020/06/12/Spring%20IOC/">Spring IOC</a>
     </h1>
   
 
         
-        <a href="/2020/06/12/Spring/" class="archive-article-date">
+        <a href="/2020/06/12/Spring%20IOC/" class="archive-article-date">
   	<time datetime="2020-06-12T06:29:04.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2020-06-12</time>
 </a>
         
@@ -232,7 +232,59 @@
 <p>通过使用property里的子标签，集合是List就用<List>,是Map就用<Map>。类似的是List<String>就用<value>，是List<userDao>就用<ref></p>
 <h4 id="Bean小结"><a href="#Bean小结" class="headerlink" title="Bean小结"></a>Bean小结</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">&lt;bean&gt;标签</span><br><span class="line">	id属性：在容器中Bean实例的唯一标识，不允许重复</span><br><span class="line">	<span class="class"><span class="keyword">class</span>属性：要实例化的<span class="title">Bean</span>的全限定名</span></span><br><span class="line"><span class="class">	<span class="title">scope</span>属性：<span class="title">Bean</span>的作用范围，默认是<span class="title">Singleton</span></span></span><br><span class="line"><span class="class">	&lt;<span class="title">property</span>&gt;标签：属性注入</span></span><br><span class="line"><span class="class">		<span class="title">name</span>属性：属性名称</span></span><br><span class="line"><span class="class">		<span class="title">value</span>属性：普通类型的属性值</span></span><br><span class="line"><span class="class">		<span class="title">ref</span>属性：引用对象的<span class="title">Bean</span>的<span class="title">id</span></span></span><br><span class="line"><span class="class">		&lt;<span class="title">list</span>&gt;标签</span></span><br><span class="line"><span class="class">		&lt;<span class="title">map</span>&gt;标签</span></span><br><span class="line"><span class="class">    	...</span></span><br><span class="line"><span class="class">		&lt;<span class="title">properties</span>&gt;标签</span></span><br><span class="line"><span class="class">	&lt;<span class="title">constructor</span>-<span class="title">arg</span>&gt;标签：带参构造注入</span></span><br><span class="line"><span class="class">    	...</span></span><br><span class="line"><span class="class">	&lt;<span class="title">import</span>&gt;标签：导入其他的<span class="title">xml</span>分文件</span></span><br></pre></td></tr></table></figure>
 
+<h4 id="Spring相关API"><a href="#Spring相关API" class="headerlink" title="Spring相关API"></a>Spring相关API</h4><p><strong>ApplicationContext的实现类</strong></p>
+<p>1.ClassPathXmlApplicationContext：从类加载路径(resources)下加载配置文件</p>
+<p>2.FilePathXmlApplicationContext：从磁盘路径下加载配置文件</p>
+<p>3.AnnotationConfigApplicationContext：当使用注解配置容器对象时，需要用此类来创建spring容器，用来读取注解</p>
+<p><strong>getBean()两种方法</strong></p>
+<p>1.getBean(string)，例如getBean(“userDao”)</p>
+<p>2.getBean(class)，例如getBean(UserDao.class)，仅限于xml中只有一个&lt;bean … class=”…UserDao”&gt;</p>
+<h4 id="Spring配置数据源"><a href="#Spring配置数据源" class="headerlink" title="Spring配置数据源"></a>Spring配置数据源</h4><p><strong>数据源/连接池作用</strong></p>
+<p>使用连接资源时从数据源中获取，使用完后将连接资源还给数据源</p>
+<p>常见的数据源：DBCP、C3P0、Druid</p>
+<p><strong>整合c3p0数据源</strong></p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">&lt;dependency&gt;</span><br><span class="line">	&lt;groupId&gt;mysql&lt;/groupId&gt;</span><br><span class="line">	&lt;artifactId&gt;mysql-connector-java&lt;/artifactId&gt;</span><br><span class="line">	&lt;version&gt;5.1.32&lt;/version&gt;</span><br><span class="line">&lt;/dependency&gt;</span><br><span class="line"></span><br><span class="line">&lt;dependency&gt;</span><br><span class="line">	&lt;groupId&gt;c3p0&lt;/groupId&gt;</span><br><span class="line">	&lt;artifactId&gt;c3p0&lt;/artifactId&gt;</span><br><span class="line">	&lt;version&gt;0.9.1.2&lt;/version&gt;</span><br><span class="line">&lt;/dependency&gt;</span><br></pre></td></tr></table></figure>
 
+
+
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//测试手动创建c3p0</span></span><br><span class="line"> <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">test1</span><span class="params">()</span> <span class="keyword">throws</span> Exception</span>&#123;</span><br><span class="line">     ComboPooledDataSource dataSource = <span class="keyword">new</span> ComboPooledDataSource();</span><br><span class="line"></span><br><span class="line">     dataSource.setDriverClass(<span class="string">"com.mysql.jdbc.Driver"</span>);</span><br><span class="line">     dataSource.setJdbcUrl(<span class="string">"jdbc:mysql://localhost:3306/mybatis"</span>);</span><br><span class="line">     dataSource.setUser(<span class="string">"root"</span>);</span><br><span class="line">     dataSource.setPassword(<span class="string">"root"</span>);</span><br><span class="line"></span><br><span class="line">     Connection connection = dataSource.getConnection();</span><br><span class="line">     System.out.println(connection);</span><br><span class="line">     connection.close();</span><br><span class="line"> &#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>整合druid数据源</strong></p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">&lt;dependency&gt;</span><br><span class="line">	&lt;groupId&gt;mysql&lt;/groupId&gt;</span><br><span class="line">	&lt;artifactId&gt;mysql-connector-java&lt;/artifactId&gt;</span><br><span class="line">	&lt;version&gt;5.1.32&lt;/version&gt;</span><br><span class="line">&lt;/dependency&gt;</span><br><span class="line"></span><br><span class="line">&lt;dependency&gt;</span><br><span class="line">	&lt;groupId&gt;com.alibaba&lt;/groupId&gt;</span><br><span class="line">	&lt;artifactId&gt;druid&lt;/artifactId&gt;</span><br><span class="line">	&lt;version&gt;1.1.10&lt;/version&gt;</span><br><span class="line">&lt;/dependency&gt;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">test2</span><span class="params">()</span> <span class="keyword">throws</span> Exception</span>&#123;</span><br><span class="line">    DruidDataSource dataSource = <span class="keyword">new</span> DruidDataSource();</span><br><span class="line"></span><br><span class="line">    dataSource.setDriverClassName(<span class="string">"com.mysql.jdbc.Driver"</span>);</span><br><span class="line">    dataSource.setUrl(<span class="string">"jdbc:mysql://localhost:3306/test"</span>);</span><br><span class="line">    dataSource.setUsername(<span class="string">"root"</span>);</span><br><span class="line">    dataSource.setPassword(<span class="string">"root"</span>);</span><br><span class="line"></span><br><span class="line">    DruidPooledConnection connection = dataSource.getConnection();</span><br><span class="line">    System.out.println(connection);</span><br><span class="line">    connection.close();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这里面的DriverClass、Url、Username、Passoword是必须设置的，想连接数据库必须配置这些参数。但是在方法里set会产生耦合，解耦合的方法是在property里设置</p>
+<p><strong>解耦合到配置文件</strong></p>
+<p>在resources里新建file，名字为jdbc.properties，内容如下</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">jdbc.driver=com.mysql.jdbc.Driver</span><br><span class="line">jdbc.url=jdbc:mysql:<span class="comment">//localhost:3306/test</span></span><br><span class="line">jdbc.username=root</span><br><span class="line">jdbc.password=root</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">test3</span><span class="params">()</span> <span class="keyword">throws</span> Exception</span>&#123;</span><br><span class="line">    <span class="comment">//读取配置文件</span></span><br><span class="line">    ResourceBundle rb = ResourceBundle.getBundle(<span class="string">"jdbc"</span>);</span><br><span class="line">    String driver = rb.getString(<span class="string">"jdbc.driver"</span>);</span><br><span class="line">    String url = rb.getString(<span class="string">"jdbc.url"</span>);</span><br><span class="line">    String username = rb.getString(<span class="string">"jdbc.username"</span>);</span><br><span class="line">    String password = rb.getString(<span class="string">"jdbc.password"</span>);</span><br><span class="line"></span><br><span class="line">    ComboPooledDataSource dataSource = <span class="keyword">new</span> ComboPooledDataSource();</span><br><span class="line">    dataSource.setDriverClass(driver);</span><br><span class="line">    dataSource.setJdbcUrl(url);</span><br><span class="line">    dataSource.setUser(username);</span><br><span class="line">    dataSource.setPassword(password);</span><br><span class="line"></span><br><span class="line">    Connection connection = dataSource.getConnection();</span><br><span class="line">    System.out.println(connection);</span><br><span class="line">    connection.close();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>getBundle需要的字符串名是类加载目录下(resources文件下的properties文件的前缀，即jdbc)</p>
+<p><strong>spring配置</strong></p>
+<p>spring的步骤是1.导入Spring开发的基本包坐标 2.编写接口和实现类 3.创建Spring核心配置文件 4.在Spring配置文件中配置 5.使用Spring的API获得Bean实例</p>
+<p>这里的第2布已经由jar包完成了</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">&lt;bean id=<span class="string">"dataSource"</span> <span class="class"><span class="keyword">class</span></span>=<span class="string">"com.mchange.v2.c3p0.ComboPooledDataSource"</span>&gt;</span><br><span class="line">    &lt;property name="driverClass" value="com.mysql.jdbc.Driver"&gt;&lt;/property&gt;</span><br><span class="line">    &lt;property name="jdbcUrl" value="jdbc:mysql://localhost:3306/test"&gt;&lt;/property&gt;</span><br><span class="line">    &lt;property name="user" value="root"&gt;&lt;/property&gt;</span><br><span class="line">    &lt;property name="password" value="root"&gt;&lt;/property&gt;</span><br><span class="line">&lt;/bean&gt;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">test4</span><span class="params">()</span><span class="keyword">throws</span> Exception</span>&#123;</span><br><span class="line">        ApplicationContext app = <span class="keyword">new</span> ClassPathXmlApplicationContext(<span class="string">"applicationContext.xml"</span>);</span><br><span class="line">        DataSource dataSource = app.getBean(ComboPooledDataSource<span class="class">.<span class="keyword">class</span>)</span>;</span><br><span class="line">        Connection connection = dataSource.getConnection();</span><br><span class="line">        System.out.println(connection);</span><br><span class="line">        connection.close();</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+
+<p>property name的值是set函数后面的部分，即对应</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">dataSource.setDriverClass(driver);</span><br><span class="line">dataSource.setJdbcUrl(url);</span><br><span class="line">dataSource.setUser(username);</span><br><span class="line">dataSource.setPassword(password);</span><br></pre></td></tr></table></figure>
+
+<p>但现在还是有个同样的问题就是value的值和xml耦合了，现在想办法让xml加载properties文件</p>
+<p><strong>解耦合</strong></p>
+<p>xml里引入properties命名空间</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">&lt;beans xmlns=<span class="string">"http://www.springframework.org/schema/beans"</span></span><br><span class="line">       xmlns:xsi=<span class="string">"http://www.w3.org/2001/XMLSchema-instance"</span></span><br><span class="line">       xmlns:context=<span class="string">"http://www.springframework.org/schema/context"</span><span class="comment">//新增这一行context</span></span><br></pre></td></tr></table></figure>
+
+<p>引入约束路径</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">xsi:schemaLocation=<span class="string">"http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd</span></span><br><span class="line"><span class="string"> http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd"</span>&gt;<span class="comment">//新增context</span></span><br></pre></td></tr></table></figure>
+
+<p>property标签改成</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">&lt;bean id=<span class="string">"dataSource"</span> <span class="class"><span class="keyword">class</span></span>=<span class="string">"com.mchange.v2.c3p0.ComboPooledDataSource"</span>&gt;</span><br><span class="line">    &lt;property name="driverClass" value="$&#123;jdbc.driver&#125;"&gt;&lt;/property&gt;</span><br><span class="line">    &lt;property name="jdbcUrl" value="$&#123;jdbc.url&#125;"&gt;&lt;/property&gt;</span><br><span class="line">    &lt;property name="user" value="$&#123;jdbc.username&#125;"&gt;&lt;/property&gt;</span><br><span class="line">    &lt;property name="password" value="$&#123;jdbc.password&#125;"&gt;&lt;/property&gt;</span><br><span class="line">&lt;/bean&gt;</span><br></pre></td></tr></table></figure>
+
+<p>${}内对应的是jdbc.properties里的内容</p>
+<h4 id="Spring注解开发"><a href="#Spring注解开发" class="headerlink" title="Spring注解开发"></a>Spring注解开发</h4>
       
 
       
@@ -247,6 +299,10 @@
         		<li class="article-tag-list-item">
         			<a href="javascript:void(0)" class="js-tag article-tag-list-link color2">spring</a>
         		</li>
+      		 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">IOC</a>
+        		</li>
       		
 		</ul>
 	</div>
@@ -255,7 +311,7 @@
 
       
         <p class="article-more-link">
-          <a class="article-more-a" href="/2020/06/12/Spring/">展开全文 >></a>
+          <a class="article-more-a" href="/2020/06/12/Spring%20IOC/">展开全文 >></a>
         </p>
       
 
@@ -1505,11 +1561,11 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">同步</a>
+                <a href="javascript:void(0)" class="js-tag color3">容器</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">容器</a>
+                <a href="javascript:void(0)" class="js-tag color3">同步</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -1525,19 +1581,11 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">集合</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color4">LeetCode</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">NIO</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">StringBuilder</a>
+                <a href="javascript:void(0)" class="js-tag color3">集合</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -1545,7 +1593,15 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">函数式编程</a>
+                <a href="javascript:void(0)" class="js-tag color4">IOC</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color4">NIO</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color4">内部类</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -1553,7 +1609,19 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color4">StringBuilder</a>
+              </li>
+             
+              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color4">多线程</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color1">函数式编程</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">反射</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -1565,15 +1633,11 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">反射</a>
+                <a href="javascript:void(0)" class="js-tag color5">设计模式</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">接口</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">内部类</a>
+                <a href="javascript:void(0)" class="js-tag color4">抽象类</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -1581,11 +1645,11 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">设计模式</a>
+                <a href="javascript:void(0)" class="js-tag color3">接口</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">抽象类</a>
+                <a href="javascript:void(0)" class="js-tag color3">泛型</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -1597,10 +1661,6 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">泛型</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color2">ThreadLocal</a>
               </li>
              
@@ -1609,7 +1669,7 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">面经</a>
+                <a href="javascript:void(0)" class="js-tag color5">错误处理</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -1617,11 +1677,11 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">错误处理</a>
+                <a href="javascript:void(0)" class="js-tag color3">无锁</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">无锁</a>
+                <a href="javascript:void(0)" class="js-tag color3">面经</a>
               </li>
             
             <div class="clearfix"></div>
