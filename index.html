@@ -150,6 +150,104 @@
           <div id="js-content" class="content-ll">
             
   
+    <article id="post-Spring-JdbcTemplate" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2020/06/14/Spring-JdbcTemplate/">Spring JdbcTemplate</a>
+    </h1>
+  
+
+        
+        <a href="/2020/06/14/Spring-JdbcTemplate/" class="archive-article-date">
+  	<time datetime="2020-06-14T01:55:57.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2020-06-14</time>
+</a>
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>Spring对Jdbc API的简单封装,还有很多相似的模板类,例如RedisTemplate</p>
+<p>开发步骤:1.导入Spring-jdbc和Spring-tx坐标 2.创建数据库实体 3.创建JdbcTemplate对象 4.执行数据库操作</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">&lt;dependency&gt;</span><br><span class="line">  &lt;groupId&gt;org.springframework&lt;/groupId&gt;</span><br><span class="line">  &lt;artifactId&gt;spring-jdbc&lt;/artifactId&gt;</span><br><span class="line">  &lt;version&gt;5.0.5.RELEASE&lt;/version&gt;</span><br><span class="line">&lt;/dependency&gt;</span><br><span class="line">&lt;dependency&gt;</span><br><span class="line">  &lt;groupId&gt;org.springframework&lt;/groupId&gt;</span><br><span class="line">  &lt;artifactId&gt;spring-tx&lt;/artifactId&gt;</span><br><span class="line">  &lt;version&gt;5.0.5.RELEASE&lt;/version&gt;</span><br><span class="line">&lt;/dependency&gt;</span><br><span class="line">&lt;dependency&gt;</span><br><span class="line">  &lt;groupId&gt;c3p0&lt;/groupId&gt;</span><br><span class="line">  &lt;artifactId&gt;c3p0&lt;/artifactId&gt;</span><br><span class="line">  &lt;version&gt;0.9.1.2&lt;/version&gt;</span><br><span class="line">&lt;/dependency&gt;</span><br><span class="line">&lt;dependency&gt;</span><br><span class="line">  &lt;groupId&gt;mysql&lt;/groupId&gt;</span><br><span class="line">  &lt;artifactId&gt;mysql-connector-java&lt;/artifactId&gt;</span><br><span class="line">  &lt;version&gt;8.0.20&lt;/version&gt;</span><br><span class="line">&lt;/dependency&gt;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com.it.test;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> com.mchange.v2.c3p0.ComboPooledDataSource;</span><br><span class="line"><span class="keyword">import</span> org.junit.Test;</span><br><span class="line"><span class="keyword">import</span> org.springframework.jdbc.core.JdbcTemplate;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> java.beans.PropertyVetoException;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">JdbcTemplateTest</span> </span>&#123;</span><br><span class="line">    <span class="meta">@Test</span></span><br><span class="line">    <span class="comment">//测试Jdbc开发步骤</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">test1</span><span class="params">()</span> <span class="keyword">throws</span> PropertyVetoException </span>&#123;</span><br><span class="line">        <span class="comment">//创建数据源对象</span></span><br><span class="line">        ComboPooledDataSource dataSource = <span class="keyword">new</span> ComboPooledDataSource();</span><br><span class="line">        dataSource.setDriverClass(<span class="string">"com.mysql.cj.jdbc.Driver"</span>);</span><br><span class="line">        dataSource.setJdbcUrl(<span class="string">"jdbc:mysql://127.0.0.1:3306/test?serverTimezone=GMT"</span>);</span><br><span class="line">        dataSource.setUser(<span class="string">"root"</span>);</span><br><span class="line">        dataSource.setPassword(<span class="string">"root"</span>);</span><br><span class="line">        JdbcTemplate jdbcTemplate = <span class="keyword">new</span> JdbcTemplate();</span><br><span class="line">        <span class="comment">//设置数据源对象</span></span><br><span class="line">        jdbcTemplate.setDataSource(dataSource);</span><br><span class="line">        <span class="comment">//执行操作</span></span><br><span class="line">        <span class="keyword">int</span> row = jdbcTemplate.update(<span class="string">"insert into account values(?,?)"</span>,<span class="string">"tom"</span>,<span class="number">5000</span>);</span><br><span class="line">        System.out.println(row);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>jdbc:mysql://127.0.0.1:3306/test?serverTimezone=GMT里的test是数据库名,加?serverTimezone=GMT解决时区错误</p>
+<h3 id="Spring产生JdbcTemplate"><a href="#Spring产生JdbcTemplate" class="headerlink" title="Spring产生JdbcTemplate"></a>Spring产生JdbcTemplate</h3><p>applicationContext.xml</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">&lt;?xml version=<span class="string">"1.0"</span> encoding=<span class="string">"UTF-8"</span>?&gt;</span><br><span class="line">&lt;beans xmlns=<span class="string">"http://www.springframework.org/schema/beans"</span></span><br><span class="line">       xmlns:xsi=<span class="string">"http://www.w3.org/2001/XMLSchema-instance"</span></span><br><span class="line">       xsi:schemaLocation=<span class="string">"http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd"</span>&gt;</span><br><span class="line"></span><br><span class="line">&lt;!--配置数据源对象--&gt;</span><br><span class="line">    &lt;bean id=<span class="string">"dataSource"</span> <span class="class"><span class="keyword">class</span></span>=<span class="string">"com.mchange.v2.c3p0.ComboPooledDataSource"</span>&gt;</span><br><span class="line">        &lt;property name="driverClass" value="com.mysql.cj.jdbc.Driver"&gt;&lt;/property&gt;</span><br><span class="line">        &lt;property name="jdbcUrl" value="jdbc:mysql://127.0.0.1:3306/test?serverTimezone=GMT"&gt;&lt;/property&gt;</span><br><span class="line">        &lt;property name="user" value="root"&gt;&lt;/property&gt;</span><br><span class="line">        &lt;property name="password" value="root"&gt;&lt;/property&gt;</span><br><span class="line">    &lt;/bean&gt;</span><br><span class="line">&lt;!--配置Jdbc模板对象--&gt;</span><br><span class="line">    &lt;bean id=<span class="string">"jdbcTemplate"</span> <span class="class"><span class="keyword">class</span></span>=<span class="string">"org.springframework.jdbc.core.JdbcTemplate"</span>&gt;</span><br><span class="line">        &lt;property name="dataSource" ref="dataSource"&gt;&lt;/property&gt;</span><br><span class="line">    &lt;/bean&gt;</span><br><span class="line">&lt;/beans&gt;</span><br></pre></td></tr></table></figure>
+
+<p>JdbcTemplateTest.java</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com.it.test;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> com.mchange.v2.c3p0.ComboPooledDataSource;</span><br><span class="line"><span class="keyword">import</span> org.junit.Test;</span><br><span class="line"><span class="keyword">import</span> org.springframework.context.ApplicationContext;</span><br><span class="line"><span class="keyword">import</span> org.springframework.context.support.ClassPathXmlApplicationContext;</span><br><span class="line"><span class="keyword">import</span> org.springframework.jdbc.core.JdbcTemplate;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> javax.sql.DataSource;</span><br><span class="line"><span class="keyword">import</span> java.beans.PropertyVetoException;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">JdbcTemplateTest</span> </span>&#123;</span><br><span class="line">    <span class="meta">@Test</span></span><br><span class="line">    <span class="comment">//测试Jdbc开发步骤</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">test1</span><span class="params">()</span> <span class="keyword">throws</span> PropertyVetoException </span>&#123;</span><br><span class="line">        <span class="comment">//创建数据源对象</span></span><br><span class="line">        ComboPooledDataSource dataSource = <span class="keyword">new</span> ComboPooledDataSource();</span><br><span class="line">        dataSource.setDriverClass(<span class="string">"com.mysql.cj.jdbc.Driver"</span>);</span><br><span class="line">        dataSource.setJdbcUrl(<span class="string">"jdbc:mysql://127.0.0.1:3306/test?serverTimezone=GMT"</span>);</span><br><span class="line">        dataSource.setUser(<span class="string">"root"</span>);</span><br><span class="line">        dataSource.setPassword(<span class="string">"root"</span>);</span><br><span class="line">        JdbcTemplate jdbcTemplate = <span class="keyword">new</span> JdbcTemplate();</span><br><span class="line">        <span class="comment">//设置数据源对象</span></span><br><span class="line">        jdbcTemplate.setDataSource(dataSource);</span><br><span class="line">        <span class="comment">//执行操作</span></span><br><span class="line">        <span class="keyword">int</span> row = jdbcTemplate.update(<span class="string">"insert into account values(?,?)"</span>,<span class="string">"tom"</span>,<span class="number">5000</span>);</span><br><span class="line">        System.out.println(row);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="meta">@Test</span></span><br><span class="line">    <span class="comment">//测试Spring产生Jdbc模板对象</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">test2</span><span class="params">()</span></span>&#123;</span><br><span class="line">        ApplicationContext app = <span class="keyword">new</span> ClassPathXmlApplicationContext(<span class="string">"applicationContext.xml"</span>);</span><br><span class="line">        DataSource dataSource = (DataSource) app.getBean(<span class="string">"dataSource"</span>);</span><br><span class="line">        JdbcTemplate jdbcTemplate = (JdbcTemplate)app.getBean(JdbcTemplate<span class="class">.<span class="keyword">class</span>)</span>;</span><br><span class="line">        <span class="keyword">int</span> row = jdbcTemplate.update(<span class="string">"insert into account values(?,?)"</span>,<span class="string">"amy"</span>,<span class="number">3000</span>);</span><br><span class="line">        System.out.println(row);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="JdbcTemplate常用操作"><a href="#JdbcTemplate常用操作" class="headerlink" title="JdbcTemplate常用操作"></a>JdbcTemplate常用操作</h3><h4 id="update更新操作"><a href="#update更新操作" class="headerlink" title="update更新操作"></a>update更新操作</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com.it.test;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> org.junit.Test;</span><br><span class="line"><span class="keyword">import</span> org.junit.runner.RunWith;</span><br><span class="line"><span class="keyword">import</span> org.springframework.beans.factory.annotation.Autowired;</span><br><span class="line"><span class="keyword">import</span> org.springframework.jdbc.core.JdbcTemplate;</span><br><span class="line"><span class="keyword">import</span> org.springframework.test.context.ContextConfiguration;</span><br><span class="line"><span class="keyword">import</span> org.springframework.test.context.junit4.SpringJUnit4ClassRunner;</span><br><span class="line"></span><br><span class="line"><span class="meta">@RunWith</span>(SpringJUnit4ClassRunner<span class="class">.<span class="keyword">class</span>)</span></span><br><span class="line">@ContextConfiguration("classpath:applicationContext.xml")</span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">JdbcTemplateCRUDTest</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Autowired</span></span><br><span class="line">    <span class="keyword">private</span> JdbcTemplate jdbcTemplate;</span><br><span class="line">    <span class="meta">@Test</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">testUpdate</span><span class="params">()</span></span>&#123;</span><br><span class="line">        jdbcTemplate.update(<span class="string">"update account set money= ? where name = ?"</span>,<span class="number">10000</span>,<span class="string">"amy"</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="meta">@Test</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">testDelete</span><span class="params">()</span></span>&#123;</span><br><span class="line">        jdbcTemplate.update(<span class="string">"delete from account where name = ?"</span>,<span class="string">"tom"</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>用Spring整合Juint测试,测试update和delete操作</p>
+<h4 id="query查询操作"><a href="#query查询操作" class="headerlink" title="query查询操作"></a>query查询操作</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com.it.test;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> com.it.domain.Account;</span><br><span class="line"><span class="keyword">import</span> org.junit.Test;</span><br><span class="line"><span class="keyword">import</span> org.junit.runner.RunWith;</span><br><span class="line"><span class="keyword">import</span> org.springframework.beans.factory.annotation.Autowired;</span><br><span class="line"><span class="keyword">import</span> org.springframework.jdbc.core.BeanPropertyRowMapper;</span><br><span class="line"><span class="keyword">import</span> org.springframework.jdbc.core.JdbcTemplate;</span><br><span class="line"><span class="keyword">import</span> org.springframework.test.context.ContextConfiguration;</span><br><span class="line"><span class="keyword">import</span> org.springframework.test.context.junit4.SpringJUnit4ClassRunner;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> java.util.List;</span><br><span class="line"></span><br><span class="line"><span class="meta">@RunWith</span>(SpringJUnit4ClassRunner<span class="class">.<span class="keyword">class</span>)</span></span><br><span class="line">@ContextConfiguration("classpath:applicationContext.xml")</span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">JdbcTemplateCRUDTest</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Autowired</span></span><br><span class="line">    <span class="keyword">private</span> JdbcTemplate jdbcTemplate;</span><br><span class="line">    <span class="meta">@Test</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">testUpdate</span><span class="params">()</span></span>&#123;</span><br><span class="line">        jdbcTemplate.update(<span class="string">"update account set money= ? where name = ?"</span>,<span class="number">10000</span>,<span class="string">"amy"</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="meta">@Test</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">testDelete</span><span class="params">()</span></span>&#123;</span><br><span class="line">        jdbcTemplate.update(<span class="string">"delete from account where name = ?"</span>,<span class="string">"tom"</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="meta">@Test</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">testQueryAll</span><span class="params">()</span></span>&#123;</span><br><span class="line">        List&lt;Account&gt; accountList = jdbcTemplate.query(<span class="string">"select * from account"</span>,<span class="keyword">new</span> BeanPropertyRowMapper&lt;Account&gt;(Account<span class="class">.<span class="keyword">class</span>))</span>;</span><br><span class="line">        System.out.println(accountList);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="meta">@Test</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">testQueryOne</span><span class="params">()</span></span>&#123;</span><br><span class="line">        Account account = jdbcTemplate.queryForObject("select * from account where name = ?",new BeanPropertyRowMapper&lt;Account&gt;(Account.class),"amy");</span><br><span class="line">        System.out.println(account);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="meta">@Test</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">testQueryCount</span><span class="params">()</span></span>&#123;</span><br><span class="line">        Long count = jdbcTemplate.queryForObject(<span class="string">"select count(*) from count"</span>,Long<span class="class">.<span class="keyword">class</span>)</span>;</span><br><span class="line">        System.out.println(count);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>如果要返回的值是个实体,就需要BeanPropertyRowMapper<Account>(Account.class)进行映射,让方法帮我封装实体</p>
+<p>如果要返回的值是个简单值,就直接传Long.class,不用上面那么麻烦</p>
+<p>queryForObject是用来查询单个结果,query查询多个结果</p>
+
+      
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
+	<div class="article-tag tagcloud">
+		<i class="icon-price-tags icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color2">spring</a>
+        		</li>
+      		 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color5">Jdbc</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
+      
+
+      
+        <p class="article-more-link">
+          <a class="article-more-a" href="/2020/06/14/Spring-JdbcTemplate/">展开全文 >></a>
+        </p>
+      
+
+      
+      <div class="clearfix"></div>
+    </div>
+  </div>
+</article>
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+    </div>
+</aside>
+
+
+
+
+  
     <article id="post-Spring-AOP" class="article article-type-post  article-index" itemscope itemprop="blogPost">
   <div class="article-inner">
     
@@ -1503,92 +1601,6 @@
 
 
   
-    <article id="post-NIO网络编程" class="article article-type-post  article-index" itemscope itemprop="blogPost">
-  <div class="article-inner">
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2019/09/20/NIO%E7%BD%91%E7%BB%9C%E7%BC%96%E7%A8%8B/">NIO网络编程</a>
-    </h1>
-  
-
-        
-        <a href="/2019/09/20/NIO%E7%BD%91%E7%BB%9C%E7%BC%96%E7%A8%8B/" class="archive-article-date">
-  	<time datetime="2019-09-20T04:00:00.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2019-09-20</time>
-</a>
-        
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <p>使用Java的NIO可以将网络IO等待时间从业务处理线程中抽取出来。</p>
-<p>NIO：准备好了再通知我</p>
-<p><strong>Channel</strong>：类似于流，可以和文件对应，往Channel中写就是往文件中写；可以和Socket对应，往Channel写就是往Socket中写</p>
-<p><strong>Buffer</strong>：一个内存区域，写入或者读取的数据需要包装成Buffer才能和Channel交互</p>
-<p><strong>Selector</strong>：Channel可以实习SelectableChannel类，表示可被选择的通道，实现这个类的Channel可以被Selector管理。一个Selector可以管理多个SelectableChannel。当SelectableChannel的数据准备好时，Selector会接到通知去处理数据。</p>
-<p>Socket Channel是SelectableChannel的一种，一个SoketChannel表示一个客户端连接。这些Socket  Channel由一个Selector管理，一个Selector由一个线程管理。所以可以通过一个或者少数线程来处理大量客户端连接。当客户端的数据没有准备好时，Selector通过轮询的方式等待。</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">private</span> Selector selector;</span><br><span class="line"><span class="keyword">private</span> ExecutorService tp = Executors.newCashedThreadPool();</span><br></pre></td></tr></table></figure>
-
-<p>Selector用于处理所有客户端连接，线程池用于对每一个客户端的请求进行处理。</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> java.net.InetAddress;</span><br><span class="line"><span class="keyword">import</span> java.net.InetSocketAddress;</span><br><span class="line"><span class="keyword">import</span> java.net.ServerSocket;</span><br><span class="line"><span class="keyword">import</span> java.net.Socket;</span><br><span class="line"><span class="keyword">import</span> java.nio.channels.SelectionKey;</span><br><span class="line"><span class="keyword">import</span> java.nio.channels.Selector;</span><br><span class="line"><span class="keyword">import</span> java.nio.channels.ServerSocketChannel;</span><br><span class="line"><span class="keyword">import</span> java.nio.channels.spi.SelectorProvider;</span><br><span class="line"><span class="keyword">import</span> java.util.HashMap;</span><br><span class="line"><span class="keyword">import</span> java.util.Iterator;</span><br><span class="line"><span class="keyword">import</span> java.util.Map;</span><br><span class="line"><span class="keyword">import</span> java.util.Set;</span><br><span class="line"><span class="keyword">import</span> java.util.concurrent.ExecutorService;</span><br><span class="line"><span class="keyword">import</span> java.util.concurrent.Executors;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Test</span> </span>&#123;</span><br><span class="line">    <span class="keyword">private</span> Selector selector;</span><br><span class="line">    <span class="keyword">private</span> ExecutorService tp = Executors.newCachedThreadPool();</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> Map&lt;Socket,Long&gt; time_stat = <span class="keyword">new</span> HashMap&lt;&gt;(<span class="number">10240</span>);</span><br><span class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">startServer</span><span class="params">()</span> <span class="keyword">throws</span> Exception</span>&#123;</span><br><span class="line">        selector = SelectorProvider.provider().openSelector();</span><br><span class="line">        ServerSocketChannel ssc = ServerSocketChannel.open();</span><br><span class="line">        ssc.configureBlocking(<span class="keyword">false</span>);</span><br><span class="line"></span><br><span class="line">        InetSocketAddress isa = <span class="keyword">new</span> InetSocketAddress(InetAddress.getLocalHost(),<span class="number">8000</span>);</span><br><span class="line">        InetSocketAddress aisa = <span class="keyword">new</span> InetSocketAddress(<span class="number">8000</span>);</span><br><span class="line">        ssc.socket().bind(isa);</span><br><span class="line"></span><br><span class="line">        SelectionKey acceptKEy = ssc.register(selector,SelectionKey.OP_ACCEPT);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">for</span>(;;)&#123;</span><br><span class="line">            selector.select();</span><br><span class="line">            Set readyKeys = selector.selectedKeys();</span><br><span class="line">            Iterator i = readyKeys.iterator();</span><br><span class="line">            <span class="keyword">long</span> e = <span class="number">0</span>;</span><br><span class="line">            <span class="keyword">while</span> (i.hasNext())&#123;</span><br><span class="line">                SelectionKey sk = (SelectionKey)i.next();</span><br><span class="line">                i.remove();</span><br><span class="line"></span><br><span class="line">                <span class="keyword">if</span>(sk.isAcceptable())&#123;</span><br><span class="line">                    <span class="comment">//doAccept(sk);</span></span><br><span class="line">                &#125;</span><br><span class="line">                <span class="keyword">else</span> <span class="keyword">if</span>(sk.isValid() &amp;&amp; sk.isReadable())&#123;</span><br><span class="line">                    <span class="comment">//doRead(sk);</span></span><br><span class="line">                &#125;</span><br><span class="line">                <span class="keyword">else</span> <span class="keyword">if</span>(sk.isValid() &amp;&amp; sk.isWritable())&#123;</span><br><span class="line">                    <span class="comment">//doWrite(sk);</span></span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-      
-
-      
-    </div>
-    <div class="article-info article-info-index">
-      
-      
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">实战Java高并发程序设计</a>
-        		</li>
-      		 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">NIO</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-      
-
-      
-        <p class="article-more-link">
-          <a class="article-more-a" href="/2019/09/20/NIO%E7%BD%91%E7%BB%9C%E7%BC%96%E7%A8%8B/">展开全文 >></a>
-        </p>
-      
-
-      
-      <div class="clearfix"></div>
-    </div>
-  </div>
-</article>
-
-<aside class="wrap-side-operation">
-    <div class="mod-side-operation">
-        
-        <div class="jump-container" id="js-jump-container" style="display:none;">
-            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
-                <i class="icon-font icon-back"></i>
-            </a>
-            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
-                <i class="icon-font icon-plane jump-plane"></i>
-            </div>
-        </div>
-        
-        
-    </div>
-</aside>
-
-
-
-
-  
   
     <nav id="page-nav">
       <span class="page-number current">1</span><a class="page-number" href="/page/2/">2</a><a class="page-number" href="/page/3/">3</a><a class="page-number" href="/page/4/">4</a><a class="extend next" rel="next" href="/page/2/">Next &amp;raquo;</a>
@@ -1698,11 +1710,11 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">Java核心卷</a>
+                <a href="javascript:void(0)" class="js-tag color4">线程池</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">线程池</a>
+                <a href="javascript:void(0)" class="js-tag color3">Java核心卷</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -1722,7 +1734,7 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">AOP</a>
+                <a href="javascript:void(0)" class="js-tag color4">IOC</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -1730,11 +1742,15 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">IOC</a>
+                <a href="javascript:void(0)" class="js-tag color4">AOP</a>
               </li>
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color4">StringBuilder</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color5">Jdbc</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -1754,7 +1770,7 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">未来日记</a>
+                <a href="javascript:void(0)" class="js-tag color5">设计模式</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -1762,15 +1778,11 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color5">未来日记</a>
+              </li>
+             
+              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color3">数组</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">接口</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">设计模式</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -1779,6 +1791,10 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color3">泛型</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">接口</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -1798,7 +1814,7 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">无锁</a>
+                <a href="javascript:void(0)" class="js-tag color5">错误处理</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -1806,7 +1822,7 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">错误处理</a>
+                <a href="javascript:void(0)" class="js-tag color3">无锁</a>
               </li>
              
               <li class="article-tag-list-item">

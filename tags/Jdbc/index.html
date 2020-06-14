@@ -6,20 +6,14 @@
   <meta name="renderer" content="webkit">
   <meta http-equiv="X-UA-Compatible" content="IE=edge" >
   <link rel="dns-prefetch" href="http://yoursite.com">
-  <title>线程的基本操作3 | HanBlog</title>
+  <title>Tag: Jdbc | HanBlog</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta name="description" content="线程组123456789101112131415161718192021222324public class ThreadGroupName implements Runnable&amp;#123;    public static void main(String[] args)&amp;#123;        ThreadGroup tg &#x3D; new ThreadGroup(&quot;PrintGroup&quot;);&#x2F;">
-<meta property="og:type" content="article">
-<meta property="og:title" content="线程的基本操作3">
-<meta property="og:url" content="http://yoursite.com/2019/09/10/%E7%BA%BF%E7%A8%8B%E7%9A%84%E5%9F%BA%E6%9C%AC%E6%93%8D%E4%BD%9C3/index.html">
+  <meta property="og:type" content="website">
+<meta property="og:title" content="HanBlog">
+<meta property="og:url" content="http://yoursite.com/tags/Jdbc/index.html">
 <meta property="og:site_name" content="HanBlog">
-<meta property="og:description" content="线程组123456789101112131415161718192021222324public class ThreadGroupName implements Runnable&amp;#123;    public static void main(String[] args)&amp;#123;        ThreadGroup tg &#x3D; new ThreadGroup(&quot;PrintGroup&quot;);&#x2F;">
 <meta property="og:locale" content="en_US">
-<meta property="article:published_time" content="2019-09-10T04:00:00.000Z">
-<meta property="article:modified_time" content="2020-04-05T06:02:32.407Z">
 <meta property="article:author" content="Xuesong">
-<meta property="article:tag" content="实战Java高并发程序设计">
-<meta property="article:tag" content="线程">
 <meta name="twitter:card" content="summary">
   
     <link rel="alternative" href="/atom.xml" title="HanBlog" type="application/atom+xml">
@@ -154,205 +148,64 @@
             <canvas data-colors="#eaeaea" data-sectionHeight="100" data-contentId="js-content" id="myCanvas1" class="anm-canvas"></canvas>
           </div>
           <div id="js-content" class="content-ll">
-            <article id="post-线程的基本操作3" class="article article-type-post " itemscope itemprop="blogPost">
-  <div class="article-inner">
-    
-      <header class="article-header">
-        
+            
   
-    <h1 class="article-title" itemprop="name">
-      线程的基本操作3
+  
+    
+    
+      
+      
+      <section class="archives-wrap">
+        <div class="archive-year-wrap">
+          <a href="/archives/2020" class="archive-year">2020</a>
+        </div>
+        <div class="archives">
+    
+    <article class="archive-article archive-type-post">
+  <div class="archive-article-inner">
+    <header class="archive-article-header">
+      	<div class="article-meta">
+	      	<a href="/2020/06/14/Spring-JdbcTemplate/" class="archive-article-date">
+  	<time datetime="2020-06-14T01:55:57.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2020-06-14</time>
+</a>
+        </div>
+    	 
+  
+    <h1 itemprop="name">
+      <a class="archive-article-title" href="/2020/06/14/Spring-JdbcTemplate/">Spring JdbcTemplate</a>
     </h1>
   
 
-        
-        <a href="/2019/09/10/%E7%BA%BF%E7%A8%8B%E7%9A%84%E5%9F%BA%E6%9C%AC%E6%93%8D%E4%BD%9C3/" class="archive-article-date">
-  	<time datetime="2019-09-10T04:00:00.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2019-09-10</time>
-</a>
-        
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <h3 id="线程组"><a href="#线程组" class="headerlink" title="线程组"></a>线程组</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">ThreadGroupName</span> <span class="keyword">implements</span> <span class="title">Runnable</span></span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span></span>&#123;</span><br><span class="line">        ThreadGroup tg = <span class="keyword">new</span> ThreadGroup(<span class="string">"PrintGroup"</span>);<span class="comment">//创建线程组</span></span><br><span class="line">        Thread t1 = <span class="keyword">new</span> Thread(tg,<span class="keyword">new</span> ThreadGroupName(),<span class="string">"T1"</span>);<span class="comment">//关联线程</span></span><br><span class="line">        Thread t2 = <span class="keyword">new</span> Thread(tg,<span class="keyword">new</span> ThreadGroupName(),<span class="string">"T2"</span>);</span><br><span class="line">        t1.start();</span><br><span class="line">        t2.start();</span><br><span class="line">        System.out.println(tg.activeCount());<span class="comment">//获取活动线程总数，这里为2</span></span><br><span class="line">        tg.list();<span class="comment">//打印线程组所有线程信息</span></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span><span class="params">()</span></span>&#123;</span><br><span class="line">        String groupAndName = Thread.currentThread().getThreadGroup().getName()+</span><br><span class="line">                <span class="string">"-"</span>+Thread.currentThread().getName();</span><br><span class="line">        <span class="keyword">while</span>(<span class="keyword">true</span>)&#123;</span><br><span class="line">            System.out.println(<span class="string">"I am"</span> + groupAndName);</span><br><span class="line">            <span class="keyword">try</span>&#123;</span><br><span class="line">                Thread.sleep(<span class="number">3000</span>);</span><br><span class="line">            &#125;<span class="keyword">catch</span>(InterruptedException e)&#123;</span><br><span class="line">                e.printStackTrace();</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<h3 id="守护线程"><a href="#守护线程" class="headerlink" title="守护线程"></a>守护线程</h3><p>线程分为守护线程和用户线程，守护线程负责后台的垃圾回收等服务，用户线程负责完成用户的要求。当用户线程完成它的工作之后就会结束，守护线程等用户线程都结束后自己也会结束，Java虚拟机退出。</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">DaemonDemo</span> </span>&#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="class"><span class="keyword">class</span> <span class="title">DaemonT</span> <span class="keyword">extends</span> <span class="title">Thread</span></span>&#123;</span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span><span class="params">()</span></span>&#123;</span><br><span class="line">            <span class="keyword">while</span>(<span class="keyword">true</span>)&#123;</span><br><span class="line">                System.out.println(<span class="string">"I am alive"</span>);</span><br><span class="line">                <span class="keyword">try</span>&#123;</span><br><span class="line">                    Thread.sleep(<span class="number">1000</span>);</span><br><span class="line">                &#125;<span class="keyword">catch</span> (InterruptedException e)&#123;</span><br><span class="line">                    e.printStackTrace();</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span><span class="keyword">throws</span> InterruptedException</span>&#123;</span><br><span class="line">        Thread t = <span class="keyword">new</span> DaemonT();</span><br><span class="line">        t.setDaemon(<span class="keyword">true</span>);</span><br><span class="line">        t.start();</span><br><span class="line"></span><br><span class="line">        Thread.sleep(<span class="number">2000</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>t.setDaemon(true)将普通线程设置成为守护线程，注意这里的设置要在start之前，否则会报异常。</p>
-<p>将t设置成为守护线程之后只有主线程一个用户线程，主线程睡了2秒后程序就结束了。如果t为用户线程，那么它将死循环输出。</p>
-<h3 id="线程优先级"><a href="#线程优先级" class="headerlink" title="线程优先级"></a>线程优先级</h3><p>Thread类内置三个静态常量表示优先级，数字越大优先级越大。</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">final</span> <span class="keyword">static</span> <span class="keyword">int</span> MIN_PRRORITY = <span class="number">1</span>;</span><br><span class="line"><span class="keyword">public</span> <span class="keyword">final</span> <span class="keyword">static</span> <span class="keyword">int</span> MORE_PRIORITY = <span class="number">5</span>;</span><br><span class="line"><span class="keyword">public</span> <span class="keyword">final</span> <span class="keyword">static</span> <span class="keyword">int</span> MAX_PRIORITY = <span class="number">10</span>;</span><br></pre></td></tr></table></figure>
-
-<p>让优先级低的线程和优先级高的线程一起执行，多次运行发现总是优先级高的先完成。</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">PriorityDemo</span> </span>&#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="class"><span class="keyword">class</span> <span class="title">HightPriority</span> <span class="keyword">extends</span> <span class="title">Thread</span></span>&#123;</span><br><span class="line">        <span class="keyword">static</span> <span class="keyword">int</span> count = <span class="number">0</span>;</span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span><span class="params">()</span></span>&#123;</span><br><span class="line">            <span class="keyword">while</span>(<span class="keyword">true</span>)&#123;</span><br><span class="line">                <span class="keyword">synchronized</span> (PriorityDemo<span class="class">.<span class="keyword">class</span>)</span>&#123;</span><br><span class="line">                    count ++;</span><br><span class="line">                    <span class="keyword">if</span>(count &gt; <span class="number">10000000</span>)&#123;</span><br><span class="line">                        System.out.println(<span class="string">"HightPriority is complete"</span>);</span><br><span class="line">                        <span class="keyword">break</span>;</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="class"><span class="keyword">class</span> <span class="title">LowPriority</span> <span class="keyword">extends</span> <span class="title">Thread</span></span>&#123;</span><br><span class="line">        <span class="keyword">static</span> <span class="keyword">int</span> count = <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line">        <span class="meta">@Override</span></span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span><span class="params">()</span> </span>&#123;</span><br><span class="line">            <span class="keyword">while</span>(<span class="keyword">true</span>)&#123;</span><br><span class="line">                <span class="keyword">synchronized</span> (PriorityDemo<span class="class">.<span class="keyword">class</span>)</span>&#123;</span><br><span class="line">                    count ++;</span><br><span class="line">                    <span class="keyword">if</span>(count &gt; <span class="number">10000000</span>)&#123;</span><br><span class="line">                        System.out.println(<span class="string">"LowPriority is complete"</span>);</span><br><span class="line">                        <span class="keyword">break</span>;</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span><span class="keyword">throws</span> InterruptedException</span>&#123;</span><br><span class="line">        Thread high = <span class="keyword">new</span> HightPriority();</span><br><span class="line">        Thread low = <span class="keyword">new</span> LowPriority();</span><br><span class="line">        high.setPriority(Thread.MAX_PRIORITY);</span><br><span class="line">        low.setPriority(Thread.MIN_PRIORITY);</span><br><span class="line">        low.start();</span><br><span class="line">        high.start();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>程序输出</p>
-<p>HightPriority is complete<br>LowPriority is complete</p>
-<p>注意这里使用了类对象锁<strong>synchronized(xxx.class)</strong>，因为每个类只有一个class对象，所以可以通过它实现互斥。</p>
-
-      
-
-      
-        <div class="page-reward">
-          <a href="javascript:;" class="page-reward-btn tooltip-top">
-            <div class="tooltip tooltip-east">
-            <span class="tooltip-item">
-              赏
-            </span>
-            <span class="tooltip-content">
-              <span class="tooltip-text">
-                <span class="tooltip-inner">
-                  <p class="reward-p"><i class="icon icon-quo-left"></i>谢谢<i class="icon icon-quo-right"></i></p>
-                  <div class="reward-box">
-                    
-                    <div class="reward-box-item">
-                      <img class="reward-img" src="/assets/img/alipay.jpg">
-                      <span class="reward-type">支付宝</span>
-                    </div>
-                    
-                    
-                    <div class="reward-box-item">
-                      <img class="reward-img" src="/assets/img/wechat.jpg">
-                      <span class="reward-type">微信</span>
-                    </div>
-                    
-                  </div>
-                </span>
-              </span>
-            </span>
-          </div>
-          </a>
-        </div>
-      
-    </div>
-    <div class="article-info article-info-index">
-      
-      
+        <div class="article-info info-on-right">
+          
 	<div class="article-tag tagcloud">
 		<i class="icon-price-tags icon"></i>
 		<ul class="article-tag-list">
 			 
         		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">实战Java高并发程序设计</a>
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color2">spring</a>
         		</li>
       		 
         		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">线程</a>
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color5">Jdbc</a>
         		</li>
       		
 		</ul>
 	</div>
 
-      
+          
 
-      
-
-      
-        
-<div class="share-btn share-icons tooltip-left">
-  <div class="tooltip tooltip-east">
-    <span class="tooltip-item">
-      <a href="javascript:;" class="share-sns share-outer">
-        <i class="icon icon-share"></i>
-      </a>
-    </span>
-    <span class="tooltip-content">
-      <div class="share-wrap">
-        <div class="share-icons">
-          <a class="weibo share-sns" href="javascript:;" data-type="weibo">
-            <i class="icon icon-weibo"></i>
-          </a>
-          <a class="weixin share-sns wxFab" href="javascript:;" data-type="weixin">
-            <i class="icon icon-weixin"></i>
-          </a>
-          <a class="qq share-sns" href="javascript:;" data-type="qq">
-            <i class="icon icon-qq"></i>
-          </a>
-          <a class="douban share-sns" href="javascript:;" data-type="douban">
-            <i class="icon icon-douban"></i>
-          </a>
-          <a class="qzone share-sns" href="javascript:;" data-type="qzone">
-            <i class="icon icon-qzone"></i>
-          </a>
-          <a class="facebook share-sns" href="javascript:;" data-type="facebook">
-            <i class="icon icon-facebook"></i>
-          </a>
-          <a class="twitter share-sns" href="javascript:;" data-type="twitter">
-            <i class="icon icon-twitter"></i>
-          </a>
-          <a class="google share-sns" href="javascript:;" data-type="google">
-            <i class="icon icon-google"></i>
-          </a>
         </div>
-      </div>
-    </span>
-  </div>
-</div>
-
-<div class="page-modal wx-share js-wx-box">
-    <a class="close js-modal-close" href="javascript:;"><i class="icon icon-close"></i></a>
-    <p>扫一扫，分享到微信</p>
-    <div class="wx-qrcode">
-      <img src="//pan.baidu.com/share/qrcode?url=http://yoursite.com/2019/09/10/%E7%BA%BF%E7%A8%8B%E7%9A%84%E5%9F%BA%E6%9C%AC%E6%93%8D%E4%BD%9C3/" alt="微信分享二维码">
-    </div>
-</div>
-
-<div class="mask js-mask"></div>
-      
-      <div class="clearfix"></div>
-    </div>
+        <div class="clearfix"></div>
+    </header>
   </div>
 </article>
-
-  
-<nav id="article-nav">
-  
-    <a href="/2019/09/10/%E7%BA%BF%E7%A8%8B%E7%9A%84%E5%9F%BA%E6%9C%AC%E6%93%8D%E4%BD%9C2/" id="article-nav-newer" class="article-nav-link-wrap">
-      <i class="icon-circle-left"></i>
-      <div class="article-nav-title">
-        
-          线程的基本操作2
-        
-      </div>
-    </a>
   
   
-    <a href="/2019/09/09/%E7%BA%BF%E7%A8%8B%E7%9A%84%E5%9F%BA%E6%9C%AC%E6%93%8D%E4%BD%9C/" id="article-nav-older" class="article-nav-link-wrap">
-      <div class="article-nav-title">线程的基本操作</div>
-      <i class="icon-circle-right"></i>
-    </a>
-  
-</nav>
-
-
-<aside class="wrap-side-operation">
-    <div class="mod-side-operation">
-        
-        <div class="jump-container" id="js-jump-container" style="display:none;">
-            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
-                <i class="icon-font icon-back"></i>
-            </a>
-            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
-                <i class="icon-font icon-plane jump-plane"></i>
-            </div>
-        </div>
-        
-        
-    </div>
-</aside>
-
-
-
-  
-  
+    </div></section>
   
 
-  
-
-  
-
-  
+    
 
 
           </div>
@@ -375,9 +228,9 @@
 	var yiliaConfig = {
 		mathjax: false,
 		isHome: false,
-		isPost: true,
+		isPost: false,
 		isArchive: false,
-		isTag: false,
+		isTag: true,
 		isCategory: false,
 		open_in_new: false,
 		toc_hide_index: true,

@@ -150,6 +150,92 @@
           <div id="js-content" class="content-ll">
             
   
+    <article id="post-NIO网络编程" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2019/09/20/NIO%E7%BD%91%E7%BB%9C%E7%BC%96%E7%A8%8B/">NIO网络编程</a>
+    </h1>
+  
+
+        
+        <a href="/2019/09/20/NIO%E7%BD%91%E7%BB%9C%E7%BC%96%E7%A8%8B/" class="archive-article-date">
+  	<time datetime="2019-09-20T04:00:00.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2019-09-20</time>
+</a>
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>使用Java的NIO可以将网络IO等待时间从业务处理线程中抽取出来。</p>
+<p>NIO：准备好了再通知我</p>
+<p><strong>Channel</strong>：类似于流，可以和文件对应，往Channel中写就是往文件中写；可以和Socket对应，往Channel写就是往Socket中写</p>
+<p><strong>Buffer</strong>：一个内存区域，写入或者读取的数据需要包装成Buffer才能和Channel交互</p>
+<p><strong>Selector</strong>：Channel可以实习SelectableChannel类，表示可被选择的通道，实现这个类的Channel可以被Selector管理。一个Selector可以管理多个SelectableChannel。当SelectableChannel的数据准备好时，Selector会接到通知去处理数据。</p>
+<p>Socket Channel是SelectableChannel的一种，一个SoketChannel表示一个客户端连接。这些Socket  Channel由一个Selector管理，一个Selector由一个线程管理。所以可以通过一个或者少数线程来处理大量客户端连接。当客户端的数据没有准备好时，Selector通过轮询的方式等待。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">private</span> Selector selector;</span><br><span class="line"><span class="keyword">private</span> ExecutorService tp = Executors.newCashedThreadPool();</span><br></pre></td></tr></table></figure>
+
+<p>Selector用于处理所有客户端连接，线程池用于对每一个客户端的请求进行处理。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> java.net.InetAddress;</span><br><span class="line"><span class="keyword">import</span> java.net.InetSocketAddress;</span><br><span class="line"><span class="keyword">import</span> java.net.ServerSocket;</span><br><span class="line"><span class="keyword">import</span> java.net.Socket;</span><br><span class="line"><span class="keyword">import</span> java.nio.channels.SelectionKey;</span><br><span class="line"><span class="keyword">import</span> java.nio.channels.Selector;</span><br><span class="line"><span class="keyword">import</span> java.nio.channels.ServerSocketChannel;</span><br><span class="line"><span class="keyword">import</span> java.nio.channels.spi.SelectorProvider;</span><br><span class="line"><span class="keyword">import</span> java.util.HashMap;</span><br><span class="line"><span class="keyword">import</span> java.util.Iterator;</span><br><span class="line"><span class="keyword">import</span> java.util.Map;</span><br><span class="line"><span class="keyword">import</span> java.util.Set;</span><br><span class="line"><span class="keyword">import</span> java.util.concurrent.ExecutorService;</span><br><span class="line"><span class="keyword">import</span> java.util.concurrent.Executors;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Test</span> </span>&#123;</span><br><span class="line">    <span class="keyword">private</span> Selector selector;</span><br><span class="line">    <span class="keyword">private</span> ExecutorService tp = Executors.newCachedThreadPool();</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> Map&lt;Socket,Long&gt; time_stat = <span class="keyword">new</span> HashMap&lt;&gt;(<span class="number">10240</span>);</span><br><span class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">startServer</span><span class="params">()</span> <span class="keyword">throws</span> Exception</span>&#123;</span><br><span class="line">        selector = SelectorProvider.provider().openSelector();</span><br><span class="line">        ServerSocketChannel ssc = ServerSocketChannel.open();</span><br><span class="line">        ssc.configureBlocking(<span class="keyword">false</span>);</span><br><span class="line"></span><br><span class="line">        InetSocketAddress isa = <span class="keyword">new</span> InetSocketAddress(InetAddress.getLocalHost(),<span class="number">8000</span>);</span><br><span class="line">        InetSocketAddress aisa = <span class="keyword">new</span> InetSocketAddress(<span class="number">8000</span>);</span><br><span class="line">        ssc.socket().bind(isa);</span><br><span class="line"></span><br><span class="line">        SelectionKey acceptKEy = ssc.register(selector,SelectionKey.OP_ACCEPT);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">for</span>(;;)&#123;</span><br><span class="line">            selector.select();</span><br><span class="line">            Set readyKeys = selector.selectedKeys();</span><br><span class="line">            Iterator i = readyKeys.iterator();</span><br><span class="line">            <span class="keyword">long</span> e = <span class="number">0</span>;</span><br><span class="line">            <span class="keyword">while</span> (i.hasNext())&#123;</span><br><span class="line">                SelectionKey sk = (SelectionKey)i.next();</span><br><span class="line">                i.remove();</span><br><span class="line"></span><br><span class="line">                <span class="keyword">if</span>(sk.isAcceptable())&#123;</span><br><span class="line">                    <span class="comment">//doAccept(sk);</span></span><br><span class="line">                &#125;</span><br><span class="line">                <span class="keyword">else</span> <span class="keyword">if</span>(sk.isValid() &amp;&amp; sk.isReadable())&#123;</span><br><span class="line">                    <span class="comment">//doRead(sk);</span></span><br><span class="line">                &#125;</span><br><span class="line">                <span class="keyword">else</span> <span class="keyword">if</span>(sk.isValid() &amp;&amp; sk.isWritable())&#123;</span><br><span class="line">                    <span class="comment">//doWrite(sk);</span></span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+      
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
+	<div class="article-tag tagcloud">
+		<i class="icon-price-tags icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">实战Java高并发程序设计</a>
+        		</li>
+      		 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">NIO</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
+      
+
+      
+        <p class="article-more-link">
+          <a class="article-more-a" href="/2019/09/20/NIO%E7%BD%91%E7%BB%9C%E7%BC%96%E7%A8%8B/">展开全文 >></a>
+        </p>
+      
+
+      
+      <div class="clearfix"></div>
+    </div>
+  </div>
+</article>
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+    </div>
+</aside>
+
+
+
+
+  
     <article id="post-函数式编程简介" class="article article-type-post  article-index" itemscope itemprop="blogPost">
   <div class="article-inner">
     
@@ -1198,94 +1284,6 @@
 
 
   
-    <article id="post-volatile-有序性-可见性" class="article article-type-post  article-index" itemscope itemprop="blogPost">
-  <div class="article-inner">
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2019/09/10/volatile-%E6%9C%89%E5%BA%8F%E6%80%A7-%E5%8F%AF%E8%A7%81%E6%80%A7/">volatile-有序性-可见性</a>
-    </h1>
-  
-
-        
-        <a href="/2019/09/10/volatile-%E6%9C%89%E5%BA%8F%E6%80%A7-%E5%8F%AF%E8%A7%81%E6%80%A7/" class="archive-article-date">
-  	<time datetime="2019-09-10T04:00:00.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2019-09-10</time>
-</a>
-        
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <p>volatile会保证变量的可见性和有序性，但不能保证原子性。</p>
-<h3 id="有序性"><a href="#有序性" class="headerlink" title="有序性"></a>有序性</h3><hr>
-<p>对该变量的操作不会被指令重排。从而保证了对该变量操作的指令是顺序有序的，不会被打乱。</p>
-<h3 id="可见性"><a href="#可见性" class="headerlink" title="可见性"></a>可见性</h3><hr>
-<p>可见性与Java的内存模型有关，模型采用缓存与主存的方式对变量进行操作，也就是说，每个线程都有自己的缓存空间，对变量的操作都是在缓存中进行的，之后再将修改后的值返回到主存中，这就带来了问题，有可能一个线程在将共享变量修改后，还没有来的及将缓存中的变量返回给主存中，另外一个线程就对共享变量进行修改，那么这个线程拿到的值是主存中未被修改的值，这就是可见性的问题。</p>
-<p>意思就是说当一个共享变量被volatile修饰时，它会保证修改的值会立即被更新到主存，当有其他线程需要读取时，它会去内存中读取新值，这就保证了可见性。</p>
-<h3 id="原子性"><a href="#原子性" class="headerlink" title="原子性"></a>原子性</h3><hr>
-<p>既然它可以保证修改的值立即能更新到主存，其他线程也会捕捉到被修改后的值，那么为什么不能保证原子性呢？<br>首先需要了解的是，Java中只有对基本类型变量的赋值和读取是原子操作，如i = 1的赋值操作，但是像j = i或者i++这样的操作都不是原子操作，因为他们都进行了多次原子操作，比如先读取i的值，再将i的值赋值给j，两个原子操作加起来就不是原子操作了。</p>
-<p>所以，如果一个变量被volatile修饰了，那么肯定可以保证每次读取这个变量值的时候得到的值是最新的，但是一旦需要对变量进行自增这样的非原子操作，就不会保证这个变量的原子性了。</p>
-<p>例如</p>
-<p>一个变量i被volatile修饰，两个线程想对这个变量修改，都对其进行自增操作也就是i++，i++的过程可以分为三步，首先获取i的值，其次对i的值进行加1，最后将得到的新值写会到缓存中。<br>线程A首先得到了i的初始值100，但是还没来得及修改，就阻塞了，这时线程B开始了，它也得到了i的值，由于i的值未被修改，即使是被volatile修饰，主存的变量还没变化，那么线程B得到的值也是100，之后对其进行加1操作，得到101后，将新值写入到缓存中，再刷入主存中。根据可见性的原则，这个主存的值可以被其他线程可见。<br>问题来了，线程A已经读取到了i的值为100，也就是说读取的这个原子操作已经结束了，所以这个可见性来的有点晚，线程A阻塞结束后，继续将100这个值加1，得到101，再将值写到缓存，最后刷入主存，所以即便是volatile具有可见性，也不能保证对它修饰的变量具有原子性。</p>
-
-      
-
-      
-    </div>
-    <div class="article-info article-info-index">
-      
-      
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">实战Java高并发程序设计</a>
-        		</li>
-      		 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">多线程</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-      
-
-      
-        <p class="article-more-link">
-          <a class="article-more-a" href="/2019/09/10/volatile-%E6%9C%89%E5%BA%8F%E6%80%A7-%E5%8F%AF%E8%A7%81%E6%80%A7/">展开全文 >></a>
-        </p>
-      
-
-      
-      <div class="clearfix"></div>
-    </div>
-  </div>
-</article>
-
-<aside class="wrap-side-operation">
-    <div class="mod-side-operation">
-        
-        <div class="jump-container" id="js-jump-container" style="display:none;">
-            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
-                <i class="icon-font icon-back"></i>
-            </a>
-            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
-                <i class="icon-font icon-plane jump-plane"></i>
-            </div>
-        </div>
-        
-        
-    </div>
-</aside>
-
-
-
-
-  
   
     <nav id="page-nav">
       <a class="extend prev" rel="prev" href="/">&amp;laquo; Prev</a><a class="page-number" href="/">1</a><span class="page-number current">2</span><a class="page-number" href="/page/3/">3</a><a class="page-number" href="/page/4/">4</a><a class="extend next" rel="next" href="/page/3/">Next &amp;raquo;</a>
@@ -1395,11 +1393,11 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">Java核心卷</a>
+                <a href="javascript:void(0)" class="js-tag color4">线程池</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">线程池</a>
+                <a href="javascript:void(0)" class="js-tag color3">Java核心卷</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -1419,7 +1417,7 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">AOP</a>
+                <a href="javascript:void(0)" class="js-tag color4">IOC</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -1427,11 +1425,15 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">IOC</a>
+                <a href="javascript:void(0)" class="js-tag color4">AOP</a>
               </li>
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color4">StringBuilder</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color5">Jdbc</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -1451,7 +1453,7 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">未来日记</a>
+                <a href="javascript:void(0)" class="js-tag color5">设计模式</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -1459,15 +1461,11 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color5">未来日记</a>
+              </li>
+             
+              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color3">数组</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">接口</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">设计模式</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -1476,6 +1474,10 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color3">泛型</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">接口</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -1495,7 +1497,7 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">无锁</a>
+                <a href="javascript:void(0)" class="js-tag color5">错误处理</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -1503,7 +1505,7 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">错误处理</a>
+                <a href="javascript:void(0)" class="js-tag color3">无锁</a>
               </li>
              
               <li class="article-tag-list-item">
