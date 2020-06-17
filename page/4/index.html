@@ -150,6 +150,113 @@
           <div id="js-content" class="content-ll">
             
   
+    <article id="post-内部类" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2019/09/04/%E5%86%85%E9%83%A8%E7%B1%BB/">内部类</a>
+    </h1>
+  
+
+        
+        <a href="/2019/09/04/%E5%86%85%E9%83%A8%E7%B1%BB/" class="archive-article-date">
+  	<time datetime="2019-09-04T04:00:00.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2019-09-04</time>
+</a>
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>内部类，即定义在一个类中的类。</p>
+<p>1.使用内部类有两点好处，第一是内部类可以访问外层类定义的数据域，包括私有、静态数据。第二是内部类可以在外层类中设置为私有，从而对同一个包中的其他类隐藏起来，只对外层类可见。</p>
+<p>针对第一个好处，内部类可以访问外层类的数据和方法，原因在于内部类中存在一个隐式引用outer指向了创建它的外层类对象。outer实际是外层类创建内部类时将外层类的this作为参数传递了过来。因为该引用是隐式的，所以在内部类中使用外层类的东西并不需要显示的调用outer，而是直接调用即可。</p>
+<p>2.需要注意的是，在外层类的作用域之外定义内部类对象，内部类的类型为OuterClass.InnerClass</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">TalkingClock jabberer = <span class="keyword">new</span> TalkingClock(<span class="number">1000</span>,<span class="keyword">true</span>);</span><br><span class="line">TalkingClock.TimePrinter listener = jabberer.<span class="keyword">new</span> TimePrinter();</span><br></pre></td></tr></table></figure>
+
+<p>3.当内部类成员变量和外层类成员变量的名字相同的时候，默认会访问内部类的成员，而访问外层的成员变量则需要外部类.this.成员变量，外部类.this.成员方法。</p>
+<p>4.虽然内部类可以无条件访问外层类的所有成员，但外层类想访问内层类的成员则需要先创建一个内部类对象。</p>
+<p>5.内部类作为一个成员，可以用private 访问权限、protected 访问权限、public 访问权限及包访问权限修饰，而外部类只能被 public 和包访问两种权限修饰。</p>
+<h4 id="局部内部类"><a href="#局部内部类" class="headerlink" title="局部内部类"></a>局部内部类</h4><hr>
+<p>局部内部类是定义在一个方法或者作用域里面的类，局部内部类的访问权限仅限于方法或者作用域。局部内部类类似于局部变量，不能用public或private修饰，因为不存在外部可见性。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">OutterType</span> </span>&#123;       </span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">function</span><span class="params">()</span> </span>&#123;       </span><br><span class="line">		<span class="comment">/** 局部内部类Inner*/</span>        </span><br><span class="line">			<span class="class"><span class="keyword">class</span> <span class="title">Inner</span> </span>&#123;            </span><br><span class="line">				<span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">print</span><span class="params">()</span> </span>&#123;                </span><br><span class="line">					System.out.println(<span class="string">"局部内部类..."</span>);            </span><br><span class="line">			&#125;        </span><br><span class="line">		&#125;   </span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h4 id="匿名内部类"><a href="#匿名内部类" class="headerlink" title="匿名内部类"></a>匿名内部类</h4><hr>
+<p>假如只创建这个类的一个对象，就不必命名了。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">scan_bt.setOnClickListener(<span class="keyword">new</span> OnClickListener() &#123;</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onClick</span><span class="params">(View v)</span> </span>&#123;</span><br><span class="line">        <span class="comment">// TODO Auto-generated method stub</span></span><br><span class="line">         </span><br><span class="line">    &#125;</span><br><span class="line">&#125;);</span><br><span class="line"> </span><br><span class="line">history_bt.setOnClickListener(<span class="keyword">new</span> OnClickListener() &#123;</span><br><span class="line">     </span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onClick</span><span class="params">(View v)</span> </span>&#123;</span><br><span class="line">        <span class="comment">// TODO Auto-generated method stub</span></span><br><span class="line">         </span><br><span class="line">    &#125;</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+
+<p>这段代码为两个按钮设置监听器，这里面就使用了匿名内部类。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">new</span> OnClickListener() &#123;</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onClick</span><span class="params">(View v)</span> </span>&#123;</span><br><span class="line">        <span class="comment">// TODO Auto-generated method stub</span></span><br><span class="line">         </span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>上面这段代码就是匿名内部类，下面这段代码没有使用匿名内部类，显得冗长又难以维护。</p>
+<p>匿名内部类的通用语法是</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">new</span> SuperType(参数...)</span><br><span class="line">&#123;</span><br><span class="line">    内部类数据...</span><br><span class="line">    内部类方法...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>SuperType可以是像OnClickListener这样的接口，于是内部类就要实现这个接口，SuperType也可以是个类，于是内部类就要扩展它。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">setListener</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    scan_bt.setOnClickListener(<span class="keyword">new</span> Listener1());       </span><br><span class="line">    history_bt.setOnClickListener(<span class="keyword">new</span> Listener2());</span><br><span class="line">&#125;</span><br><span class="line"> </span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Listener1</span> <span class="keyword">implements</span> <span class="title">View</span>.<span class="title">OnClickListener</span></span>&#123;</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onClick</span><span class="params">(View v)</span> </span>&#123;</span><br><span class="line">    <span class="comment">// TODO Auto-generated method stub</span></span><br><span class="line">             </span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"> </span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Listener2</span> <span class="keyword">implements</span> <span class="title">View</span>.<span class="title">OnClickListener</span></span>&#123;</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onClick</span><span class="params">(View v)</span> </span>&#123;</span><br><span class="line">    <span class="comment">// TODO Auto-generated method stub</span></span><br><span class="line">             </span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>但因为匿名内部类没有构造器，也不能有修饰符，所以能力有限。目前常用在实现事件监听器和其他回调。一般来说，匿名内部类用于继承其他类或是实现接口，并不需要增加额外的方法，只是对继承方法的实现或是重写。</p>
+<h4 id="静态内部类"><a href="#静态内部类" class="headerlink" title="静态内部类"></a>静态内部类</h4><hr>
+<p>静态内部类为内部类前用static修饰，静态内部类是不需要依赖于外部类的，这点和类的静态成员属性类似，它不能使用外部类的非static成员变量或者方法，因为在没有外部类的对象的情况下，可以创建静态内部类的对象，如果允许访问外部类的非static成员就会产生矛盾，因为外部类的非static成员必须依附于具体的对象。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Outter</span></span>&#123;</span><br><span class="line">    <span class="keyword">int</span> a = <span class="number">10</span>;</span><br><span class="line">    <span class="keyword">static</span> <span class="keyword">int</span> b = <span class="number">5</span>;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">Outter</span><span class="params">()</span></span>&#123;&#125;</span><br><span class="line">    <span class="keyword">static</span> <span class="class"><span class="keyword">class</span> <span class="title">Inner</span></span>&#123;</span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="title">Inner</span><span class="params">()</span></span>&#123;</span><br><span class="line">            System.out.println(a);<span class="comment">//错误，不能访问</span></span><br><span class="line">            System.out.println(b);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+      
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
+	<div class="article-tag tagcloud">
+		<i class="icon-price-tags icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">Java核心卷</a>
+        		</li>
+      		 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">内部类</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
+      
+
+      
+        <p class="article-more-link">
+          <a class="article-more-a" href="/2019/09/04/%E5%86%85%E9%83%A8%E7%B1%BB/">展开全文 >></a>
+        </p>
+      
+
+      
+      <div class="clearfix"></div>
+    </div>
+  </div>
+</article>
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+    </div>
+</aside>
+
+
+
+
+  
     <article id="post-反射机制" class="article article-type-post  article-index" itemscope itemprop="blogPost">
   <div class="article-inner">
     
@@ -223,6 +330,90 @@
       
         <p class="article-more-link">
           <a class="article-more-a" href="/2019/09/04/%E5%8F%8D%E5%B0%84%E6%9C%BA%E5%88%B6/">展开全文 >></a>
+        </p>
+      
+
+      
+      <div class="clearfix"></div>
+    </div>
+  </div>
+</article>
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+    </div>
+</aside>
+
+
+
+
+  
+    <article id="post-数组列表ArrayList" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2019/09/03/%E6%95%B0%E7%BB%84%E5%88%97%E8%A1%A8ArrayList/">数组列表ArrayList</a>
+    </h1>
+  
+
+        
+        <a href="/2019/09/03/%E6%95%B0%E7%BB%84%E5%88%97%E8%A1%A8ArrayList/" class="archive-article-date">
+  	<time datetime="2019-09-03T04:00:00.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2019-09-03</time>
+</a>
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> java.util.*;</span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">ArrayListTest</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span>  <span class="keyword">void</span> <span class="title">main</span> <span class="params">(String []args)</span></span>&#123;</span><br><span class="line">        ArrayList&lt;Integer&gt; arrayList = <span class="keyword">new</span> ArrayList&lt;&gt;();</span><br><span class="line">        arrayList.ensureCapacity(<span class="number">5</span>);<span class="comment">//预估元素个数为5，影响初始数组内存的分配</span></span><br><span class="line">        System.out.println(arrayList.size());<span class="comment">//数组列表的大小</span></span><br><span class="line">        arrayList.add(<span class="number">1</span>);<span class="comment">//添加元素</span></span><br><span class="line">        arrayList.add(<span class="number">2</span>);</span><br><span class="line">        arrayList.add(<span class="number">3</span>);</span><br><span class="line">        arrayList.add(<span class="number">4</span>);</span><br><span class="line">        arrayList.trimToSize();<span class="comment">//将比size大的预留空间去掉</span></span><br><span class="line">        arrayList.set(<span class="number">0</span>,<span class="number">2</span>);<span class="comment">//设置元素值，前下标后对象</span></span><br><span class="line">        arrayList.add(<span class="number">4</span>,<span class="number">5</span>);<span class="comment">//插入元素值，前下标后对象</span></span><br><span class="line">        System.out.println(arrayList.get(<span class="number">3</span>));<span class="comment">//获取某个元素值</span></span><br><span class="line">        System.out.println(arrayList.toString());</span><br><span class="line">        arrayList.remove(<span class="number">4</span>);<span class="comment">//去除元素，参数为下标</span></span><br><span class="line">        System.out.println(arrayList.size());</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>ArrayList类解决了Java中数组不可变长的缺点，在添加和删除元素的时候可以自动调节数组的容量。</p>
+<p><strong>数组列表管理着对象引用的一个内部数组，当添加元素到数组预定的最大空间时，数组列表就自动地创建一个更大的数组，将所有的对象从小数组拷贝到大数组中去。</strong></p>
+<p>在本例中初始化了Integer的数组列表，<strong>ensureCapacity</strong>方法可以在填充元素前预估数组可能存储的元素数量5，<strong>但数组的大小仍然是0</strong>，用<strong>add</strong>方法添加元素，注意这里使用了<strong>自动装箱</strong>。随后使用<strong>trimToSize</strong>方法将数组预留的多余的空间去除，但不影响数组的大小。使用<strong>set</strong>方法将下标为0的元素赋值。使用<strong>add</strong>方法在下标4的位置插入元素5。使用<strong>remove</strong>方法去掉下标为4的元素，使用<strong>size</strong>方法显示元素数量。</p>
+<p>程序输出：</p>
+<p>0<br>4<br>[2, 2, 3, 4, 5]<br>4</p>
+
+      
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
+	<div class="article-tag tagcloud">
+		<i class="icon-price-tags icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">Java核心卷</a>
+        		</li>
+      		 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">数组</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
+      
+
+      
+        <p class="article-more-link">
+          <a class="article-more-a" href="/2019/09/03/%E6%95%B0%E7%BB%84%E5%88%97%E8%A1%A8ArrayList/">展开全文 >></a>
         </p>
       
 
@@ -374,90 +565,6 @@
 
 
   
-    <article id="post-数组列表ArrayList" class="article article-type-post  article-index" itemscope itemprop="blogPost">
-  <div class="article-inner">
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2019/09/03/%E6%95%B0%E7%BB%84%E5%88%97%E8%A1%A8ArrayList/">数组列表ArrayList</a>
-    </h1>
-  
-
-        
-        <a href="/2019/09/03/%E6%95%B0%E7%BB%84%E5%88%97%E8%A1%A8ArrayList/" class="archive-article-date">
-  	<time datetime="2019-09-03T04:00:00.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2019-09-03</time>
-</a>
-        
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> java.util.*;</span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">ArrayListTest</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span>  <span class="keyword">void</span> <span class="title">main</span> <span class="params">(String []args)</span></span>&#123;</span><br><span class="line">        ArrayList&lt;Integer&gt; arrayList = <span class="keyword">new</span> ArrayList&lt;&gt;();</span><br><span class="line">        arrayList.ensureCapacity(<span class="number">5</span>);<span class="comment">//预估元素个数为5，影响初始数组内存的分配</span></span><br><span class="line">        System.out.println(arrayList.size());<span class="comment">//数组列表的大小</span></span><br><span class="line">        arrayList.add(<span class="number">1</span>);<span class="comment">//添加元素</span></span><br><span class="line">        arrayList.add(<span class="number">2</span>);</span><br><span class="line">        arrayList.add(<span class="number">3</span>);</span><br><span class="line">        arrayList.add(<span class="number">4</span>);</span><br><span class="line">        arrayList.trimToSize();<span class="comment">//将比size大的预留空间去掉</span></span><br><span class="line">        arrayList.set(<span class="number">0</span>,<span class="number">2</span>);<span class="comment">//设置元素值，前下标后对象</span></span><br><span class="line">        arrayList.add(<span class="number">4</span>,<span class="number">5</span>);<span class="comment">//插入元素值，前下标后对象</span></span><br><span class="line">        System.out.println(arrayList.get(<span class="number">3</span>));<span class="comment">//获取某个元素值</span></span><br><span class="line">        System.out.println(arrayList.toString());</span><br><span class="line">        arrayList.remove(<span class="number">4</span>);<span class="comment">//去除元素，参数为下标</span></span><br><span class="line">        System.out.println(arrayList.size());</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>ArrayList类解决了Java中数组不可变长的缺点，在添加和删除元素的时候可以自动调节数组的容量。</p>
-<p><strong>数组列表管理着对象引用的一个内部数组，当添加元素到数组预定的最大空间时，数组列表就自动地创建一个更大的数组，将所有的对象从小数组拷贝到大数组中去。</strong></p>
-<p>在本例中初始化了Integer的数组列表，<strong>ensureCapacity</strong>方法可以在填充元素前预估数组可能存储的元素数量5，<strong>但数组的大小仍然是0</strong>，用<strong>add</strong>方法添加元素，注意这里使用了<strong>自动装箱</strong>。随后使用<strong>trimToSize</strong>方法将数组预留的多余的空间去除，但不影响数组的大小。使用<strong>set</strong>方法将下标为0的元素赋值。使用<strong>add</strong>方法在下标4的位置插入元素5。使用<strong>remove</strong>方法去掉下标为4的元素，使用<strong>size</strong>方法显示元素数量。</p>
-<p>程序输出：</p>
-<p>0<br>4<br>[2, 2, 3, 4, 5]<br>4</p>
-
-      
-
-      
-    </div>
-    <div class="article-info article-info-index">
-      
-      
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">Java核心卷</a>
-        		</li>
-      		 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">数组</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-      
-
-      
-        <p class="article-more-link">
-          <a class="article-more-a" href="/2019/09/03/%E6%95%B0%E7%BB%84%E5%88%97%E8%A1%A8ArrayList/">展开全文 >></a>
-        </p>
-      
-
-      
-      <div class="clearfix"></div>
-    </div>
-  </div>
-</article>
-
-<aside class="wrap-side-operation">
-    <div class="mod-side-operation">
-        
-        <div class="jump-container" id="js-jump-container" style="display:none;">
-            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
-                <i class="icon-font icon-back"></i>
-            </a>
-            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
-                <i class="icon-font icon-plane jump-plane"></i>
-            </div>
-        </div>
-        
-        
-    </div>
-</aside>
-
-
-
-
-  
     <article id="post-抽象类的几点说明" class="article article-type-post  article-index" itemscope itemprop="blogPost">
   <div class="article-inner">
     
@@ -514,93 +621,6 @@
       
         <p class="article-more-link">
           <a class="article-more-a" href="/2019/09/02/%E6%8A%BD%E8%B1%A1%E7%B1%BB%E7%9A%84%E5%87%A0%E7%82%B9%E8%AF%B4%E6%98%8E/">展开全文 >></a>
-        </p>
-      
-
-      
-      <div class="clearfix"></div>
-    </div>
-  </div>
-</article>
-
-<aside class="wrap-side-operation">
-    <div class="mod-side-operation">
-        
-        <div class="jump-container" id="js-jump-container" style="display:none;">
-            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
-                <i class="icon-font icon-back"></i>
-            </a>
-            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
-                <i class="icon-font icon-plane jump-plane"></i>
-            </div>
-        </div>
-        
-        
-    </div>
-</aside>
-
-
-
-
-  
-    <article id="post-静态变量常量方法" class="article article-type-post  article-index" itemscope itemprop="blogPost">
-  <div class="article-inner">
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2019/09/02/%E9%9D%99%E6%80%81%E5%8F%98%E9%87%8F%E5%B8%B8%E9%87%8F%E6%96%B9%E6%B3%95/">静态变量|常量|方法</a>
-    </h1>
-  
-
-        
-        <a href="/2019/09/02/%E9%9D%99%E6%80%81%E5%8F%98%E9%87%8F%E5%B8%B8%E9%87%8F%E6%96%B9%E6%B3%95/" class="archive-article-date">
-  	<time datetime="2019-09-02T04:00:00.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2019-09-02</time>
-</a>
-        
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <p><strong>静态变量：属于类不属于对象，类的所有实例共享一个静态变量。</strong></p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Employee</span></span>&#123;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">int</span> nextId = <span class="number">1</span>;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">int</span> id;</span><br><span class="line">    </span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setId</span><span class="params">()</span></span>&#123;</span><br><span class="line">        id = nextId;</span><br><span class="line">        nextId ++;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>所有雇员的nextId均为1，id初始化默认值0。调用setId后第一个雇员id为1，第二个为2，以此类推。</p>
-<p><strong>静态常量：属于类不属于对象，类的所有实例共享一个静态常量。</strong></p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Math</span></span>&#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">double</span> PI = <span class="number">3.1415926535</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>Math.PI可以不实例化Math对象就可以调用Math类的PI值。</p>
-<p><strong>静态方法：属于类不属于对象，类的所有实例共享一个静态方法。</strong></p>
-<p>静态方法没有this参数，不能向对象实施操作，因此不能操作实例域，只能访问自身类中的静态域。</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">int</span> <span class="title">getNextId</span><span class="params">()</span></span>&#123;</span><br><span class="line">    <span class="keyword">return</span> nextId;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-      
-
-      
-    </div>
-    <div class="article-info article-info-index">
-      
-      
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">Java核心卷</a>
-        		</li>
-      		 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">静态</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-      
-
-      
-        <p class="article-more-link">
-          <a class="article-more-a" href="/2019/09/02/%E9%9D%99%E6%80%81%E5%8F%98%E9%87%8F%E5%B8%B8%E9%87%8F%E6%96%B9%E6%B3%95/">展开全文 >></a>
         </p>
       
 
@@ -695,6 +715,93 @@
       
         <p class="article-more-link">
           <a class="article-more-a" href="/2019/09/02/%E7%BB%A7%E6%89%BF%E5%A4%9A%E6%80%81%E5%8A%A8%E6%80%81%E7%BB%91%E5%AE%9A/">展开全文 >></a>
+        </p>
+      
+
+      
+      <div class="clearfix"></div>
+    </div>
+  </div>
+</article>
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+    </div>
+</aside>
+
+
+
+
+  
+    <article id="post-静态变量常量方法" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2019/09/02/%E9%9D%99%E6%80%81%E5%8F%98%E9%87%8F%E5%B8%B8%E9%87%8F%E6%96%B9%E6%B3%95/">静态变量|常量|方法</a>
+    </h1>
+  
+
+        
+        <a href="/2019/09/02/%E9%9D%99%E6%80%81%E5%8F%98%E9%87%8F%E5%B8%B8%E9%87%8F%E6%96%B9%E6%B3%95/" class="archive-article-date">
+  	<time datetime="2019-09-02T04:00:00.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2019-09-02</time>
+</a>
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p><strong>静态变量：属于类不属于对象，类的所有实例共享一个静态变量。</strong></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Employee</span></span>&#123;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">int</span> nextId = <span class="number">1</span>;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">int</span> id;</span><br><span class="line">    </span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setId</span><span class="params">()</span></span>&#123;</span><br><span class="line">        id = nextId;</span><br><span class="line">        nextId ++;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>所有雇员的nextId均为1，id初始化默认值0。调用setId后第一个雇员id为1，第二个为2，以此类推。</p>
+<p><strong>静态常量：属于类不属于对象，类的所有实例共享一个静态常量。</strong></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Math</span></span>&#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">double</span> PI = <span class="number">3.1415926535</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>Math.PI可以不实例化Math对象就可以调用Math类的PI值。</p>
+<p><strong>静态方法：属于类不属于对象，类的所有实例共享一个静态方法。</strong></p>
+<p>静态方法没有this参数，不能向对象实施操作，因此不能操作实例域，只能访问自身类中的静态域。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">int</span> <span class="title">getNextId</span><span class="params">()</span></span>&#123;</span><br><span class="line">    <span class="keyword">return</span> nextId;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+      
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
+	<div class="article-tag tagcloud">
+		<i class="icon-price-tags icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">Java核心卷</a>
+        		</li>
+      		 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">静态</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
+      
+
+      
+        <p class="article-more-link">
+          <a class="article-more-a" href="/2019/09/02/%E9%9D%99%E6%80%81%E5%8F%98%E9%87%8F%E5%B8%B8%E9%87%8F%E6%96%B9%E6%B3%95/">展开全文 >></a>
         </p>
       
 
@@ -1098,15 +1205,11 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">Java8</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color3">容器</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">同步</a>
+                <a href="javascript:void(0)" class="js-tag color3">集合</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -1114,11 +1217,15 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">同步</a>
+              </li>
+             
+              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color4">LeetCode</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">集合</a>
+                <a href="javascript:void(0)" class="js-tag color1">Java8</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -1134,6 +1241,18 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color5">Jdbc</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color5">SpringMVC</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">事务</a>
+              </li>
+             
+              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color4">StringBuilder</a>
               </li>
              
@@ -1142,19 +1261,11 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">事务</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">多线程</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color2">Java基础</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">Jdbc</a>
+                <a href="javascript:void(0)" class="js-tag color4">多线程</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -1166,19 +1277,11 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">反射</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color5">未来日记</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">设计模式</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">抽象类</a>
+                <a href="javascript:void(0)" class="js-tag color3">反射</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -1186,15 +1289,7 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">接口</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">线程</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">泛型</a>
+                <a href="javascript:void(0)" class="js-tag color5">设计模式</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -1202,7 +1297,23 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color4">抽象类</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">接口</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">泛型</a>
+              </li>
+             
+              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color5">sync</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">线程</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -1210,19 +1321,19 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">锁</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color3">无锁</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">静态</a>
+                <a href="javascript:void(0)" class="js-tag color2">锁</a>
               </li>
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color5">错误处理</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">静态</a>
               </li>
              
               <li class="article-tag-list-item">

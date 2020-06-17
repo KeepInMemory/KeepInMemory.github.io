@@ -150,6 +150,156 @@
           <div id="js-content" class="content-ll">
             
   
+    <article id="post-SpringMVC简介" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2020/06/15/SpringMVC%E7%AE%80%E4%BB%8B/">SpringMVC简介</a>
+    </h1>
+  
+
+        
+        <a href="/2020/06/15/SpringMVC%E7%AE%80%E4%BB%8B/" class="archive-article-date">
+  	<time datetime="2020-06-15T06:08:43.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2020-06-15</time>
+</a>
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>SpringMVC是一种基于Java实现的MVC设计模型的请求驱动类型的轻量级web框架，是SpringFrameWork的后续产品</p>
+<p>1.导入SpringMVC的坐标 2.配置Servlet前端控制器DispatherServlet 3.编写Controller类和视图页面 4.将Controller使用注解配置到Spring容器(@Controller)，配置请求映射的是哪个方法 5.配置spring-mvc.xml文件(配置组件扫描) 6.执行访问测试</p>
+<p>1.prm.xml导坐标</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">&lt;dependency&gt;</span><br><span class="line">  &lt;groupId&gt;org.springframework&lt;/groupId&gt;</span><br><span class="line">  &lt;artifactId&gt;spring-webmvc&lt;/artifactId&gt;</span><br><span class="line">  &lt;version&gt;5.0.5.RELEASE&lt;/version&gt;</span><br><span class="line">&lt;/dependency&gt;</span><br><span class="line">&lt;dependency&gt;</span><br><span class="line">  &lt;groupId&gt;org.springframework&lt;/groupId&gt;</span><br><span class="line">  &lt;artifactId&gt;spring-web&lt;/artifactId&gt;</span><br><span class="line">  &lt;version&gt;5.0.5.RELEASE&lt;/version&gt;</span><br><span class="line">&lt;/dependency&gt;</span><br><span class="line"></span><br><span class="line">&lt;dependency&gt;</span><br><span class="line">  &lt;groupId&gt;javax.servlet&lt;/groupId&gt;</span><br><span class="line">  &lt;artifactId&gt;javax.servlet-api&lt;/artifactId&gt;</span><br><span class="line">  &lt;version&gt;3.0.1&lt;/version&gt;</span><br><span class="line">&lt;/dependency&gt;</span><br><span class="line">&lt;dependency&gt;</span><br><span class="line">  &lt;groupId&gt;javax.servlet.jsp&lt;/groupId&gt;</span><br><span class="line">  &lt;artifactId&gt;javax.servlet.jsp-api&lt;/artifactId&gt;</span><br><span class="line">  &lt;version&gt;2.2.1&lt;/version&gt;</span><br><span class="line">&lt;/dependency&gt;</span><br></pre></td></tr></table></figure>
+
+<p>2.配置前端控制器</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">&lt;!DOCTYPE web-app PUBLIC</span><br><span class="line"> <span class="string">"-//Sun Microsystems, Inc.//DTD Web Application 2.3//EN"</span></span><br><span class="line"> <span class="string">"http://java.sun.com/dtd/web-app_2_3.dtd"</span> &gt;</span><br><span class="line"></span><br><span class="line">&lt;web-app&gt;</span><br><span class="line">  &lt;display-name&gt;Archetype Created Web Application&lt;/display-name&gt;</span><br><span class="line"></span><br><span class="line">&lt;!-- 配置SpringMVC的前端控制器--&gt;</span><br><span class="line">  &lt;servlet&gt;</span><br><span class="line">    &lt;servlet-name&gt;DispatcherServlet&lt;/servlet-name&gt;</span><br><span class="line">    &lt;servlet-<span class="class"><span class="keyword">class</span>&gt;<span class="title">org</span>.<span class="title">springframework</span>.<span class="title">web</span>.<span class="title">servlet</span>.<span class="title">DispatcherServlet</span>&lt;/<span class="title">servlet</span>-<span class="title">class</span>&gt;</span></span><br><span class="line"><span class="class">    &lt;<span class="title">init</span>-<span class="title">param</span>&gt;</span></span><br><span class="line"><span class="class">      &lt;<span class="title">param</span>-<span class="title">name</span>&gt;<span class="title">contextConfigLocation</span>&lt;/<span class="title">param</span>-<span class="title">name</span>&gt;</span></span><br><span class="line">      &lt;param-value&gt;classpath:spring-mvc.xml&lt;/param-value&gt;</span><br><span class="line">    &lt;/init-param&gt;</span><br><span class="line">    &lt;load-on-startup&gt;1&lt;/load-on-startup&gt;</span><br><span class="line">  &lt;/servlet&gt;</span><br><span class="line">&lt;!--配置映射地址--&gt;</span><br><span class="line">  &lt;servlet-mapping&gt;</span><br><span class="line">    &lt;servlet-name&gt;DispatcherServlet&lt;/servlet-name&gt;</span><br><span class="line">    &lt;url-pattern&gt;/&lt;/url-pattern&gt;</span><br><span class="line">  &lt;/servlet-mapping&gt;</span><br><span class="line">&lt;/web-app&gt;</span><br></pre></td></tr></table></figure>
+
+<p>3.4.编写POJOController配置注解</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com.it.controller;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> org.springframework.stereotype.Component;</span><br><span class="line"><span class="keyword">import</span> org.springframework.web.bind.annotation.RequestMapping;</span><br><span class="line"></span><br><span class="line"><span class="meta">@Component</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">UserController</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@RequestMapping</span>(<span class="string">"/quick"</span>)</span><br><span class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">save</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        System.out.println(<span class="string">"Controller save running"</span>);</span><br><span class="line">        <span class="keyword">return</span> <span class="string">"success.jsp"</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>UrlBasedViewResolver类里区分REDIRECT_URL_PREFIX=”redirect:” FORWARD_URL_PREFIX=”forward:”，通过这个区分重定向和转发，例如在上面save方法里写return “success.jsp”，这里默认省略了return “forward:success.jsp”，如果想改成重定向方式则改成return “redirect:success.jsp”</p>
+<p>若要return “jsp/success.jsp”重新配置视图解析器可以省略前后缀</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">&lt;bean id=<span class="string">"viewSolver"</span> <span class="class"><span class="keyword">class</span></span>=<span class="string">"org.springframeowork.web.servlet.view.InternalResourceViewResolver"</span>&gt;</span><br><span class="line">	&lt;property name="perfix" value="/jsp/"&gt;&lt;/property&gt;</span><br><span class="line">	&lt;property name="suffix" value=".jsp"&gt;&lt;/property&gt;</span><br><span class="line">&lt;/bean&gt;</span><br></pre></td></tr></table></figure>
+
+<p>重新配置视图解析器后就可写成return “success”</p>
+<p>4.配置spring-mvc.xml</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">&lt;?xml version=<span class="string">"1.0"</span> encoding=<span class="string">"UTF-8"</span>?&gt;</span><br><span class="line">&lt;beans xmlns=<span class="string">"http://www.springframework.org/schema/beans"</span></span><br><span class="line">       xmlns:xsi=<span class="string">"http://www.w3.org/2001/XMLSchema-instance"</span></span><br><span class="line">       xmlns:context=<span class="string">"http://www.springframework.org/schema/context"</span></span><br><span class="line">       xsi:schemaLocation=<span class="string">"http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd</span></span><br><span class="line"><span class="string">                            http://www.springframework.org/schema/context  http://www.springframework.org/schema/context/spring-context.xsd"</span>&gt;</span><br><span class="line"></span><br><span class="line">&lt;!--Controller组件扫描--&gt;</span><br><span class="line">        &lt;context:component-scan base-package="com.it.controller"&gt;&lt;/context:component-scan&gt;</span><br><span class="line">&lt;/beans&gt;</span><br></pre></td></tr></table></figure>
+
+<p>当有请求访问localhost:8080/quick时找Tomcat，Tomcat会找DispatcherServlet，因为作为前端控制器它的url-pattern是缺省的，所有请求都要过DispatcherServlet，根据DispatcherServlet指定的spring-mvc.xml去扫包去找对应的Web部分的Controller，找到@RequestMapping(/quick)时对应上，执行save方法</p>
+<h4 id="SpringMVC相关组件"><a href="#SpringMVC相关组件" class="headerlink" title="SpringMVC相关组件"></a>SpringMVC相关组件</h4><p>前端控制器DispatcherServlet：调用其它功能组件</p>
+<p>处理器映射器HandlerMapping：进行地址解析，返回执行链</p>
+<p>处理器适配器HandlerAdapter：被前端控制器调用，去调用处理器</p>
+<p>处理器Handler：相当于我们自己封装的Controller</p>
+<p>视图解析器ViewResolver：将ModelAndView的View解析出来</p>
+<p>视图View</p>
+<h4 id="SpringMVC的数据响应"><a href="#SpringMVC的数据响应" class="headerlink" title="SpringMVC的数据响应"></a>SpringMVC的数据响应</h4><h5 id="页面跳转"><a href="#页面跳转" class="headerlink" title="页面跳转"></a>页面跳转</h5><p>1.返回字符串形式：此种方式会将返回的字符串与视图解析器的前后缀拼接后跳转</p>
+<p>2.返回ModelAndView</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com.it.controller;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> org.springframework.stereotype.Component;</span><br><span class="line"><span class="keyword">import</span> org.springframework.web.bind.annotation.RequestMapping;</span><br><span class="line"><span class="keyword">import</span> org.springframework.web.servlet.ModelAndView;</span><br><span class="line"></span><br><span class="line"><span class="meta">@Component</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">UserController</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@RequestMapping</span>(<span class="string">"/quick2"</span>)</span><br><span class="line">    <span class="function"><span class="keyword">public</span> ModelAndView <span class="title">save2</span><span class="params">()</span> </span>&#123;</span><br><span class="line"><span class="comment">//        Model：模型 作用封装数据</span></span><br><span class="line"><span class="comment">//        View：视图 作用展示数据</span></span><br><span class="line">        ModelAndView modelAndView = <span class="keyword">new</span> ModelAndView();</span><br><span class="line">        <span class="comment">//设置模型数据,和之前的setAttribute一样，将数据放在域中可以在前端获取</span></span><br><span class="line">        modelAndView.addObject(<span class="string">"username"</span>,<span class="string">"itcast"</span>);</span><br><span class="line">        <span class="comment">//设置视图名称</span></span><br><span class="line">        modelAndView.setViewName(<span class="string">"success"</span>);</span><br><span class="line">        <span class="keyword">return</span> modelAndView;</span><br><span class="line">    &#125;</span><br><span class="line">        <span class="meta">@RequestMapping</span>(<span class="string">"/quick3"</span>)</span><br><span class="line">    <span class="function"><span class="keyword">public</span> ModelAndView <span class="title">save3</span><span class="params">(ModelAndView modelAndView)</span> </span>&#123;</span><br><span class="line">        <span class="comment">//设置模型数据,和之前的addAttribute一样，将数据放在域中可以在前端获取</span></span><br><span class="line">        modelAndView.addObject(<span class="string">"username"</span>,<span class="string">"itcast"</span>);</span><br><span class="line">        <span class="comment">//设置视图名称</span></span><br><span class="line">        modelAndView.setViewName(<span class="string">"success"</span>);</span><br><span class="line">        <span class="keyword">return</span> modelAndView;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">        <span class="meta">@RequestMapping</span>(<span class="string">"/quick4"</span>)</span><br><span class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">save3</span><span class="params">(Model model)</span> </span>&#123;</span><br><span class="line">        model.addAttribute(<span class="string">"username"</span>,<span class="string">"bob"</span>);</span><br><span class="line">        <span class="keyword">return</span> <span class="string">"success.jsp"</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>SpringMVC在解析方法的时候发现参数是ModelAndView、Model等需要提供，它就会从容器中将已有的对象注入</p>
+<h5 id="回写数据"><a href="#回写数据" class="headerlink" title="回写数据"></a>回写数据</h5><p>1.直接返回字符串</p>
+<p>将需要回写的字符串直接返回，需要@ResponseBody注解告诉SpringMVC，方法返回的字符串不是跳转</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com.it.controller;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> org.springframework.stereotype.Component;</span><br><span class="line"><span class="keyword">import</span> org.springframework.web.bind.annotation.RequestMapping;</span><br><span class="line"><span class="keyword">import</span> org.springframework.web.bind.annotation.ResponseBody;</span><br><span class="line"><span class="keyword">import</span> java.io.IOException;</span><br><span class="line"></span><br><span class="line"><span class="meta">@Component</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">UserController</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@RequestMapping</span>(<span class="string">"/quick"</span>)</span><br><span class="line">    <span class="meta">@ResponseBody</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">save</span><span class="params">()</span><span class="keyword">throws</span> IOException </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="string">"hello"</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>2.返回对象和集合</p>
+<p>使用在xml里用<a href="mvc:annotation-driven">mvc:annotation-driven</a>就能在方法上继续使用@ResponseBody(告知不是跳转)返回Json</p>
+<h4 id="SpringMVC获得请求数据"><a href="#SpringMVC获得请求数据" class="headerlink" title="SpringMVC获得请求数据"></a>SpringMVC获得请求数据</h4><h5 id="基本类型参数"><a href="#基本类型参数" class="headerlink" title="基本类型参数"></a>基本类型参数</h5><p>Controller中的方法参数名称要与请求参数名一致，参数值会自动映射匹配</p>
+<p><a href="http://localhost:8080/Spring-MVC/quick?username=zhangsan&amp;age=12" target="_blank" rel="noopener">http://localhost:8080/Spring-MVC/quick?username=zhangsan&amp;age=12</a></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@RequestMapping</span>(<span class="string">"/quick"</span>)</span><br><span class="line"><span class="meta">@ResponseBody</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">quickMethod</span><span class="params">(String username,<span class="keyword">int</span> age)</span><span class="keyword">throws</span> IOException </span>&#123;</span><br><span class="line">	System.out.println(username+age);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h5 id="POJO类型参数"><a href="#POJO类型参数" class="headerlink" title="POJO类型参数"></a>POJO类型参数</h5><p>Controller中的方法的POJO参数的属性名与请求参数名一致，参数值会自动映射匹配</p>
+<p><a href="http://localhost:8080/Spring-MVC/quick?username=zhangsan&amp;age=12" target="_blank" rel="noopener">http://localhost:8080/Spring-MVC/quick?username=zhangsan&amp;age=12</a></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">User</span> </span>&#123;</span><br><span class="line">	<span class="keyword">private</span> String username;</span><br><span class="line">	<span class="keyword">private</span> <span class="keyword">int</span> age;</span><br><span class="line">	getter/setter...</span><br><span class="line">&#125;</span><br><span class="line"><span class="meta">@RequestMapping</span>(<span class="string">"/quick"</span>)</span><br><span class="line"><span class="meta">@ResponseBody</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">quickMethod</span><span class="params">(User user)</span><span class="keyword">throws</span> IOException </span>&#123;</span><br><span class="line">	System.out.println(user);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h5 id="数组类型参数"><a href="#数组类型参数" class="headerlink" title="数组类型参数"></a>数组类型参数</h5><p>Controller中的方法的数组名与请求参数名一致，参数值会自动映射匹配</p>
+<p><a href="http://localhost:8080/Spring-MVC/quick?strs=111&amp;strs=222&amp;strs=333" target="_blank" rel="noopener">http://localhost:8080/Spring-MVC/quick?strs=111&amp;strs=222&amp;strs=333</a></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@RequestMapping</span>(<span class="string">"/quick"</span>)</span><br><span class="line"><span class="meta">@ResponseBody</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">quickMethod</span><span class="params">(String[] strs)</span><span class="keyword">throws</span> IOException </span>&#123;</span><br><span class="line">	System.out.println(Arrays.asList(strs));</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>因为数组打印都是地址，List打印是值，所以这里转换成List</p>
+<h5 id="集合类型参数"><a href="#集合类型参数" class="headerlink" title="集合类型参数"></a>集合类型参数</h5><p>当使用ajax提交时，可以指定contentType为Json格式，Controller的方法参数位置加@RequestBody可以直接接收集合数据</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@RequestMapping</span>(<span class="string">"/quick"</span>)</span><br><span class="line"><span class="meta">@ResponseBody</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">quickMethod</span><span class="params">(@ResponseBody List&lt;User&gt; userList)</span><span class="keyword">throws</span> IOException </span>&#123;</span><br><span class="line">	System.out.println(userList);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h5 id="参数绑定注解-requestParam"><a href="#参数绑定注解-requestParam" class="headerlink" title="参数绑定注解@requestParam"></a>参数绑定注解@requestParam</h5><p><a href="http://localhost:8080/Spring-MVC/quick?name=zhangsan" target="_blank" rel="noopener">http://localhost:8080/Spring-MVC/quick?name=zhangsan</a></p>
+<p>value指请求的参数名称(和Controller方法参数可以不一致)</p>
+<p>required请求的参数是否必须有它，没有就报错</p>
+<p>defaultValue没有该参数时它的默认值是什么</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@RequestMapping</span>(<span class="string">"/quick"</span>)</span><br><span class="line"><span class="meta">@ResponseBody</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">quickMethod</span><span class="params">(@RequestParam(value=<span class="string">"name"</span>,required=<span class="keyword">false</span>,defaultValue=<span class="string">"itcast"</span>)</span> String username)<span class="keyword">throws</span> IOException </span>&#123;</span><br><span class="line">	System.out.println(username);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h5 id="Restful风格参数"><a href="#Restful风格参数" class="headerlink" title="Restful风格参数"></a>Restful风格参数</h5><p>Restful风格：使用”url+请求方式”进行请求</p>
+<p>/user/1 GET:得到id=1的user</p>
+<p>/user/1 DELETE:删除id=1的user</p>
+<p>/user/1 PUT:更新id=1的user</p>
+<p>/user POST:新增user</p>
+<p><a href="http://localhost:8080/Spring-MVC/quick/zhangsan" target="_blank" rel="noopener">http://localhost:8080/Spring-MVC/quick/zhangsan</a></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@RequestMapping</span>(<span class="string">"/quick/&#123;name&#125;"</span>)</span><br><span class="line"><span class="meta">@ResponseBody</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">quickMethod</span><span class="params">(@PathVariable(value=<span class="string">"name"</span>,required=<span class="keyword">true</span>)</span> String name) </span>&#123;</span><br><span class="line">	System.out.println(name);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>在SpringMVC中可以使用占位符继续参数绑定，占位符{name}对应的就是zhangsan，Controller方法参数使用@PathVariable用value的值去匹配占位符，匹配到赋值给后面的变量，也就是说String name的参数名可以改，但是value与占位符必须是对应的</p>
+<h5 id="获得请求头"><a href="#获得请求头" class="headerlink" title="获得请求头"></a>获得请求头</h5><p>1.@RequestHeader</p>
+<p>可以获得指定请求头信息，相当于request.getHeader(name)</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@RequestMapping</span>(<span class="string">"/quick"</span>)</span><br><span class="line"><span class="meta">@ResponseBody</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">quickMethod</span><span class="params">(@RequestHeader(value=<span class="string">"User-Agent"</span>,required=<span class="keyword">false</span>)</span> String name) </span>&#123;</span><br><span class="line">	System.out.println(name);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>value：请求头名称，required：是否必须携带此请求头</p>
+<p>2.@CookieValue</p>
+<p>可以获得指定Cookie的值，value和required同上</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@RequestMapping</span>(<span class="string">"/quick"</span>)</span><br><span class="line"><span class="meta">@ResponseBody</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">quickMethod</span><span class="params">(@CookieValue(value=<span class="string">"JSESSIONID"</span>,required=<span class="keyword">false</span>)</span> String jsessionid) </span>&#123;</span><br><span class="line">	System.out.println(jsessionid);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+      
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
+	<div class="article-tag tagcloud">
+		<i class="icon-price-tags icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color5">SpringMVC</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
+      
+
+      
+        <p class="article-more-link">
+          <a class="article-more-a" href="/2020/06/15/SpringMVC%E7%AE%80%E4%BB%8B/">展开全文 >></a>
+        </p>
+      
+
+      
+      <div class="clearfix"></div>
+    </div>
+  </div>
+</article>
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+    </div>
+</aside>
+
+
+
+
+  
     <article id="post-Spring-事务控制" class="article article-type-post  article-index" itemscope itemprop="blogPost">
   <div class="article-inner">
     
@@ -1362,105 +1512,6 @@
 
 
   
-    <article id="post-Java8的并发" class="article article-type-post  article-index" itemscope itemprop="blogPost">
-  <div class="article-inner">
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2019/09/22/Java8%E7%9A%84%E5%B9%B6%E5%8F%91/">Java8的并发</a>
-    </h1>
-  
-
-        
-        <a href="/2019/09/22/Java8%E7%9A%84%E5%B9%B6%E5%8F%91/" class="archive-article-date">
-  	<time datetime="2019-09-22T04:00:00.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2019-09-22</time>
-</a>
-        
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <h3 id="增强的Future：CompletableFuture"><a href="#增强的Future：CompletableFuture" class="headerlink" title="增强的Future：CompletableFuture"></a>增强的Future：CompletableFuture</h3><h4 id="没准备好就等待"><a href="#没准备好就等待" class="headerlink" title="没准备好就等待"></a>没准备好就等待</h4><p>向CompletableFuture请求一个数据，如果数据还没准备好，请求线程就会等待。也可以通过手动设置CompletableFuture的完成状态</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> java.util.concurrent.CompletableFuture;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">AskThread</span> <span class="keyword">implements</span> <span class="title">Runnable</span></span>&#123;</span><br><span class="line">    CompletableFuture&lt;Integer&gt; re = <span class="keyword">null</span>;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">AskThread</span><span class="params">(CompletableFuture&lt;Integer&gt; re)</span></span>&#123;</span><br><span class="line">        <span class="keyword">this</span>.re = re;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">int</span> myRe = <span class="number">0</span>;</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            myRe = re.get() * re.get();</span><br><span class="line">        &#125;<span class="keyword">catch</span> (Exception e)&#123;</span><br><span class="line">            System.out.println(myRe);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span><span class="keyword">throws</span> InterruptedException</span>&#123;</span><br><span class="line">        <span class="keyword">final</span> CompletableFuture&lt;Integer&gt; future = <span class="keyword">new</span> CompletableFuture&lt;&gt;();</span><br><span class="line">        <span class="keyword">new</span> Thread(<span class="keyword">new</span> AskThread(future)).start();</span><br><span class="line"></span><br><span class="line">        Thread.sleep(<span class="number">1000</span>);</span><br><span class="line">        future.complete(<span class="number">60</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>线程的作用是计算CompletableFuture表示的数字的平方。程序执行到</p>
-<p>myRe = re.get() * re.get();时会阻塞，因为CompletableFuture没有需要的数据。最后一行diamagnetic表示CompletableFuture已经完成，因此线程可以继续运行并结束。</p>
-<h4 id="异步执行任务"><a href="#异步执行任务" class="headerlink" title="异步执行任务"></a>异步执行任务</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> Integer <span class="title">calc</span><span class="params">(Integer para)</span></span>&#123;</span><br><span class="line">	<span class="keyword">try</span>&#123;</span><br><span class="line">		Thread.sleep(<span class="number">1000</span>);</span><br><span class="line">	&#125;<span class="keyword">catch</span>(InterruptedException e)&#123;&#125;</span><br><span class="line">	<span class="keyword">return</span> para * para;</span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span><span class="keyword">throws</span> InterruptedException,ExecutionException</span>&#123;</span><br><span class="line">    <span class="keyword">final</span> CompletableFuture&lt;Integer&gt; future = CompletableFuture.supplyAsync(()-&gt;calc(<span class="number">50</span>));</span><br><span class="line">    System.out.println(future.get)();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>通过使用CompletableFuture.supplyAsync()构造一个CompletableFuture实例，supplyAsync会在一个新线程中执行传入的参数。这里会让新线程执行calc函数，异步体现在了执行calc后立即返回，并不会等待参数执行完。返回后执行future.get方法，因为future的数据还没准备好，所以会等待。</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">static</span> &lt;U&gt; <span class="function">CompletableFuture&lt;U&gt; <span class="title">supplyAsync</span><span class="params">(Supplier&lt;U&gt; supplier)</span></span>;</span><br><span class="line"><span class="keyword">static</span> &lt;U&gt; <span class="function">CompletableFuture&lt;U&gt; <span class="title">supplyAsync</span><span class="params">(Supplier&lt;U&gt; supplier,Executor executor)</span></span>;</span><br><span class="line"><span class="function"><span class="keyword">static</span> CompletableFuture&lt;Void&gt; <span class="title">runAsync</span><span class="params">(Runnable runnable)</span></span>;</span><br><span class="line"><span class="function"><span class="keyword">static</span> CompletableFuture&lt;Void&gt; <span class="title">runAsync</span><span class="params">(Runnable runnable,Executor executor)</span></span>;</span><br></pre></td></tr></table></figure>
-
-<p>supplyAsync()用于需要返回值的场景，例如计算某个数据。runAsync()用于没有返回值的场景，例如简单地执行某个异步动作。</p>
-<p>每个方法都可接收Executor，让Supplier或者Runnable在指定的线程池中工作，否则默认系统公共的线程池ForkJoinPool.common</p>
-<h4 id="异常处理"><a href="#异常处理" class="headerlink" title="异常处理"></a>异常处理</h4><p>CompletableFuture提供了一个异常处理方法exceptionally()</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> Integer <span class="title">calc</span><span class="params">(Integer para)</span></span>&#123;</span><br><span class="line">    <span class="keyword">return</span> para/<span class="number">0</span>;</span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span><span class="keyword">throws</span> InterruptedException,ExecutionException</span>&#123;</span><br><span class="line">    CompletableFuture&lt;Void&gt; fu = CompletableFuture</span><br><span class="line">        .supplyAsync(()-&gt;calc(<span class="number">50</span>));</span><br><span class="line">    .exceptionally(ex-&gt;&#123;</span><br><span class="line">        System.out.println(ex.toString());</span><br><span class="line">        <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">    &#125;)</span><br><span class="line">     fu.get();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<h3 id="改进的读写锁：StampedLock"><a href="#改进的读写锁：StampedLock" class="headerlink" title="改进的读写锁：StampedLock"></a>改进的读写锁：StampedLock</h3><p>普通的读写锁采用悲观的锁策略，读和写之间是互斥的。而StampedLock则是乐观的读策略，类似于无锁的操作，使得读操作不会阻塞写操作。</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> sun.nio.cs.ext.MacArabic;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> java.util.concurrent.locks.StampedLock;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Point</span> </span>&#123;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">double</span> x,y;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">final</span> StampedLock s1 = <span class="keyword">new</span> StampedLock();</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">move</span><span class="params">(<span class="keyword">double</span> x,<span class="keyword">double</span> y)</span></span>&#123;</span><br><span class="line">        <span class="keyword">long</span> stamp = s1.writeLock();</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            <span class="keyword">this</span>.x += x;</span><br><span class="line">            <span class="keyword">this</span>.y += y;</span><br><span class="line">        &#125;<span class="keyword">finally</span> &#123;</span><br><span class="line">            s1.unlockWrite(stamp);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">double</span> <span class="title">distanceFromOrigin</span><span class="params">()</span></span>&#123;</span><br><span class="line">        <span class="keyword">long</span> stamp = s1.tryOptimisticRead();</span><br><span class="line">        <span class="keyword">double</span> currentX = x,currentY = y;</span><br><span class="line">        <span class="keyword">if</span>(!s1.validate(stamp))&#123;</span><br><span class="line">            stamp = s1.readLock();</span><br><span class="line">            <span class="keyword">try</span> &#123;</span><br><span class="line">                currentX = x;</span><br><span class="line">                currentY = y;</span><br><span class="line">            &#125;<span class="keyword">finally</span> &#123;</span><br><span class="line">                s1.unlockRead(stamp);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> Math.sqrt(currentX*currentX+currentY*currentY);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>每一次写操作都会修改时间戳</p>
-<p>tryOptimisticRead乐观读方法，认为没有写线程在写，不管在没在写直接读出来，返回一个时间戳。此时要用validate判断时间戳在读过程中是否被修改过，如果没有修改过则认为这次读取是有效的。如果读取有效，直接执行最后一行Math.sqrt。如果读取无效，有两个选择，一种是选择把乐观锁变成悲观锁，本例中就是变成悲观锁后再读，此时读和写是互斥的，最后不管怎样都会执行读锁的解锁；另一种方法是重复乐观读，直到读取有效。</p>
-<h3 id="发布和订阅模式"><a href="#发布和订阅模式" class="headerlink" title="发布和订阅模式"></a>发布和订阅模式</h3><p>Java9引入的并发编程架构反应式编程，反应式编程用于处理异步流的数据，反应式编程以流的形式处理数据，内存使用效率更高。</p>
-<p>反应式编程的核心组件是Publisher和Subscriber。Publisher将数据发布到流中，Subscriber负责处理这些数据。</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//Subscriber是订阅者</span></span><br><span class="line">onSubscribe():订阅者注册后被调用的第一个方法</span><br><span class="line">onNext():当有下一个数据项准备好时，进行通知</span><br><span class="line">onError():当发生无法恢复的异常时被调用</span><br><span class="line">onComplete()：当没有更多数据需要处理时被调用</span><br><span class="line"></span><br><span class="line"><span class="comment">//Subscription是对订阅数据的处理</span></span><br><span class="line">request()：设定请求的数据</span><br><span class="line">cancel()：Subscribe停止接收新的消息</span><br></pre></td></tr></table></figure>
-      
-
-      
-    </div>
-    <div class="article-info article-info-index">
-      
-      
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">实战Java高并发程序设计</a>
-        		</li>
-      		 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color1">Java8</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-      
-
-      
-        <p class="article-more-link">
-          <a class="article-more-a" href="/2019/09/22/Java8%E7%9A%84%E5%B9%B6%E5%8F%91/">展开全文 >></a>
-        </p>
-      
-
-      
-      <div class="clearfix"></div>
-    </div>
-  </div>
-</article>
-
-<aside class="wrap-side-operation">
-    <div class="mod-side-operation">
-        
-        <div class="jump-container" id="js-jump-container" style="display:none;">
-            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
-                <i class="icon-font icon-back"></i>
-            </a>
-            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
-                <i class="icon-font icon-plane jump-plane"></i>
-            </div>
-        </div>
-        
-        
-    </div>
-</aside>
-
-
-
-
-  
   
     <nav id="page-nav">
       <span class="page-number current">1</span><a class="page-number" href="/page/2/">2</a><a class="page-number" href="/page/3/">3</a><a class="page-number" href="/page/4/">4</a><a class="extend next" rel="next" href="/page/2/">Next &amp;raquo;</a>
@@ -1562,15 +1613,11 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">Java8</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color3">容器</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">同步</a>
+                <a href="javascript:void(0)" class="js-tag color3">集合</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -1578,11 +1625,15 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">同步</a>
+              </li>
+             
+              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color4">LeetCode</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">集合</a>
+                <a href="javascript:void(0)" class="js-tag color1">Java8</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -1598,6 +1649,18 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color5">Jdbc</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color5">SpringMVC</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">事务</a>
+              </li>
+             
+              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color4">StringBuilder</a>
               </li>
              
@@ -1606,19 +1669,11 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">事务</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">多线程</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color2">Java基础</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">Jdbc</a>
+                <a href="javascript:void(0)" class="js-tag color4">多线程</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -1630,19 +1685,11 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">反射</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color5">未来日记</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">设计模式</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">抽象类</a>
+                <a href="javascript:void(0)" class="js-tag color3">反射</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -1650,15 +1697,7 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">接口</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">线程</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">泛型</a>
+                <a href="javascript:void(0)" class="js-tag color5">设计模式</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -1666,7 +1705,23 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color4">抽象类</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">接口</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">泛型</a>
+              </li>
+             
+              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color5">sync</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">线程</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -1674,19 +1729,19 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">锁</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color3">无锁</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">静态</a>
+                <a href="javascript:void(0)" class="js-tag color2">锁</a>
               </li>
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color5">错误处理</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">静态</a>
               </li>
              
               <li class="article-tag-list-item">
