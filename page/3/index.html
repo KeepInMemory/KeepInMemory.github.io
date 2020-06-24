@@ -150,6 +150,195 @@
           <div id="js-content" class="content-ll">
             
   
+    <article id="post-锁的优化-建议与JVM" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2019/09/15/%E9%94%81%E7%9A%84%E4%BC%98%E5%8C%96-%E5%BB%BA%E8%AE%AE%E4%B8%8EJVM/">锁的优化-建议与JVM</a>
+    </h1>
+  
+
+        
+        <a href="/2019/09/15/%E9%94%81%E7%9A%84%E4%BC%98%E5%8C%96-%E5%BB%BA%E8%AE%AE%E4%B8%8EJVM/" class="archive-article-date">
+  	<time datetime="2019-09-15T04:00:00.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2019-09-15</time>
+</a>
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h3 id="提高锁性能的建议"><a href="#提高锁性能的建议" class="headerlink" title="提高锁性能的建议"></a>提高锁性能的建议</h3><h4 id="减少锁持有的时间"><a href="#减少锁持有的时间" class="headerlink" title="减少锁持有的时间"></a>减少锁持有的时间</h4><p>如果线程持有锁的时间越长，那么锁的竞争程度也就越激烈，等待的线程会越来越多。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">synchronized</span> <span class="keyword">void</span> syncMethod&#123;</span><br><span class="line">	othercode1();</span><br><span class="line">	mytexMethod();</span><br><span class="line">	othercode2();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>可以优化为</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">void</span> syncMethod&#123;</span><br><span class="line">	othercode1();</span><br><span class="line">	<span class="keyword">synchronized</span>(<span class="keyword">this</span>)&#123;</span><br><span class="line">		mytexMethod();</span><br><span class="line">	&#125;</span><br><span class="line">	othercode2();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>只在必要时同步</p>
+<h4 id="减小锁粒度"><a href="#减小锁粒度" class="headerlink" title="减小锁粒度"></a>减小锁粒度</h4><p>减小锁粒度，就是缩小指定对象的范围。典型的例子就是ConcurrentHashMap</p>
+<p>对于HashMap来说，最重要的两个方法就是get()和put()。一种很自然的想法就是对整个HashMap加锁，这样肯定会得到一个线程安全的HashMap，但是这样做由于加锁粒度过大，会导致系统性能下降。</p>
+<p>在ConcurrentHashMap内部进一步细分了若干个小的HashMap，称之为段(segment)，默认情况下ConcurrentHashMap内部被细分为16个段。</p>
+<p>如果需要在ConcurrentHashMap中新增一个表项，并不需要将整个HashMap加锁，而是首先根据hashcode得到该表项应该被存放到哪个段，然后对该段加锁，并完成put()操作。在多线程环境中，如果多个线程同时进行put()操作，只要被加入的表项不存放在同一个段中，则线程间便可以做到真正的并行。</p>
+<p>但这么做的缺点就是ConcurrentHashMap.size方法要获取这个信息需要取得所有子段的锁。</p>
+<h4 id="锁分离"><a href="#锁分离" class="headerlink" title="锁分离"></a>锁分离</h4><p>将独占锁的功能不同进行分离，比如分成读和写两部分。在读多写少的场合使用读写锁可以提高并发能力</p>
+<h4 id="锁粗化"><a href="#锁粗化" class="headerlink" title="锁粗化"></a>锁粗化</h4><p>为此，虚拟机在遇到一连窜连续的对一个锁不断的进行请求和释放操作时，便会把所有的锁操作，整合成对锁的一次请求，从而减少对锁的请求同步次数，这个操作叫锁的粗化。</p>
+<p>下面给出两个锁粗化的例子</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">demoMethod</span><span class="params">()</span></span>&#123;</span><br><span class="line">    <span class="keyword">synchronized</span>(lock)&#123;</span><br><span class="line">        <span class="comment">//do sth.</span></span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">//做其他不需要同步的工作，但很快能执行完毕</span></span><br><span class="line">    <span class="keyword">synchronized</span>(lock)&#123;</span><br><span class="line">        <span class="comment">//do sth.</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">demoMethod</span><span class="params">()</span></span>&#123;</span><br><span class="line">    <span class="keyword">synchronized</span>(lock)&#123;</span><br><span class="line">        <span class="comment">//do sth.</span></span><br><span class="line">        <span class="comment">//做其他不需要同步的工作，但很快能执行完毕</span></span><br><span class="line">        <span class="comment">//do sth.</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">for</span>(<span class="keyword">int</span> i = <span class="number">0</span> ; i &lt; k; ++ i)&#123;</span><br><span class="line">	<span class="keyword">synchronized</span>(lock)&#123;&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">synchronized</span>(lock)&#123;</span><br><span class="line">	<span class="keyword">for</span>(<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; k ; ++ i)&#123;</span><br><span class="line">	</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="JVM的锁优化"><a href="#JVM的锁优化" class="headerlink" title="JVM的锁优化"></a>JVM的锁优化</h3><h4 id="锁偏向"><a href="#锁偏向" class="headerlink" title="锁偏向"></a>锁偏向</h4><p>如果一个线程获得了锁，那么锁就进入偏向，当这个线程再次请求锁时，无需再做任何同步操作。这样节省了大量申请锁的时间。适用于几乎没有锁竞争的场合，在锁竞争激烈的场合还不如没有。</p>
+<h4 id="锁消除"><a href="#锁消除" class="headerlink" title="锁消除"></a>锁消除</h4><p>JVM在进行JIT编译时，通过对运行上下文的扫描，去除不可能存在共享资源竞争的锁。</p>
+<p>例如，在没有并发的场合使用了Vector，锁消除使用的技术为逃逸分析，即分析一个变量是否会逃出某一个作用域。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> String[] createStrings()&#123;</span><br><span class="line">	Vector&lt;String&gt; v= <span class="keyword">new</span> Vector&lt;String&gt;();</span><br><span class="line">    <span class="keyword">for</span>(<span class="keyword">int</span> i = <span class="number">0</span> ; i &lt; <span class="number">100</span>; ++ i)&#123;</span><br><span class="line">        v.add(Integer.toString(i));</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> v.toArray(<span class="keyword">new</span> String[]&#123;&#125;);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>在本例种变量v没有掏出createStrings的作用域，所以可以将变量v内部的加锁操作去除。</p>
+<p>如果返回的是变量v，则认为v有可能会被其他线程访问，不能消除加锁操作。</p>
+<h4 id="轻量级锁"><a href="#轻量级锁" class="headerlink" title="轻量级锁"></a>轻量级锁</h4><h4 id="自旋锁"><a href="#自旋锁" class="headerlink" title="自旋锁"></a>自旋锁</h4>
+      
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
+	<div class="article-tag tagcloud">
+		<i class="icon-price-tags icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">实战Java高并发程序设计</a>
+        		</li>
+      		 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color2">锁</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
+      
+
+      
+        <p class="article-more-link">
+          <a class="article-more-a" href="/2019/09/15/%E9%94%81%E7%9A%84%E4%BC%98%E5%8C%96-%E5%BB%BA%E8%AE%AE%E4%B8%8EJVM/">展开全文 >></a>
+        </p>
+      
+
+      
+      <div class="clearfix"></div>
+    </div>
+  </div>
+</article>
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+    </div>
+</aside>
+
+
+
+
+  
+    <article id="post-JDK并发包-并发容器" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2019/09/14/JDK%E5%B9%B6%E5%8F%91%E5%8C%85-%E5%B9%B6%E5%8F%91%E5%AE%B9%E5%99%A8/">JDK并发包-并发容器</a>
+    </h1>
+  
+
+        
+        <a href="/2019/09/14/JDK%E5%B9%B6%E5%8F%91%E5%8C%85-%E5%B9%B6%E5%8F%91%E5%AE%B9%E5%99%A8/" class="archive-article-date">
+  	<time datetime="2019-09-14T04:00:00.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2019-09-14</time>
+</a>
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>ConcurrentHashMap：一个高效安全的并发HashMap。</p>
+<p>CopyOnWriteArrayList：用在读多写少的场合，是性能最好的list</p>
+<p>ConcurrentLinkedQueue：一个高效安全的并发的链表实现的队列</p>
+<p>BlockingQueue：阻塞队列，作为数据共享的通道，ArrayBlockingQueue、LinkedBlockingQueue实现了这个接口</p>
+<p>ConcurrentSkipListMap：跳表实现的Map，对其遍历是有序的。</p>
+
+      
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
+	<div class="article-tag tagcloud">
+		<i class="icon-price-tags icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">实战Java高并发程序设计</a>
+        		</li>
+      		 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">容器</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
+      
+
+      
+        <p class="article-more-link">
+          <a class="article-more-a" href="/2019/09/14/JDK%E5%B9%B6%E5%8F%91%E5%8C%85-%E5%B9%B6%E5%8F%91%E5%AE%B9%E5%99%A8/">展开全文 >></a>
+        </p>
+      
+
+      
+      <div class="clearfix"></div>
+    </div>
+  </div>
+</article>
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+    </div>
+</aside>
+
+
+
+
+  
     <article id="post-JDK并发包-线程池" class="article article-type-post  article-index" itemscope itemprop="blogPost">
   <div class="article-inner">
     
@@ -250,88 +439,6 @@
       
         <p class="article-more-link">
           <a class="article-more-a" href="/2019/09/14/JDK%E5%B9%B6%E5%8F%91%E5%8C%85-%E7%BA%BF%E7%A8%8B%E6%B1%A0/">展开全文 >></a>
-        </p>
-      
-
-      
-      <div class="clearfix"></div>
-    </div>
-  </div>
-</article>
-
-<aside class="wrap-side-operation">
-    <div class="mod-side-operation">
-        
-        <div class="jump-container" id="js-jump-container" style="display:none;">
-            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
-                <i class="icon-font icon-back"></i>
-            </a>
-            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
-                <i class="icon-font icon-plane jump-plane"></i>
-            </div>
-        </div>
-        
-        
-    </div>
-</aside>
-
-
-
-
-  
-    <article id="post-JDK并发包-并发容器" class="article article-type-post  article-index" itemscope itemprop="blogPost">
-  <div class="article-inner">
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2019/09/14/JDK%E5%B9%B6%E5%8F%91%E5%8C%85-%E5%B9%B6%E5%8F%91%E5%AE%B9%E5%99%A8/">JDK并发包-并发容器</a>
-    </h1>
-  
-
-        
-        <a href="/2019/09/14/JDK%E5%B9%B6%E5%8F%91%E5%8C%85-%E5%B9%B6%E5%8F%91%E5%AE%B9%E5%99%A8/" class="archive-article-date">
-  	<time datetime="2019-09-14T04:00:00.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2019-09-14</time>
-</a>
-        
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <p>ConcurrentHashMap：一个高效安全的并发HashMap。</p>
-<p>CopyOnWriteArrayList：用在读多写少的场合，是性能最好的list</p>
-<p>ConcurrentLinkedQueue：一个高效安全的并发的链表实现的队列</p>
-<p>BlockingQueue：阻塞队列，作为数据共享的通道，ArrayBlockingQueue、LinkedBlockingQueue实现了这个接口</p>
-<p>ConcurrentSkipListMap：跳表实现的Map，对其遍历是有序的。</p>
-
-      
-
-      
-    </div>
-    <div class="article-info article-info-index">
-      
-      
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">实战Java高并发程序设计</a>
-        		</li>
-      		 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">容器</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-      
-
-      
-        <p class="article-more-link">
-          <a class="article-more-a" href="/2019/09/14/JDK%E5%B9%B6%E5%8F%91%E5%8C%85-%E5%B9%B6%E5%8F%91%E5%AE%B9%E5%99%A8/">展开全文 >></a>
         </p>
       
 
@@ -1225,137 +1332,6 @@
 
 
   
-    <article id="post-泛型详解" class="article article-type-post  article-index" itemscope itemprop="blogPost">
-  <div class="article-inner">
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2019/09/07/%E6%B3%9B%E5%9E%8B%E8%AF%A6%E8%A7%A3/">泛型详解</a>
-    </h1>
-  
-
-        
-        <a href="/2019/09/07/%E6%B3%9B%E5%9E%8B%E8%AF%A6%E8%A7%A3/" class="archive-article-date">
-  	<time datetime="2019-09-07T04:00:00.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2019-09-07</time>
-</a>
-        
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <p><strong>泛型类的定义</strong></p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Number</span>&lt;<span class="title">T</span>,<span class="title">E</span>&gt;</span></span><br><span class="line"><span class="class"></span>&#123;</span><br><span class="line">	<span class="keyword">private</span> T num1;</span><br><span class="line">	<span class="keyword">private</span> E num2;</span><br><span class="line">	<span class="function"><span class="keyword">public</span> T <span class="title">getNum1</span><span class="params">()</span></span>&#123;<span class="keyword">return</span> num1;&#125;</span><br><span class="line">	<span class="function"><span class="keyword">public</span> E <span class="title">getNum2</span><span class="params">()</span></span>&#123;<span class="keyword">return</span> num2;&#125;</span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setNum1</span><span class="params">(T Num1)</span></span>&#123;<span class="keyword">this</span>.num1 = num1;&#125;</span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setNum2</span><span class="params">(T Num2)</span></span>&#123;<span class="keyword">this</span>.num2 = num2;&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p><strong>泛型接口的定义</strong></p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">Iterable</span>&lt;<span class="title">T</span>&gt; </span>&#123;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p><strong>泛型方法的定义</strong></p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">ArrayAlg</span></span></span><br><span class="line"><span class="class"></span>&#123;</span><br><span class="line">    <span class="keyword">public</span> &lt;T&gt; <span class="function">T <span class="title">getmiddle</span><span class="params">(T[] a)</span></span></span><br><span class="line"><span class="function">        return a[a.length/2]</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>泛型方法可以定义在泛型类中，也可以定义在普通类中。在修饰符后面，返回类型T前面写表示泛型的类型。</p>
-<p>当泛型类和泛型方法同时存在时，泛型类中的类型参数与泛型方法中的类型参数是没有联系的，泛型方法始终以自己定义的类型参数为准。</p>
-<p><strong>调用泛型方法</strong></p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">int</span>[] a = &#123;<span class="number">1</span>,<span class="number">2</span>,<span class="number">3</span>,<span class="number">4</span>&#125;;</span><br><span class="line">ArrayAlg  alg = <span class="keyword">new</span> AttayAlg();</span><br><span class="line"><span class="comment">//第一种方法</span></span><br><span class="line"><span class="keyword">int</span> result = alg.&lt;<span class="keyword">int</span>&gt;getmiddle(a);</span><br><span class="line"><span class="comment">//第二种方法</span></span><br><span class="line"><span class="keyword">int</span> result = alg.getmiddle(a);</span><br></pre></td></tr></table></figure>
-
-<p>第一种方法是调用泛型方法时在方法名前的尖括号中放入具体的类型。</p>
-<p>第二种方法是因为编译器能够通过信息判断出类型所以往往省略类型。</p>
-<p><strong>类型变量的限定</strong></p>
-<p>这里看一个例子</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">ArrayAlg</span></span></span><br><span class="line"><span class="class"></span>&#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> &lt;T&gt; <span class="function">T <span class="title">min</span><span class="params">(T[]a)</span></span></span><br><span class="line"><span class="function">    </span>&#123;</span><br><span class="line">        <span class="keyword">if</span>(a == <span class="keyword">null</span> || a.length == <span class="number">0</span>) <span class="keyword">return</span> <span class="keyword">null</span>;</span><br><span class="line">        T smallest = a[<span class="number">0</span>];</span><br><span class="line">        <span class="keyword">for</span>(<span class="keyword">int</span> i = <span class="number">1</span>;i &lt; a.length; ++ i)</span><br><span class="line">            <span class="keyword">if</span>(smallest.compareTo(a[i]) &gt; <span class="number">0</span>) smallest = a[i];</span><br><span class="line">        <span class="keyword">return</span> smallest;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>这个类方法实现的是对传入的T类型数组找出最小值，这里用到了compareTo方法，所以必须限制T为实现了Comparable接口的类。</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">static</span> &lt;T extends Comparable&gt; <span class="function">T <span class="title">min</span><span class="params">(T[]a)</span></span></span><br></pre></td></tr></table></figure>
-
-<p>注意使用extends而不是implements，这里的T和绑定类型可以是类也可以是接口，所以使用extends更合适。</p>
-<h4 id="通配符"><a href="#通配符" class="headerlink" title="通配符"></a><strong>通配符</strong></h4><hr>
-<p>通配符有三种形式：</p>
-<p>被称作无限定的通配符。被称作有上限的通配符。被称作有下限的通配符。 <strong>无限定通配符</strong></p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">testWildCards</span><span class="params">(Collection&lt;?&gt; collection)</span></span>&#123;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>testWidlCards() 这个方法内部无需关注 Collection 中的真实类型，因为它是未知的。所以，你只能调用 Collection 中与类型无关的方法。</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">TestWildCards</span></span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">testWildCards</span><span class="params">(Collection&lt;?&gt; collection)</span></span></span><br><span class="line"><span class="function">    </span>&#123;</span><br><span class="line">        collection.add(<span class="number">123</span>);<span class="comment">//编译不通过</span></span><br><span class="line">        collection.add(<span class="keyword">new</span> Object());<span class="comment">//编译不通过</span></span><br><span class="line">        collection.size();<span class="comment">//通过</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>当 `</p>
-<p>`存在时，Collection 对象丧失了 add() 方法的功能，编译器不通过。</p>
-<p><strong>有上限的通配符</strong></p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">testWildCards</span><span class="params">(Collection&lt;? extends Base&gt; collection)</span></span>&#123;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>有上限的通配符表明了Collection 接受 Base 及 Base 的子类的类型。</p>
-<p><strong>有下限的通配符</strong></p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">testWildCards</span><span class="params">(Collection&lt;? <span class="keyword">super</span> Base&gt; collection)</span></span>&#123;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>有上限的通配符表明了Collection 接受 Base 及 Base 的父类的类型。</p>
-<h4 id="类型擦除"><a href="#类型擦除" class="headerlink" title="类型擦除"></a>类型擦除</h4><hr>
-<p>泛型是 Java 1.5 版本才引进的概念，在这之前是没有泛型的概念的，泛型代码为了能够很好地和之前版本的代码很好地兼容，进行了如下设计。<br>泛型信息只存在于代码编译阶段，在进入 JVM 之前，与泛型相关的信息会被擦除掉，专业术语叫做类型擦除。通俗地讲，泛型类和普通类在 Java虚拟机内是没有什么特别的地方。</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">List&lt;String&gt; l1 = <span class="keyword">new</span> ArrayList&lt;String&gt;();</span><br><span class="line">List&lt;Integer&gt; l2 = <span class="keyword">new</span> ArrayList&lt;Integer&gt;();</span><br><span class="line">		</span><br><span class="line">System.out.println(l1.getClass() == l2.getClass());</span><br></pre></td></tr></table></figure>
-
-<p>输出结果为true，因为是因为 List和 List在 jvm 中的 Class 都是 List.class。泛型信息被擦除了。</p>
-<p><strong>在泛型类被类型擦除的时候，之前泛型类中的类型参数部分如果没有指定上限，如 则会被转译成普通的 Object 类型，如果指定了上限如 则类型参数就被替换成类型上限。</strong></p>
-<p><strong>在实际的泛型代码中，写明了泛型的类型，在通过编译的检查后（比如String类型只能接收String类型的数据），在JVM生成字节码的过程中会擦除类型，为了能和之前的版本进行兼容。擦除类型后可以通过反射机制绕开编译器进行不合法的操作。</strong></p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">ToolTest</span></span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span></span>&#123;</span><br><span class="line">        List&lt;Integer&gt;ls = <span class="keyword">new</span> ArrayList&lt;&gt;();</span><br><span class="line">        ls.add(<span class="number">123</span>);</span><br><span class="line">        <span class="comment">//ls.add("text");</span></span><br><span class="line">        <span class="keyword">try</span>&#123;</span><br><span class="line">            Method method = ls.getClass().getDeclaredMethod(<span class="string">"add"</span>,Object<span class="class">.<span class="keyword">class</span>)</span>;</span><br><span class="line">            method.invoke(ls,<span class="string">"test"</span>);</span><br><span class="line">			method.invoke(ls,<span class="number">42.9f</span>);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">catch</span>(Exception e)</span><br><span class="line">        &#123;</span><br><span class="line">            e.printStackTrace();</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">for</span>(Object o :ls)</span><br><span class="line">            System.out.print(o);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>程序输出结果为123test42.9</p>
-<h4 id="其他"><a href="#其他" class="headerlink" title="其他"></a>其他</h4><hr>
-<p>泛型类和泛型方法中不接收基本数据类型。</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">List&lt;<span class="keyword">int</span>&gt; li = <span class="keyword">new</span> ArrayList&lt;&gt;();<span class="comment">//错误</span></span><br><span class="line">List&lt;Integer&gt; li = <span class="keyword">new</span> ArrayList&lt;&gt;();<span class="comment">//正确</span></span><br></pre></td></tr></table></figure>
-      
-
-      
-    </div>
-    <div class="article-info article-info-index">
-      
-      
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">Java核心卷</a>
-        		</li>
-      		 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">泛型</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-      
-
-      
-        <p class="article-more-link">
-          <a class="article-more-a" href="/2019/09/07/%E6%B3%9B%E5%9E%8B%E8%AF%A6%E8%A7%A3/">展开全文 >></a>
-        </p>
-      
-
-      
-      <div class="clearfix"></div>
-    </div>
-  </div>
-</article>
-
-<aside class="wrap-side-operation">
-    <div class="mod-side-operation">
-        
-        <div class="jump-container" id="js-jump-container" style="display:none;">
-            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
-                <i class="icon-font icon-back"></i>
-            </a>
-            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
-                <i class="icon-font icon-plane jump-plane"></i>
-            </div>
-        </div>
-        
-        
-    </div>
-</aside>
-
-
-
-
-  
   
     <nav id="page-nav">
       <a class="extend prev" rel="prev" href="/page/2/">&amp;laquo; Prev</a><a class="page-number" href="/">1</a><a class="page-number" href="/page/2/">2</a><span class="page-number current">3</span><a class="page-number" href="/page/4/">4</a><a class="page-number" href="/page/5/">5</a><a class="extend next" rel="next" href="/page/4/">Next &amp;raquo;</a>
@@ -1457,6 +1433,10 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">容器</a>
+              </li>
+             
+              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color4">线程池</a>
               </li>
              
@@ -1465,7 +1445,7 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">容器</a>
+                <a href="javascript:void(0)" class="js-tag color4">序列化</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -1497,18 +1477,6 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">AOP</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">Jdbc</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">SpringMVC</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color3">事务</a>
               </li>
              
@@ -1517,15 +1485,19 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">多线程</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color2">Java基础</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">函数式编程</a>
+                <a href="javascript:void(0)" class="js-tag color4">AOP</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color5">Jdbc</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color4">多线程</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -1533,11 +1505,7 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">设计模式</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">反射</a>
+                <a href="javascript:void(0)" class="js-tag color1">函数式编程</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -1549,7 +1517,23 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color5">SpringMVC</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">反射</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color5">设计模式</a>
+              </li>
+             
+              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color4">抽象类</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">数组</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -1557,7 +1541,7 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">数组</a>
+                <a href="javascript:void(0)" class="js-tag color5">sync</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -1569,10 +1553,6 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">sync</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color2">ThreadLocal</a>
               </li>
              
@@ -1581,11 +1561,11 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">无锁</a>
+                <a href="javascript:void(0)" class="js-tag color5">错误处理</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">错误处理</a>
+                <a href="javascript:void(0)" class="js-tag color3">无锁</a>
               </li>
              
               <li class="article-tag-list-item">
