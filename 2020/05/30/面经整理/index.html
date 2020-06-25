@@ -8,15 +8,15 @@
   <link rel="dns-prefetch" href="http://yoursite.com">
   <title>面经整理 | HanBlog</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta name="description" content="编译与解释 编译和解释都是将高级语言翻译成机器语言，是翻译的时间不同。 编译过程发生在运行程序之前，解释过程发生在运行时，边运行边解释。 java文件-&gt;编译-&gt;.class文件，编译成.class字节码,.class需要jvm解释，然后解释执行。Java很特殊，Java程序需要编译但是没有直接编译成机器语言，即二进制机械码，而是编译成字节码（.class）再用解释方式执行。 解释器">
+  <meta name="description" content="编译与解释编译和解释都是将高级语言翻译成机器语言，是翻译的时间不同。 编译过程发生在运行程序之前，解释过程发生在运行时，边运行边解释。 java文件-&gt;编译-&gt;.class文件，编译成.class字节码,.class需要jvm解释，然后解释执行。Java很特殊，Java程序需要编译但是没有直接编译成机器语言，即二进制机械码，而是编译成字节码（.class）再用解释方式执行。 解释器JV">
 <meta property="og:type" content="article">
 <meta property="og:title" content="面经整理">
 <meta property="og:url" content="http://yoursite.com/2020/05/30/%E9%9D%A2%E7%BB%8F%E6%95%B4%E7%90%86/index.html">
 <meta property="og:site_name" content="HanBlog">
-<meta property="og:description" content="编译与解释 编译和解释都是将高级语言翻译成机器语言，是翻译的时间不同。 编译过程发生在运行程序之前，解释过程发生在运行时，边运行边解释。 java文件-&gt;编译-&gt;.class文件，编译成.class字节码,.class需要jvm解释，然后解释执行。Java很特殊，Java程序需要编译但是没有直接编译成机器语言，即二进制机械码，而是编译成字节码（.class）再用解释方式执行。 解释器">
+<meta property="og:description" content="编译与解释编译和解释都是将高级语言翻译成机器语言，是翻译的时间不同。 编译过程发生在运行程序之前，解释过程发生在运行时，边运行边解释。 java文件-&gt;编译-&gt;.class文件，编译成.class字节码,.class需要jvm解释，然后解释执行。Java很特殊，Java程序需要编译但是没有直接编译成机器语言，即二进制机械码，而是编译成字节码（.class）再用解释方式执行。 解释器JV">
 <meta property="og:locale" content="en_US">
 <meta property="article:published_time" content="2020-05-30T11:56:00.000Z">
-<meta property="article:modified_time" content="2020-06-24T03:14:04.483Z">
+<meta property="article:modified_time" content="2020-06-25T05:12:55.793Z">
 <meta property="article:author" content="Xuesong">
 <meta property="article:tag" content="面经">
 <meta name="twitter:card" content="summary">
@@ -173,50 +173,42 @@
     
     <div class="article-entry" itemprop="articleBody">
       
-        <p><strong>编译与解释</strong></p>
-<p>编译和解释都是将高级语言翻译成机器语言，是翻译的时间不同。</p>
+        <h4 id="编译与解释"><a href="#编译与解释" class="headerlink" title="编译与解释"></a><strong>编译与解释</strong></h4><p>编译和解释都是将高级语言翻译成机器语言，是翻译的时间不同。</p>
 <p>编译过程发生在运行程序之前，解释过程发生在运行时，边运行边解释。</p>
 <p>java文件-&gt;编译-&gt;.class文件，编译成.class字节码,.class需要jvm解释，然后解释执行。Java很特殊，Java程序需要编译但是没有直接编译成机器语言，即二进制机械码，而是编译成字节码（.class）再用解释方式执行。</p>
-<p><strong>解释器</strong></p>
-<p>JVM类加载器首先加载字节码文件，然后解释器逐行解释执行，这种方式响应速度快，解释一行执行一行，不用等到全部解释完再执行。</p>
-<p><strong>JIT编译器</strong></p>
-<p>为了提高性能，JIT编译器在运行时与JVM交互，并将适当的字节码序列（执行频率高的热点代码）编译为二进制机械码并存储到缓存。使用JIT编译器时，硬件可以执行本机代码，而不是让JVM重复解释相同的字节码序列，并导致翻译过程相对冗长。这种方式响应速度慢一点，但是一旦解释完并且存储到了缓存，以后执行就会快很多。</p>
+<h4 id="解释器"><a href="#解释器" class="headerlink" title="解释器"></a><strong>解释器</strong></h4><p>JVM类加载器首先加载字节码文件，然后解释器逐行解释执行，这种方式响应速度快，解释一行执行一行，不用等到全部解释完再执行。</p>
+<h4 id="JIT编译器"><a href="#JIT编译器" class="headerlink" title="JIT编译器"></a><strong>JIT编译器</strong></h4><p>为了提高性能，JIT编译器在运行时与JVM交互，并将适当的字节码序列（执行频率高的热点代码）编译为二进制机械码并存储到缓存。使用JIT编译器时，硬件可以执行本机代码，而不是让JVM重复解释相同的字节码序列，并导致翻译过程相对冗长。这种方式响应速度慢一点，但是一旦解释完并且存储到了缓存，以后执行就会快很多。</p>
 <p>解释器和JIT编译器是可以互补的，当Java虚拟机启动时，解释器首先发挥作用，而不必等待即使编译器全部编译完成后再执行，这样可以省去不必要的编译时间。随着时间推移，编译器发挥作用，把越来越多的代码编译成本地代码，获得更高的执行效率。</p>
-<p><strong>AOT编译</strong></p>
-<p>JIT是在程序运行当中，发现热点代码，将其解释为字节码</p>
+<h4 id="AOT编译"><a href="#AOT编译" class="headerlink" title="AOT编译"></a><strong>AOT编译</strong></h4><p>JIT是在程序运行当中，发现热点代码，将其解释为字节码</p>
 <p>AOT则在程序运行前，直接把Java源码文件（.java）编译成本地机器码（.so），不必等待即使编译器的预热。因为已经编译成了机器码，破坏了java一次编译到处执行，因为不同机器码对应着不同系统；降低了Java链接过程的动态性，加载的代码在编译器就必须全部已知。</p>
-<p><strong>JDK|JRE</strong></p>
-<p>JDK=JRE+编译器(javac)+工具(javadoc、jdb)</p>
+<h4 id="JDK-JRE"><a href="#JDK-JRE" class="headerlink" title="JDK|JRE"></a><strong>JDK|JRE</strong></h4><p>JDK=JRE+编译器(javac)+工具(javadoc、jdb)</p>
 <p>javadoc：@author、@version、@since、@see、@link、@code、@param、@return、@exception、@throws等注解都属于javadoc</p>
 <p>jdb：The Java Debugger用来debug一个Java程序</p>
 <p>需要运行java程序-&gt;安装JRE</p>
 <p>需要编译java程序-&gt;安装JDK</p>
-<p><strong>多继承</strong></p>
-<p>java类是单继承的 classB Extends classA</p>
+<h4 id="多继承"><a href="#多继承" class="headerlink" title="多继承"></a><strong>多继承</strong></h4><p>java类是单继承的 classB Extends classA</p>
 <p>java接口可以多继承 Interface3 Extends Interface0, Interface1, interface……</p>
 <p>不允许类多重继承的主要原因是，如果A同时继承B和C，而B和C同时有一个D方法，会报错，A无法判断继承哪个D方法</p>
-<p><strong>‘\0’</strong></p>
-<p>c语言在字符串和字符数组中用’\0’表示结束，获取串的长度用strlen()方法，从头到尾遍历</p>
+<h4 id="‘-0’"><a href="#‘-0’" class="headerlink" title="‘\0’"></a><strong>‘\0’</strong></h4><p>c语言在字符串和字符数组中用’\0’表示结束，获取串的长度用strlen()方法，从头到尾遍历</p>
 <p>java里一切都是对象，字符串的长度就可以存放在对象内，获取长度也可以通过属性length，所以也就没必要用’\0’标识结束位置</p>
-<p><strong>基本类型大小不变</strong></p>
-<p>jvm可以使这些数据类型不因为操作系统和硬件的差别而无法运行，一处编译，到处运行。</p>
+<h4 id="基本类型大小不变"><a href="#基本类型大小不变" class="headerlink" title="基本类型大小不变"></a><strong>基本类型大小不变</strong></h4><p>jvm可以使这些数据类型不因为操作系统和硬件的差别而无法运行，一处编译，到处运行。</p>
 <p>怎么实现的？</p>
-<p><strong>重载</strong></p>
-<p>方法签名：方法名+参数类型，返回值不是方法签名的一部分</p>
+<h4 id="重载"><a href="#重载" class="headerlink" title="重载"></a><strong>重载</strong></h4><p>方法签名：方法名+参数类型，返回值不是方法签名的一部分</p>
 <p>不能有两个名字相同，参数类型也相同，却返回不同类型值的方法</p>
-<p><strong>重载和重写</strong></p>
-<p>重载在<strong>编译期</strong>确定调用的方法。</p>
+<h4 id="重载和重写"><a href="#重载和重写" class="headerlink" title="重载和重写"></a><strong>重载和重写</strong></h4><p>重载在<strong>编译期</strong>确定调用的方法。</p>
 <p>重写在<strong>运行期</strong>确定调用的方法。</p>
 <p>A a = new B();中的A称之为静态类型，B称之为实际类型。</p>
 <p>静态分派：重载时在选择哪个版本的时候，是根据静态类型去匹配的，也就是去找A类中的相应的方法。对于JVM来说，在编译期变量的静态类型是确定的，同样重载的方法也就能够确定。</p>
 <p>动态分派：invokespecial以及invokestatic指令所执行的符号引用，在类被加载的时候就直接替换成了直接引用，并不会等到运行期。invokevirtual则不同，虚拟机在执行invokevirtual时，会找它的实际类型，然后找到它对应的符号引用，如果没有就一步步往上找，直到找到。紧接着动态链接到它的真正内存地址，也就是子类重写的方法上。</p>
-<p><strong>static</strong></p>
-<p>静态变量/方法被所有的对象所共享，在内存中只有一个副本，它当且仅当在类初次加载时会被初始化，只初始化一次。而非静态变量是对象所拥有的，在创建对象的时候被初始化，存在多个副本，各个对象拥有的副本互不影响。 </p>
-<p><strong>接口和抽象类</strong></p>
-<p>接口的设计目的，是对类的行为进行约束，可以强制要求不同的类具有相同的行为。它只约束了行为的有无，但不对如何实现行为进行限制。</p>
+<h4 id="static"><a href="#static" class="headerlink" title="static"></a><strong>static</strong></h4><p><strong>修饰成员变量和成员方法</strong>：(1)静态变量/方法被所有的对象所共享，在内存中只有一个副本，它当且仅当在类初次加载时会被初始化，只初始化一次。而非静态变量是对象所拥有的，在创建对象的时候被初始化，存在多个副本，各个对象拥有的副本互不影响。(2) 静态方法在访问本类的成员时，只允许访问静态成员（即静态成员变量和静态方法），而不允许访问实例成员变量和实例方法；实例方法则无此限制</p>
+<p><strong>静态代码块:</strong> 静态代码块定义在类中方法外, 静态代码块在非静态代码块之前执行(静态代码块—&gt;非静态代码块—&gt;构造方法)。 静态代码块只在第一次new执行一次，之后不再执行，而非静态代码块在每new一次就执行一次。</p>
+<p>非静态代码块与构造函数的区别： 非静态代码块是给所有对象进行统一初始化，而构造函数是给对应的对象初始化，因为构造函数是可以多个的，运行哪个构造函数就会建立什么样的对象，但无论建立哪个对象，都会先执行相同的非静态代码块。 </p>
+<p><strong>静态内部类（static修饰类的话只能修饰内部类）：</strong> 静态内部类与非静态内部类之间存在一个最大的区别:  非静态内部类在编译完成之后会隐含地保存着一个引用，该引用是指向创建它的外围类，但是静态内部类却没有。没有这个引用就意味着：1.  它的创建是不需要依赖外围类的创建。2. 它不能使用任何外围类的非static成员变量和方法。</p>
+<p>在外部类加载时，静态内部类不会被加载，只有当某些静态方法中用到了该静态内部类时才会加载该类。</p>
+<p><strong>静态导包(用来导入类中的静态资源，1.5之后的新特性):</strong> 格式为：<code>import static</code> 这两个关键字连用可以指定导入某个类中的指定静态资源，并且不需要使用类名调用类中静态成员，可以直接使用类中静态成员变量和成员方法。</p>
+<h4 id="接口和抽象类"><a href="#接口和抽象类" class="headerlink" title="接口和抽象类"></a><strong>接口和抽象类</strong></h4><p>接口的设计目的，是对类的行为进行约束，可以强制要求不同的类具有相同的行为。它只约束了行为的有无，但不对如何实现行为进行限制。</p>
 <p>抽象类的设计目的，是代码复用。当不同的类具有某些相同的行为(记为行为集合A)，且其中一部分行为的实现方式一致时（记为B），可以让这些类都派生于一个抽象类。在这个抽象类中实现了B（非抽象方法），避免让所有的子类来实现B，这就达到了代码复用的目的。而A减B的部分（抽象方法），留给各个子类自己实现。正是因为A-B在这里没有实现，所以抽象类不允许实例化出来（否则当调用到A-B时，无法执行）。</p>
-<p><strong>拆箱装箱</strong></p>
-<p>装箱过程是通过调用包装器的valueOf方法实现的，而拆箱过程是通过调用包装器的 xxxValue方法实现的。比如Integer的是intValue方法。</p>
+<h4 id="拆箱装箱"><a href="#拆箱装箱" class="headerlink" title="拆箱装箱"></a><strong>拆箱装箱</strong></h4><p>装箱过程是通过调用包装器的valueOf方法实现的，而拆箱过程是通过调用包装器的 xxxValue方法实现的。比如Integer的是intValue方法。</p>
 <p>在通过valueOf方法创建Integer对象的时候，如果数值在[-128,127]之间，便返回指向IntegerCache.cache中已经存在的对象的引用；否则创建一个新的Integer对象。</p>
 <p>Integer、Short、Byte、Character、Long、Boolean这几个类的valueOf方法的实现是类似的。</p>
 <p>Double、Float的valueOf是没有这种实现的，因为在某个范围内的整型数值的个数是有限的，而浮点数却不是。</p>
@@ -226,16 +218,14 @@
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">Integer a = <span class="number">3</span>;</span><br><span class="line">System.out.println(a.equals(<span class="number">3</span>));<span class="comment">//true</span></span><br></pre></td></tr></table></figure>
 
 <p>对于a+h，先自动触发拆箱，就变成了int类型和long类型相加，这个会触发类型晋升，结果是long类型的，然后会触发装箱过程，就变成Long了。因此比较结果是true，因为指向同一个对象。</p>
-<p><strong>值传递</strong></p>
-<p>一个方法不能修改一个基本数据类型的参数（即数值型或布尔型）。</p>
+<h4 id="值传递"><a href="#值传递" class="headerlink" title="值传递"></a><strong>值传递</strong></h4><p>一个方法不能修改一个基本数据类型的参数（即数值型或布尔型）。</p>
 <p>一个方法可以改变一个对象参数的状态(int[] char[])。</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">int</span>[] arr = &#123; <span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>, <span class="number">5</span> &#125;;</span><br><span class="line">     System.out.println(arr[<span class="number">0</span>]);</span><br><span class="line">     change(arr);</span><br><span class="line">     System.out.println(arr[<span class="number">0</span>]);</span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">change</span><span class="params">(<span class="keyword">int</span>[] array)</span> </span>&#123;</span><br><span class="line">     <span class="comment">// 将数组的第一个元素变为0</span></span><br><span class="line">     array[<span class="number">0</span>] = <span class="number">0</span>;</span><br><span class="line">&#125;</span><br><span class="line"><span class="number">1</span></span><br><span class="line"><span class="number">0</span></span><br></pre></td></tr></table></figure>
 
 <p>一个方法不能让对象参数引用一个新的对象(在交换方法引用了新对象，回去就没有了)</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Test</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        <span class="comment">// TODO Auto-generated method stub</span></span><br><span class="line">        Student s1 = <span class="keyword">new</span> Student(<span class="string">"小张"</span>);</span><br><span class="line">        Student s2 = <span class="keyword">new</span> Student(<span class="string">"小李"</span>);</span><br><span class="line">        Test.swap(s1, s2);</span><br><span class="line">        System.out.println(<span class="string">"s1:"</span> + s1.getName());</span><br><span class="line">        System.out.println(<span class="string">"s2:"</span> + s2.getName());</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">swap</span><span class="params">(Student x, Student y)</span> </span>&#123;</span><br><span class="line">        Student temp = x;</span><br><span class="line">        x = y;</span><br><span class="line">        y = temp;</span><br><span class="line">        System.out.println(<span class="string">"x:"</span> + x.getName());</span><br><span class="line">        System.out.println(<span class="string">"y:"</span> + y.getName());</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line">x:小李</span><br><span class="line">y:小张</span><br><span class="line">s1:小张</span><br><span class="line">s2:小李</span><br></pre></td></tr></table></figure>
 
-<p><strong>String不可变</strong></p>
-<p>什么是不可变：String的不可变是指当字符串改变的时候，不是在原字符串上进行改变，而是创建一个新的字符串，让String变量引向它。这和String Buffer是不一样的，String Buffer是在原字符串上进行修改</p>
+<h4 id="String不可变"><a href="#String不可变" class="headerlink" title="String不可变"></a><strong>String不可变</strong></h4><p>什么是不可变：String的不可变是指当字符串改变的时候，不是在原字符串上进行改变，而是创建一个新的字符串，让String变量引向它。这和String Buffer是不一样的，String Buffer是在原字符串上进行修改</p>
 <p>怎样实现的：JDK源码，java.lang.String类起手前三行</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">final</span> <span class="class"><span class="keyword">class</span> <span class="title">String</span></span></span><br><span class="line"><span class="class">    <span class="keyword">implements</span> <span class="title">java</span>.<span class="title">io</span>.<span class="title">Serializable</span>, <span class="title">Comparable</span>&lt;<span class="title">String</span>&gt;, <span class="title">CharSequence</span></span></span><br><span class="line"><span class="class"></span>&#123;</span><br><span class="line">    <span class="comment">/** The value is used for character storage. */</span></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">final</span> <span class="keyword">char</span> value[];</span><br></pre></td></tr></table></figure>
 
@@ -244,8 +234,7 @@
 <p>String不可变，关键是String内部的方法都很小心的没有去动数组的元素，没有暴露成员信息，所以String的不可变关键在于底层的实现，而不仅仅在于一个final</p>
 <p>为什么要不可变：为了安全和效率</p>
 <p>安全性：(1).String是几乎每个类都会使用的类，特别是作为Hashmap之类的集合的key值时候，mutable的String有非常大的风险，例如通过修改产生了两个相同的key。(2).在网络连接和数据库连接中字符串常常作为参数，例如，网络连接地址URL，文件路径path，反射机制所需要的String参数。其不可变性可以保证连接的安全性。如果字符串是可变的，黑客就有可能改变字符串指向对象的值，那么会引起很严重的安全问题。</p>
-<p><strong>字节流字符流</strong></p>
-<ul>
+<h4 id="字节流字符流"><a href="#字节流字符流" class="headerlink" title="字节流字符流"></a><strong>字节流字符流</strong></h4><ul>
 <li>节点流：可以从某节点读数据或向某节点写数据的流。如 FileInputStream</li>
 <li>处理流：对已存在的流的连接和封装，实现更为丰富的流数据处理，处理流的构造方法需要其他的流对象参数。如 BufferedReader</li>
 </ul>
@@ -253,6 +242,15 @@
 <p><strong>文 件</strong> FileInputStream FileOutputStrean FileReader FileWriter 文件进行处理的节点流。<br><strong>字符串</strong> StringReader StringWriter 对字符串进行处理的节点流。<br><strong>数 组</strong> ByteArrayInputStream ByteArrayOutputStreamCharArrayReader CharArrayWriter 对数组进行处理的节点流(对应的不再是文件，而是内存中的一个数组)。<br><strong>管 道</strong> PipedInputStream PipedOutputStream PipedReaderPipedWriter对管道进行处理的节点流。</p>
 <p>常用处理流：</p>
 <p><strong>缓冲流</strong>：BufferedInputStrean BufferedOutputStream BufferedReader BufferedWriter增加缓冲功能，避免频繁读写硬盘。<br><strong>转换流</strong>：InputStreamReader OutputStreamWriter实现字节流和字符流之间的转换，InputStreamReader 字节流到字符流，OutputStreamWriter字符流到字节流。文件是字节流，控制台要字符流<br><strong>数据流</strong> DataInputStream DataOutputStream 提供将基础数据类型写入到文件中，或者读取出来。</p>
+<h4 id="final"><a href="#final" class="headerlink" title="final"></a><strong>final</strong></h4><ol>
+<li><p>final修饰的类不能被继承，final类中的所有成员方法都会被隐式的指定为final方法；</p>
+</li>
+<li><p>final修饰的方法不能被重写；</p>
+</li>
+<li><p>final修饰的变量是常量，如果是基本数据类型的变量，则其数值一旦在初始化之后便不能更改；如果是引用类型的变量，则在对其初始化之后便不能让其指向另一个对象。</p>
+<p>被 static 修饰的成员属于类，不属于单个这个类的某个对象，被类中所有对象共享。而 this 代表对本类对象的引用，指向本类对象；而 super 代表对父类对象的引用，指向父类对象；所以， this和super是属于对象范畴的东西，而静态对象和方法是属于类范畴的东西。</p>
+</li>
+</ol>
 
       
 
@@ -516,7 +514,7 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">同步</a>
+                <a href="javascript:void(0)" class="js-tag color3">Java核心卷</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -524,15 +522,15 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">Java核心卷</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">Java8</a>
+                <a href="javascript:void(0)" class="js-tag color3">同步</a>
               </li>
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color3">集合</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color1">Java8</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -552,43 +550,7 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">事务</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">StringBuilder</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">Java基础</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color4">AOP</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">Jdbc</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">多线程</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">内部类</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">函数式编程</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">剑指Offer</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">未来日记</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -596,11 +558,35 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">反射</a>
+                <a href="javascript:void(0)" class="js-tag color2">Java基础</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">设计模式</a>
+                <a href="javascript:void(0)" class="js-tag color4">StringBuilder</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color5">Jdbc</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">事务</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color4">多线程</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color1">函数式编程</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color4">内部类</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color5">未来日记</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -612,11 +598,15 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">接口</a>
+                <a href="javascript:void(0)" class="js-tag color3">剑指Offer</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">sync</a>
+                <a href="javascript:void(0)" class="js-tag color3">反射</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color5">设计模式</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -624,7 +614,7 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">线程</a>
+                <a href="javascript:void(0)" class="js-tag color3">接口</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -632,15 +622,15 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color5">sync</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">线程</a>
+              </li>
+             
+              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color2">锁</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">错误处理</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">无锁</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -648,7 +638,15 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color5">错误处理</a>
+              </li>
+             
+              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color3">面经</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">无锁</a>
               </li>
             
             <div class="clearfix"></div>
