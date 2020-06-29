@@ -150,6 +150,132 @@
           <div id="js-content" class="content-ll">
             
   
+    <article id="post-Java集合初识" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2019/09/07/Java%E9%9B%86%E5%90%88%E5%88%9D%E8%AF%86/">Java集合初识</a>
+    </h1>
+  
+
+        
+        <a href="/2019/09/07/Java%E9%9B%86%E5%90%88%E5%88%9D%E8%AF%86/" class="archive-article-date">
+  	<time datetime="2019-09-07T04:00:01.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2019-09-07</time>
+</a>
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h3 id="接口和实现分离"><a href="#接口和实现分离" class="headerlink" title="接口和实现分离"></a>接口和实现分离</h3><hr>
+<p>接口：是代表集合的抽象数据类型。例如 Collection、List、Set、Map 等。</p>
+<p>实现（类）：是集合接口的具体实现。从本质上讲，它们是可重复使用的数据结构，例如：ArrayList、LinkedList、HashSet、HashMap。</p>
+<h3 id="迭代器"><a href="#迭代器" class="headerlink" title="迭代器"></a>迭代器</h3><hr>
+<p>Java迭代器位于两个元素之间，当调用next时，迭代器就越过下一元素并返回刚刚越过的那个元素的引用。比如想删掉字符串集合中第一个元素的方法</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">Collection c = <span class="keyword">new</span> </span><br><span class="line">Iterator&lt;String&gt; it = c.iterator();</span><br><span class="line">it.next();</span><br><span class="line">it.remove();</span><br></pre></td></tr></table></figure>
+
+<p>迭代器访问时必须顺序访问。</p>
+<h3 id="集合框架"><a href="#集合框架" class="headerlink" title="集合框架"></a>集合框架</h3><hr>
+<p>Java 集合框架主要包括两种类型的容器，一种是集合（Collection），存储一个元素集合，另一种是图（Map），存储键/值对映射。</p>
+<p>Collection 接口又有 3 种子类型，List、Set 和 Queue</p>
+<p>常用List：ArrayList、LinkedList</p>
+<p>常用Set：HashSet、LinkedHashSet</p>
+<p>常用Map：HashMap、LinkedHashMap </p>
+<h4 id="List"><a href="#List" class="headerlink" title="List"></a>List</h4><p>ArrayList : 数组结构,查询快,增删慢,线程不安全,因此效率高.</p>
+<p>Vector : 数组结构,查询快,增删慢,线程安全,因此效率低.</p>
+<p>LinkedList : 链表结构,查询慢,增删快,线程不安全,因此效率高.</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> linkedList;</span><br><span class="line"><span class="keyword">import</span> java.util.*;</span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">LinkedListTest</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span> <span class="params">(String[] args)</span></span></span><br><span class="line"><span class="function">    </span>&#123;</span><br><span class="line">        List&lt;String&gt; a = <span class="keyword">new</span> LinkedList&lt;&gt;();</span><br><span class="line">        a.add(<span class="string">"Amy"</span>);</span><br><span class="line">        a.add(<span class="string">"Cral"</span>);</span><br><span class="line">        a.add(<span class="string">"Erica"</span>);</span><br><span class="line"></span><br><span class="line">        List&lt;String&gt;b = <span class="keyword">new</span> LinkedList&lt;&gt;();</span><br><span class="line">        b.add(<span class="string">"Bob"</span>);</span><br><span class="line">        b.add(<span class="string">"Doug"</span>);</span><br><span class="line">        b.add(<span class="string">"Frances"</span>);</span><br><span class="line">        b.add(<span class="string">"Gloria"</span>);</span><br><span class="line"></span><br><span class="line">        ListIterator&lt;String&gt; aIter = a.listIterator();</span><br><span class="line">        Iterator&lt;String&gt; bIter = b.iterator();</span><br><span class="line"></span><br><span class="line">        <span class="keyword">while</span>(bIter.hasNext())</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="keyword">if</span>(aIter.hasNext()) aIter.next();</span><br><span class="line">            aIter.add(bIter.next());</span><br><span class="line">        &#125;</span><br><span class="line">        System.out.println(a);</span><br><span class="line"></span><br><span class="line">        bIter = b.iterator();</span><br><span class="line">        <span class="keyword">while</span> (bIter.hasNext())&#123;</span><br><span class="line">            bIter.next();</span><br><span class="line">            <span class="keyword">if</span>(bIter.hasNext())&#123;</span><br><span class="line">                bIter.next();</span><br><span class="line">                bIter.remove();</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        System.out.println(b);</span><br><span class="line"></span><br><span class="line">        a.removeAll(b);</span><br><span class="line">        System.out.println(a);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h4 id="Set"><a href="#Set" class="headerlink" title="Set"></a>Set</h4><p>HashSet :  存储无序，元素无索引，元素不可以重复，底层是哈希表。通过元素的hashcode和equals来保证元素的唯一性。如果元素的hashcode值相同，才会判断equals是否为true； 如果元素的hashcode的值不同，不会调用equals。所以必须重写hashCode() 和 equals() 方法。</p>
+<p>TreeSet：存储有序，元素无索引，不可重复，底层是树结构。排序支持自然排序(Comparable接口)和定制排序(Comparator接口)，增删元素比Hash Set慢，但查找元素比HashSet快。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> treeSet;</span><br><span class="line"><span class="keyword">import</span> java.util.*;</span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Item</span> <span class="keyword">implements</span> <span class="title">Comparable</span>&lt;<span class="title">Item</span>&gt;</span>&#123;</span><br><span class="line">    <span class="keyword">private</span> String description;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">int</span> partNumber;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">Item</span><span class="params">(String description,<span class="keyword">int</span> partNumber)</span></span>&#123;</span><br><span class="line">        <span class="keyword">this</span>.description = description;</span><br><span class="line">        <span class="keyword">this</span>.partNumber = partNumber;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">getDescription</span><span class="params">()</span></span>&#123;</span><br><span class="line">        <span class="keyword">return</span> description;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">toString</span><span class="params">()</span></span>&#123;</span><br><span class="line">        <span class="keyword">return</span> description+<span class="string">","</span>+partNumber;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">equals</span><span class="params">(Object obj)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span>(<span class="keyword">this</span> == obj) <span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line">        <span class="keyword">if</span>(obj == <span class="keyword">null</span>) <span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line">        <span class="keyword">if</span>(getClass() != obj.getClass()) <span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line">        Item other = (Item)obj;</span><br><span class="line">        <span class="keyword">if</span>(Objects.equals(description,other.description)&amp;&amp;partNumber == other.partNumber)</span><br><span class="line">            <span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">hashCode</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> Objects.hash(description,partNumber);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">compaerTo</span><span class="params">(Item other)</span></span>&#123;</span><br><span class="line">        <span class="keyword">int</span> diff = Integer.compare(partNumber,other.partNumber);</span><br><span class="line">        <span class="keyword">return</span> diff!=<span class="number">0</span>? diff:description.compareTo(other.description);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h4 id="Map"><a href="#Map" class="headerlink" title="Map"></a>Map</h4><p><strong>更新映射项</strong></p>
+<p>使用一个映射统计一个单词在文件中出现的次数</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">counts.put(word,counts.get(word)+<span class="number">1</span>);</span><br></pre></td></tr></table></figure>
+
+<p>但当单词第一次出现时，get会返回null出现异常，这里有两种解决办法。</p>
+<p>第一种是使用getOrDefault方法</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">counts.put(word,counts.getOrDefault(word,<span class="number">0</span>)+<span class="number">1</span>);</span><br></pre></td></tr></table></figure>
+
+<p>第二种使用putIfAbsent方法，如果传入key对应的value已经存在，就返回存在的value，不进行替换。如果不存在，就添加key和value。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">counts.putIfAbsent(word,<span class="number">0</span>);</span><br><span class="line">counts.put(word,counts.get(word)+<span class="number">1</span>);</span><br></pre></td></tr></table></figure>
+
+<p><strong>映射视图</strong></p>
+<p>三种视图：</p>
+<p>键集：Set keySet()</p>
+<p>值集：Collectuinvalues()</p>
+<p>键值对集：Set&lt;Map.Entry&lt;K,V&gt;&gt; entrySet()</p>
+<p>查看映射的所有键</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">Set&lt;String&gt; keys = map.keySet();</span><br><span class="line"><span class="keyword">for</span>(String key:keys)&#123;</span><br><span class="line">    System.out.println(key);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>查看映射的所有键值对</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">for</span>(Map.Entry&lt;String,Employee&gt; entry: staff.entrySet())</span><br><span class="line">&#123;</span><br><span class="line">	System.out.println(entry.getKey()+entry.getValue());</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="位集"><a href="#位集" class="headerlink" title="位集"></a>位集</h3><p>位集BitSet类用于存放位序列</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">bucketOfBits.get(i)<span class="comment">//如果第i位处于开状态，就返回true否则返回false。</span></span><br><span class="line"></span><br><span class="line">bucketOfBits.set(i)<span class="comment">//将第i位设置为开状态</span></span><br><span class="line"></span><br><span class="line">bucketOfBits.clear(i)<span class="comment">//将第i位设置为关状态</span></span><br></pre></td></tr></table></figure>
+
+<p>此外还有与、或、异或运算</p>
+
+      
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
+	<div class="article-tag tagcloud">
+		<i class="icon-price-tags icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">Java核心卷</a>
+        		</li>
+      		 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">集合</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
+      
+
+      
+        <p class="article-more-link">
+          <a class="article-more-a" href="/2019/09/07/Java%E9%9B%86%E5%90%88%E5%88%9D%E8%AF%86/">展开全文 >></a>
+        </p>
+      
+
+      
+      <div class="clearfix"></div>
+    </div>
+  </div>
+</article>
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+    </div>
+</aside>
+
+
+
+
+  
     <article id="post-泛型详解" class="article article-type-post  article-index" itemscope itemprop="blogPost">
   <div class="article-inner">
     
@@ -731,90 +857,6 @@
 
 
   
-    <article id="post-数组列表ArrayList" class="article article-type-post  article-index" itemscope itemprop="blogPost">
-  <div class="article-inner">
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2019/09/03/%E6%95%B0%E7%BB%84%E5%88%97%E8%A1%A8ArrayList/">数组列表ArrayList</a>
-    </h1>
-  
-
-        
-        <a href="/2019/09/03/%E6%95%B0%E7%BB%84%E5%88%97%E8%A1%A8ArrayList/" class="archive-article-date">
-  	<time datetime="2019-09-03T04:00:00.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2019-09-03</time>
-</a>
-        
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> java.util.*;</span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">ArrayListTest</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span>  <span class="keyword">void</span> <span class="title">main</span> <span class="params">(String []args)</span></span>&#123;</span><br><span class="line">        ArrayList&lt;Integer&gt; arrayList = <span class="keyword">new</span> ArrayList&lt;&gt;();</span><br><span class="line">        arrayList.ensureCapacity(<span class="number">5</span>);<span class="comment">//预估元素个数为5，影响初始数组内存的分配</span></span><br><span class="line">        System.out.println(arrayList.size());<span class="comment">//数组列表的大小</span></span><br><span class="line">        arrayList.add(<span class="number">1</span>);<span class="comment">//添加元素</span></span><br><span class="line">        arrayList.add(<span class="number">2</span>);</span><br><span class="line">        arrayList.add(<span class="number">3</span>);</span><br><span class="line">        arrayList.add(<span class="number">4</span>);</span><br><span class="line">        arrayList.trimToSize();<span class="comment">//将比size大的预留空间去掉</span></span><br><span class="line">        arrayList.set(<span class="number">0</span>,<span class="number">2</span>);<span class="comment">//设置元素值，前下标后对象</span></span><br><span class="line">        arrayList.add(<span class="number">4</span>,<span class="number">5</span>);<span class="comment">//插入元素值，前下标后对象</span></span><br><span class="line">        System.out.println(arrayList.get(<span class="number">3</span>));<span class="comment">//获取某个元素值</span></span><br><span class="line">        System.out.println(arrayList.toString());</span><br><span class="line">        arrayList.remove(<span class="number">4</span>);<span class="comment">//去除元素，参数为下标</span></span><br><span class="line">        System.out.println(arrayList.size());</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>ArrayList类解决了Java中数组不可变长的缺点，在添加和删除元素的时候可以自动调节数组的容量。</p>
-<p><strong>数组列表管理着对象引用的一个内部数组，当添加元素到数组预定的最大空间时，数组列表就自动地创建一个更大的数组，将所有的对象从小数组拷贝到大数组中去。</strong></p>
-<p>在本例中初始化了Integer的数组列表，<strong>ensureCapacity</strong>方法可以在填充元素前预估数组可能存储的元素数量5，<strong>但数组的大小仍然是0</strong>，用<strong>add</strong>方法添加元素，注意这里使用了<strong>自动装箱</strong>。随后使用<strong>trimToSize</strong>方法将数组预留的多余的空间去除，但不影响数组的大小。使用<strong>set</strong>方法将下标为0的元素赋值。使用<strong>add</strong>方法在下标4的位置插入元素5。使用<strong>remove</strong>方法去掉下标为4的元素，使用<strong>size</strong>方法显示元素数量。</p>
-<p>程序输出：</p>
-<p>0<br>4<br>[2, 2, 3, 4, 5]<br>4</p>
-
-      
-
-      
-    </div>
-    <div class="article-info article-info-index">
-      
-      
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">Java核心卷</a>
-        		</li>
-      		 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">数组</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-      
-
-      
-        <p class="article-more-link">
-          <a class="article-more-a" href="/2019/09/03/%E6%95%B0%E7%BB%84%E5%88%97%E8%A1%A8ArrayList/">展开全文 >></a>
-        </p>
-      
-
-      
-      <div class="clearfix"></div>
-    </div>
-  </div>
-</article>
-
-<aside class="wrap-side-operation">
-    <div class="mod-side-operation">
-        
-        <div class="jump-container" id="js-jump-container" style="display:none;">
-            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
-                <i class="icon-font icon-back"></i>
-            </a>
-            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
-                <i class="icon-font icon-plane jump-plane"></i>
-            </div>
-        </div>
-        
-        
-    </div>
-</aside>
-
-
-
-
-  
     <article id="post-接口详情" class="article article-type-post  article-index" itemscope itemprop="blogPost">
   <div class="article-inner">
     
@@ -908,6 +950,90 @@
       
         <p class="article-more-link">
           <a class="article-more-a" href="/2019/09/03/%E6%8E%A5%E5%8F%A3%E8%AF%A6%E6%83%85/">展开全文 >></a>
+        </p>
+      
+
+      
+      <div class="clearfix"></div>
+    </div>
+  </div>
+</article>
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+    </div>
+</aside>
+
+
+
+
+  
+    <article id="post-数组列表ArrayList" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2019/09/03/%E6%95%B0%E7%BB%84%E5%88%97%E8%A1%A8ArrayList/">数组列表ArrayList</a>
+    </h1>
+  
+
+        
+        <a href="/2019/09/03/%E6%95%B0%E7%BB%84%E5%88%97%E8%A1%A8ArrayList/" class="archive-article-date">
+  	<time datetime="2019-09-03T04:00:00.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2019-09-03</time>
+</a>
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> java.util.*;</span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">ArrayListTest</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span>  <span class="keyword">void</span> <span class="title">main</span> <span class="params">(String []args)</span></span>&#123;</span><br><span class="line">        ArrayList&lt;Integer&gt; arrayList = <span class="keyword">new</span> ArrayList&lt;&gt;();</span><br><span class="line">        arrayList.ensureCapacity(<span class="number">5</span>);<span class="comment">//预估元素个数为5，影响初始数组内存的分配</span></span><br><span class="line">        System.out.println(arrayList.size());<span class="comment">//数组列表的大小</span></span><br><span class="line">        arrayList.add(<span class="number">1</span>);<span class="comment">//添加元素</span></span><br><span class="line">        arrayList.add(<span class="number">2</span>);</span><br><span class="line">        arrayList.add(<span class="number">3</span>);</span><br><span class="line">        arrayList.add(<span class="number">4</span>);</span><br><span class="line">        arrayList.trimToSize();<span class="comment">//将比size大的预留空间去掉</span></span><br><span class="line">        arrayList.set(<span class="number">0</span>,<span class="number">2</span>);<span class="comment">//设置元素值，前下标后对象</span></span><br><span class="line">        arrayList.add(<span class="number">4</span>,<span class="number">5</span>);<span class="comment">//插入元素值，前下标后对象</span></span><br><span class="line">        System.out.println(arrayList.get(<span class="number">3</span>));<span class="comment">//获取某个元素值</span></span><br><span class="line">        System.out.println(arrayList.toString());</span><br><span class="line">        arrayList.remove(<span class="number">4</span>);<span class="comment">//去除元素，参数为下标</span></span><br><span class="line">        System.out.println(arrayList.size());</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>ArrayList类解决了Java中数组不可变长的缺点，在添加和删除元素的时候可以自动调节数组的容量。</p>
+<p><strong>数组列表管理着对象引用的一个内部数组，当添加元素到数组预定的最大空间时，数组列表就自动地创建一个更大的数组，将所有的对象从小数组拷贝到大数组中去。</strong></p>
+<p>在本例中初始化了Integer的数组列表，<strong>ensureCapacity</strong>方法可以在填充元素前预估数组可能存储的元素数量5，<strong>但数组的大小仍然是0</strong>，用<strong>add</strong>方法添加元素，注意这里使用了<strong>自动装箱</strong>。随后使用<strong>trimToSize</strong>方法将数组预留的多余的空间去除，但不影响数组的大小。使用<strong>set</strong>方法将下标为0的元素赋值。使用<strong>add</strong>方法在下标4的位置插入元素5。使用<strong>remove</strong>方法去掉下标为4的元素，使用<strong>size</strong>方法显示元素数量。</p>
+<p>程序输出：</p>
+<p>0<br>4<br>[2, 2, 3, 4, 5]<br>4</p>
+
+      
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
+	<div class="article-tag tagcloud">
+		<i class="icon-price-tags icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">Java核心卷</a>
+        		</li>
+      		 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">数组</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
+      
+
+      
+        <p class="article-more-link">
+          <a class="article-more-a" href="/2019/09/03/%E6%95%B0%E7%BB%84%E5%88%97%E8%A1%A8ArrayList/">展开全文 >></a>
         </p>
       
 
@@ -1116,93 +1242,6 @@
 
 
   
-    <article id="post-静态变量常量方法" class="article article-type-post  article-index" itemscope itemprop="blogPost">
-  <div class="article-inner">
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2019/09/02/%E9%9D%99%E6%80%81%E5%8F%98%E9%87%8F%E5%B8%B8%E9%87%8F%E6%96%B9%E6%B3%95/">静态变量|常量|方法</a>
-    </h1>
-  
-
-        
-        <a href="/2019/09/02/%E9%9D%99%E6%80%81%E5%8F%98%E9%87%8F%E5%B8%B8%E9%87%8F%E6%96%B9%E6%B3%95/" class="archive-article-date">
-  	<time datetime="2019-09-02T04:00:00.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2019-09-02</time>
-</a>
-        
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <p><strong>静态变量：属于类不属于对象，类的所有实例共享一个静态变量。</strong></p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Employee</span></span>&#123;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">int</span> nextId = <span class="number">1</span>;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">int</span> id;</span><br><span class="line">    </span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setId</span><span class="params">()</span></span>&#123;</span><br><span class="line">        id = nextId;</span><br><span class="line">        nextId ++;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>所有雇员的nextId均为1，id初始化默认值0。调用setId后第一个雇员id为1，第二个为2，以此类推。</p>
-<p><strong>静态常量：属于类不属于对象，类的所有实例共享一个静态常量。</strong></p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Math</span></span>&#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">double</span> PI = <span class="number">3.1415926535</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>Math.PI可以不实例化Math对象就可以调用Math类的PI值。</p>
-<p><strong>静态方法：属于类不属于对象，类的所有实例共享一个静态方法。</strong></p>
-<p>静态方法没有this参数，不能向对象实施操作，因此不能操作实例域，只能访问自身类中的静态域。</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">int</span> <span class="title">getNextId</span><span class="params">()</span></span>&#123;</span><br><span class="line">    <span class="keyword">return</span> nextId;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-      
-
-      
-    </div>
-    <div class="article-info article-info-index">
-      
-      
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">Java核心卷</a>
-        		</li>
-      		 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">静态</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-      
-
-      
-        <p class="article-more-link">
-          <a class="article-more-a" href="/2019/09/02/%E9%9D%99%E6%80%81%E5%8F%98%E9%87%8F%E5%B8%B8%E9%87%8F%E6%96%B9%E6%B3%95/">展开全文 >></a>
-        </p>
-      
-
-      
-      <div class="clearfix"></div>
-    </div>
-  </div>
-</article>
-
-<aside class="wrap-side-operation">
-    <div class="mod-side-operation">
-        
-        <div class="jump-container" id="js-jump-container" style="display:none;">
-            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
-                <i class="icon-font icon-back"></i>
-            </a>
-            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
-                <i class="icon-font icon-plane jump-plane"></i>
-            </div>
-        </div>
-        
-        
-    </div>
-</aside>
-
-
-
-
-  
   
     <nav id="page-nav">
       <a class="extend prev" rel="prev" href="/page/3/">&amp;laquo; Prev</a><a class="page-number" href="/">1</a><a class="page-number" href="/page/2/">2</a><a class="page-number" href="/page/3/">3</a><span class="page-number current">4</span><a class="page-number" href="/page/5/">5</a><a class="extend next" rel="next" href="/page/5/">Next &amp;raquo;</a>
@@ -1296,6 +1335,14 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
           <ul class="article-tag-list" q-show="showTags">
              
               <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color4">LeetCode</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color4">序列化</a>
+              </li>
+             
+              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color4">实战Java高并发程序设计</a>
               </li>
              
@@ -1304,11 +1351,11 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">LeetCode</a>
+                <a href="javascript:void(0)" class="js-tag color3">Java核心卷</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">Java8</a>
+                <a href="javascript:void(0)" class="js-tag color3">集合</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -1316,19 +1363,11 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">Java核心卷</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color3">同步</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">序列化</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">集合</a>
+                <a href="javascript:void(0)" class="js-tag color1">Java8</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -1340,6 +1379,10 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color4">StringBuilder</a>
+              </li>
+             
+              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color2">spring</a>
               </li>
              
@@ -1348,27 +1391,11 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">AOP</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">多线程</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">StringBuilder</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color2">Java基础</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">内部类</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">函数式编程</a>
+                <a href="javascript:void(0)" class="js-tag color4">AOP</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -1376,7 +1403,7 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">SpringMVC</a>
+                <a href="javascript:void(0)" class="js-tag color4">多线程</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -1384,15 +1411,7 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">抽象类</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">未来日记</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">数组</a>
+                <a href="javascript:void(0)" class="js-tag color4">内部类</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -1404,6 +1423,18 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color1">函数式编程</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color4">抽象类</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color5">未来日记</a>
+              </li>
+             
+              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color5">设计模式</a>
               </li>
              
@@ -1412,15 +1443,15 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">泛型</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color5">sync</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">ThreadLocal</a>
+                <a href="javascript:void(0)" class="js-tag color3">数组</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color5">SpringMVC</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -1428,11 +1459,23 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">错误处理</a>
+                <a href="javascript:void(0)" class="js-tag color2">ThreadLocal</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">面经</a>
               </li>
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color2">锁</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">泛型</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color5">错误处理</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -1441,10 +1484,6 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color3">无锁</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">面经</a>
               </li>
             
             <div class="clearfix"></div>

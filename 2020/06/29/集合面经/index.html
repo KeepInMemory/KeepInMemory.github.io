@@ -6,14 +6,19 @@
   <meta name="renderer" content="webkit">
   <meta http-equiv="X-UA-Compatible" content="IE=edge" >
   <link rel="dns-prefetch" href="http://yoursite.com">
-  <title>Tag: 集合 | HanBlog</title>
+  <title>集合面经 | HanBlog</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta property="og:type" content="website">
-<meta property="og:title" content="HanBlog">
-<meta property="og:url" content="http://yoursite.com/tags/%E9%9B%86%E5%90%88/index.html">
+  <meta name="description" content="HashMap什么是HashMapHashMap是基于哈希表的Map接口实现，它是以key-value存储形式存在，用来放键值对 它的特点是，1.存取是无序的 2.键值都可以为null，但是键最多只能有一个null JDK1.8之前是由数组+链表组成的，数组是HashMap的主体，用数组是为了方便索引查询，链表则是为了解决哈希冲突。HashMap的默认初始长度是16， JDK1.8以前有两个缺点，">
+<meta property="og:type" content="article">
+<meta property="og:title" content="集合面经">
+<meta property="og:url" content="http://yoursite.com/2020/06/29/%E9%9B%86%E5%90%88%E9%9D%A2%E7%BB%8F/index.html">
 <meta property="og:site_name" content="HanBlog">
+<meta property="og:description" content="HashMap什么是HashMapHashMap是基于哈希表的Map接口实现，它是以key-value存储形式存在，用来放键值对 它的特点是，1.存取是无序的 2.键值都可以为null，但是键最多只能有一个null JDK1.8之前是由数组+链表组成的，数组是HashMap的主体，用数组是为了方便索引查询，链表则是为了解决哈希冲突。HashMap的默认初始长度是16， JDK1.8以前有两个缺点，">
 <meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2020-06-29T01:19:17.000Z">
+<meta property="article:modified_time" content="2020-06-29T06:24:11.939Z">
 <meta property="article:author" content="Xuesong">
+<meta property="article:tag" content="面经">
 <meta name="twitter:card" content="summary">
   
     <link rel="alternative" href="/atom.xml" title="HanBlog" type="application/atom+xml">
@@ -148,64 +153,192 @@
             <canvas data-colors="#eaeaea" data-sectionHeight="100" data-contentId="js-content" id="myCanvas1" class="anm-canvas"></canvas>
           </div>
           <div id="js-content" class="content-ll">
-            
-  
-  
+            <article id="post-集合面经" class="article article-type-post " itemscope itemprop="blogPost">
+  <div class="article-inner">
     
-    
-      
-      
-      <section class="archives-wrap">
-        <div class="archive-year-wrap">
-          <a href="/archives/2019" class="archive-year">2019</a>
-        </div>
-        <div class="archives">
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2019/09/07/Java%E9%9B%86%E5%90%88%E5%88%9D%E8%AF%86/" class="archive-article-date">
-  	<time datetime="2019-09-07T04:00:01.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2019-09-07</time>
-</a>
-        </div>
-    	 
+      <header class="article-header">
+        
   
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2019/09/07/Java%E9%9B%86%E5%90%88%E5%88%9D%E8%AF%86/">Java集合初识</a>
+    <h1 class="article-title" itemprop="name">
+      集合面经
     </h1>
   
 
-        <div class="article-info info-on-right">
-          
+        
+        <a href="/2020/06/29/%E9%9B%86%E5%90%88%E9%9D%A2%E7%BB%8F/" class="archive-article-date">
+  	<time datetime="2020-06-29T01:19:17.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2020-06-29</time>
+</a>
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h3 id="HashMap"><a href="#HashMap" class="headerlink" title="HashMap"></a>HashMap</h3><h4 id="什么是HashMap"><a href="#什么是HashMap" class="headerlink" title="什么是HashMap"></a>什么是HashMap</h4><p>HashMap是基于哈希表的Map接口实现，它是以key-value存储形式存在，用来放键值对</p>
+<p>它的特点是，1.存取是无序的 2.键值都可以为null，但是键最多只能有一个null</p>
+<p>JDK1.8之前是由数组+链表组成的，数组是HashMap的主体，用数组是为了方便索引查询，链表则是为了解决哈希冲突。HashMap的默认初始长度是16，</p>
+<p>JDK1.8以前有两个缺点，一是线程不安全的，Rehash时可能会产生死锁。二是有安全漏洞，黑客可以通过精心构造的恶意请求进行Dos攻击。在哈希碰撞多了以后，哈希桶会退化成链表，链表的查找的复杂度是O(n)</p>
+<p>JDK1.8之后在解决哈希冲突时有了较大变化，数据结构改为了数组+链表+红黑树的形式，当链表长度大于阈值8并且当前数组的长度大于64时，此时该哈希桶上的所有数据改为红黑树存储，如果阈值大于8但是数组长度小于64不会改成红黑树，而是进行数组扩容。这是因为数组较小，搜索时间相对较短，红黑树需要进行左旋右旋变色等操作来保持平衡，改成红黑树反而会降低效率</p>
+<p>JDK1.8虽然解决了Rehash时死锁的问题，但还是会存在其他多线程不安全的问题，并发环境下使用ConcurrentHashMap</p>
+<h4 id="为什么数组大小一定是2的幂"><a href="#为什么数组大小一定是2的幂" class="headerlink" title="为什么数组大小一定是2的幂"></a>为什么数组大小一定是2的幂</h4><p>Hash值范围大概是40亿个数，不可能创建一个40亿长度的数组，内存就爆了，所以计算后的hash值是不能拿来直接用的，还需要进行计算索引值，一般是进行取模操作，源码中在计算出hash值之后有个indexFor方法计算索引值，计算方法是hash&amp;(length-1)，如果是2的n次方，即10000…后面全是0，减一后会变成01111..后面全是1，此时跟哈希值按位与的话能让数据分配均匀，减少碰撞。如果不是2的幂，那么某些位会成为0，此时hash值和0与怎么样都是0，结果是有些Hash桶永远是空的。</p>
+<p>数组长度-1正好相当于一个“低位掩码”。“与”操作的结果就是散列值的高位全部归零，只保留低位值，用来做数组下标访问。</p>
+<h4 id="什么是红黑树"><a href="#什么是红黑树" class="headerlink" title="什么是红黑树"></a>什么是红黑树</h4><p>红黑树是一个二叉平衡树，二叉树的平均查找时间是O(logn)，如果不巧可能会成为一条线，退化成链表。所以红黑树通过旋转等的操作，保证自己是平衡的。</p>
+<h4 id="为什么负载因子是0-75"><a href="#为什么负载因子是0-75" class="headerlink" title="为什么负载因子是0.75"></a>为什么负载因子是0.75</h4><p>是空间和时间的一个折中，负载因子是0.75的时候，空间利用率比较高，而且避免了相当多的Hash冲突，使得底层的链表或者是红黑树的高度比较低。</p>
+<h4 id="为什么树化的阈值是8"><a href="#为什么树化的阈值是8" class="headerlink" title="为什么树化的阈值是8"></a>为什么树化的阈值是8</h4><p>源码的注释里说哈希桶中节点的个数服从参数为0.5的泊松分布，一个桶里面有大于8个元素的概率是小于十万分之一的，因为超过8的概率已经非常小了，所以采用8作为阈值。 </p>
+<h4 id="散列表扩容"><a href="#散列表扩容" class="headerlink" title="散列表扩容"></a>散列表扩容</h4><p>resize()扩容方法，只有在两种情况下会被调用：</p>
+<p>HashMap实行了懒加载: 新建HashMap时不会对Node[] table进行赋值, 而是到第一次插入时, 进行resize时构建Node[] table，Node对象内部有hash、next、key、value字段</p>
+<p>当HashMap的大小值大于 threshold16*0.75=12时, 会进行扩容，扩容成2倍。</p>
+<h4 id="Node的hash值计算方法"><a href="#Node的hash值计算方法" class="headerlink" title="Node的hash值计算方法"></a>Node的hash值计算方法</h4><p>Node.hash不是key对象的hashcode()返回值，而是key.hashCode返回值高16位异或低16位，作用是优化hash算法，因为这样就算散列值分布再松散，要是只取最后几位的话，碰撞也会很严重。更要命的是如果散列本身做得不好，分布上成等差数列的漏洞，如果正好让最后几个低位呈现规律性重复，就很难受。</p>
+<p>key.hashCode返回值高16位异或低16位，以此来加大低位的随机性。而且混合后的低位掺杂了高位的部分特征，这样高位的信息也被变相保留下来。</p>
+
+      
+
+      
+        <div class="page-reward">
+          <a href="javascript:;" class="page-reward-btn tooltip-top">
+            <div class="tooltip tooltip-east">
+            <span class="tooltip-item">
+              赏
+            </span>
+            <span class="tooltip-content">
+              <span class="tooltip-text">
+                <span class="tooltip-inner">
+                  <p class="reward-p"><i class="icon icon-quo-left"></i>谢谢<i class="icon icon-quo-right"></i></p>
+                  <div class="reward-box">
+                    
+                    <div class="reward-box-item">
+                      <img class="reward-img" src="/assets/img/alipay.jpg">
+                      <span class="reward-type">支付宝</span>
+                    </div>
+                    
+                    
+                    <div class="reward-box-item">
+                      <img class="reward-img" src="/assets/img/wechat.jpg">
+                      <span class="reward-type">微信</span>
+                    </div>
+                    
+                  </div>
+                </span>
+              </span>
+            </span>
+          </div>
+          </a>
+        </div>
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
 	<div class="article-tag tagcloud">
 		<i class="icon-price-tags icon"></i>
 		<ul class="article-tag-list">
 			 
         		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">Java核心卷</a>
-        		</li>
-      		 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">集合</a>
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">面经</a>
         		</li>
       		
 		</ul>
 	</div>
 
-          
+      
 
+      
+
+      
+        
+<div class="share-btn share-icons tooltip-left">
+  <div class="tooltip tooltip-east">
+    <span class="tooltip-item">
+      <a href="javascript:;" class="share-sns share-outer">
+        <i class="icon icon-share"></i>
+      </a>
+    </span>
+    <span class="tooltip-content">
+      <div class="share-wrap">
+        <div class="share-icons">
+          <a class="weibo share-sns" href="javascript:;" data-type="weibo">
+            <i class="icon icon-weibo"></i>
+          </a>
+          <a class="weixin share-sns wxFab" href="javascript:;" data-type="weixin">
+            <i class="icon icon-weixin"></i>
+          </a>
+          <a class="qq share-sns" href="javascript:;" data-type="qq">
+            <i class="icon icon-qq"></i>
+          </a>
+          <a class="douban share-sns" href="javascript:;" data-type="douban">
+            <i class="icon icon-douban"></i>
+          </a>
+          <a class="qzone share-sns" href="javascript:;" data-type="qzone">
+            <i class="icon icon-qzone"></i>
+          </a>
+          <a class="facebook share-sns" href="javascript:;" data-type="facebook">
+            <i class="icon icon-facebook"></i>
+          </a>
+          <a class="twitter share-sns" href="javascript:;" data-type="twitter">
+            <i class="icon icon-twitter"></i>
+          </a>
+          <a class="google share-sns" href="javascript:;" data-type="google">
+            <i class="icon icon-google"></i>
+          </a>
         </div>
-        <div class="clearfix"></div>
-    </header>
+      </div>
+    </span>
+  </div>
+</div>
+
+<div class="page-modal wx-share js-wx-box">
+    <a class="close js-modal-close" href="javascript:;"><i class="icon icon-close"></i></a>
+    <p>扫一扫，分享到微信</p>
+    <div class="wx-qrcode">
+      <img src="//pan.baidu.com/share/qrcode?url=http://yoursite.com/2020/06/29/%E9%9B%86%E5%90%88%E9%9D%A2%E7%BB%8F/" alt="微信分享二维码">
+    </div>
+</div>
+
+<div class="mask js-mask"></div>
+      
+      <div class="clearfix"></div>
+    </div>
   </div>
 </article>
+
+  
+<nav id="article-nav">
   
   
-    </div></section>
+    <a href="/2020/06/24/Java%E5%BA%8F%E5%88%97%E5%8C%96/" id="article-nav-older" class="article-nav-link-wrap">
+      <div class="article-nav-title">Java序列化</div>
+      <i class="icon-circle-right"></i>
+    </a>
+  
+</nav>
+
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+    </div>
+</aside>
+
+
+
+  
+  
   
 
-    
+  
+
+  
+
+  
 
 
           </div>
@@ -228,9 +361,9 @@
 	var yiliaConfig = {
 		mathjax: false,
 		isHome: false,
-		isPost: false,
+		isPost: true,
 		isArchive: false,
-		isTag: true,
+		isTag: false,
 		isCategory: false,
 		open_in_new: false,
 		toc_hide_index: true,
