@@ -560,10 +560,46 @@
 <p>79.在矩阵中寻找字符串 不熟练</p>
 <p>257.二叉树的所有路径 不熟练</p>
 <p>46.全排列</p>
+<p>for从0开始</p>
 <p>47.全排列Ⅱ</p>
-<p>if(i &gt;= 1 &amp;&amp; nums[i] == nums[i-1] &amp;&amp; !visited[i-1]) continue; 表示如果这次的数和它前面的数是一样的，而且visited[i-1]=false前面那个相同的数还没被访问过，那么必定一会构造的排列会有前面那个相同的数，一定会产生相同的排列，因为这次排列前面的排列是从前往后排的，一定是前面的先排再是后面的排，如果前面的那个相同数还没排说明一定有重复的排列了，应该舍弃</p>
+<p>for从0开始，有boolean[] visited。if(i &gt; 0 &amp;&amp; nums[i] == nums[i-1] &amp;&amp; !visited[i-1]) continue; 表示如果这次的数和它前面的数是一样的，而且visited[i-1]=false前面那个相同的数还没被访问过，那么必定一会构造的排列会有前面那个相同的数，一定会产生相同的排列，因为这次排列前面的排列是从前往后排的，一定是前面的先排再是后面的排，如果前面的那个相同数还没排说明一定有重复的排列了，应该舍弃</p>
 <p>77.组合</p>
-<p>回溯法解决组合问题。和排序问题不同的是，在组合问题中元素的顺序不考虑，只需要从当前位置向后寻找。排序问题每次都需要从头寻找，需要用visited数组记录访问过的元素。</p>
+<p>从Start开始，不是从0开始。回溯法解决组合问题。和排序问题不同的是，在组合问题中元素的顺序不考虑，只需要从当前位置向后寻找。排序问题每次都需要从头寻找，需要用visited数组记录访问过的元素。</p>
+<p>39.组合总和</p>
+<p>注意也是从Start开始，不是从0开始，因为是初始数组是有序的</p>
+<p>40.组合总和Ⅱ</p>
+<p>从Start开始，不是从0开始，有boolean[] visited。排序后用if(i &gt; 0 &amp;&amp; nums[i] == nums[i-1] &amp;&amp; !visited[i-1]) continue;避免重复结果</p>
+<p>216.组合总和Ⅲ</p>
+<p>78.子集</p>
+<p>从start开始</p>
+<p>90.子集Ⅱ</p>
+<p>数组排序，从start开始，有boolean[] visited。if(i &gt; 0 &amp;&amp; nums[i] == nums[i-1] &amp;&amp; !visited[i-1]) continue; </p>
+<p>131.分割回文串</p>
+<h3 id="动态规划"><a href="#动态规划" class="headerlink" title="动态规划"></a>动态规划</h3><p>70.爬楼梯</p>
+<p>198.打家劫舍</p>
+<p>表达式会写</p>
+<p>213.打家劫舍Ⅱ</p>
+<p>把环拆成两个队列，一个是从0到n-1，另一个是从1到n，然后返回两个结果最大的。</p>
+<p>64.最小路径和</p>
+<p>注意表达式</p>
+<p>62.不同路径</p>
+<p>我们令 dp[i][j] 是到达 i, j 最多路径</p>
+<p>动态方程：dp[i][j] = dp[i-1][j] + dp[i][j-1]</p>
+<p>注意，对于第一行 dp[0][j]，或者第一列 dp[i][0]，由于都是在边界，所以只能为 1（横着或者竖着走，都是一条路径）</p>
+<p>413.等差数列划分</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">dp[<span class="number">2</span>] = <span class="number">1</span></span><br><span class="line">    [<span class="number">0</span>, <span class="number">1</span>, <span class="number">2</span>]</span><br><span class="line">dp[<span class="number">3</span>] = dp[<span class="number">2</span>] + <span class="number">1</span> = <span class="number">2</span></span><br><span class="line">    [<span class="number">0</span>, <span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>], <span class="comment">// [0, 1, 2] 之后加一个 3</span></span><br><span class="line">    [<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>]     <span class="comment">// 新的递增子区间</span></span><br><span class="line">dp[<span class="number">4</span>] = dp[<span class="number">3</span>] + <span class="number">1</span> = <span class="number">3</span></span><br><span class="line">    [<span class="number">0</span>, <span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>], <span class="comment">// [0, 1, 2, 3] 之后加一个 4</span></span><br><span class="line">    [<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>],    <span class="comment">// [1, 2, 3] 之后加一个 4</span></span><br><span class="line">    [<span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>]        <span class="comment">// 新的递增子区间</span></span><br></pre></td></tr></table></figure>
+
+<p>综上，在 A[i] - A[i-1] == A[i-1] - A[i-2] 时，dp[i] = dp[i-1] + 1。</p>
+<p>因为递增子区间不一定以最后一个元素为结尾，可以是任意一个元素结尾，因此需要返回 dp 数组累加的结果。</p>
+<p>343.整数拆分</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">IntegerBreak</span><span class="params">(<span class="keyword">int</span> n)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">int</span>[] dp = <span class="keyword">new</span> <span class="keyword">int</span>[n+<span class="number">1</span>]; </span><br><span class="line">        <span class="keyword">if</span>(n &lt;= <span class="number">3</span>) <span class="keyword">return</span> n-<span class="number">1</span>;</span><br><span class="line">        <span class="comment">/*解决大问题的时候用到小问题的解并不是这三个数</span></span><br><span class="line"><span class="comment">        真正的dp[1] = 0,dp[2] = 1,dp[3] = 2</span></span><br><span class="line"><span class="comment">        但是当n=4时，4=2+2 2*2=4 而dp[2]=1是不对的</span></span><br><span class="line"><span class="comment">        也就是说当n=1/2/3时，分割后反而比没分割的值要小，当大问题用到dp[j]时，说明已经分成了一个j一个i-j，这两部分又可以再分，但是再分不能比他本身没分割的要小，如果分了更小还不如不分</span></span><br><span class="line"><span class="comment">        所以在这里指定大问题用到的dp[1],dp[2],dp[3]是他本身*/</span></span><br><span class="line">        dp[<span class="number">1</span>] = <span class="number">1</span>;dp[<span class="number">2</span>] = <span class="number">2</span>;dp[<span class="number">3</span>] = <span class="number">3</span>;</span><br><span class="line">        <span class="keyword">for</span>(<span class="keyword">int</span> i = <span class="number">4</span>; i &lt;= n; i++) &#123;</span><br><span class="line">            <span class="keyword">for</span>(<span class="keyword">int</span> j = <span class="number">1</span>; j &lt;= i/<span class="number">2</span>; j++) &#123;</span><br><span class="line">                dp[i] = Math.max(dp[i],dp[i-j]*dp[j]);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> dp[n];</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>300.最长上升子序列</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">lengthOfLIS</span><span class="params">(<span class="keyword">int</span>[] nums)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span>(nums.length == <span class="number">0</span>)<span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">        <span class="keyword">int</span>[] dp = <span class="keyword">new</span> <span class="keyword">int</span>[nums.length];</span><br><span class="line">        <span class="keyword">int</span> max = <span class="number">1</span>;</span><br><span class="line">        <span class="keyword">for</span>(<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; nums.length; i++) &#123;</span><br><span class="line">            <span class="keyword">for</span>(<span class="keyword">int</span> j = <span class="number">0</span>; j &lt; i; j++) &#123;</span><br><span class="line">                <span class="keyword">if</span>(nums[i] &gt; nums[j]) &#123;</span><br><span class="line">                    dp[i] = Math.max(dp[i],dp[j]+<span class="number">1</span>);</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">            max = Math.max(max,dp[i]+<span class="number">1</span>);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">return</span> max;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+
+<p>646.最长数对链</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">findLongestChain</span><span class="params">(<span class="keyword">int</span>[][] pairs)</span> </span>&#123;</span><br><span class="line">        Arrays.sort(pairs,<span class="keyword">new</span> Comparator&lt;&gt;() &#123;</span><br><span class="line">            <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">compare</span><span class="params">(<span class="keyword">int</span>[] p1,<span class="keyword">int</span>[] p2)</span> </span>&#123;</span><br><span class="line">                <span class="keyword">return</span> p1[<span class="number">1</span>] - p2[<span class="number">1</span>];</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span>(pairs.length == <span class="number">0</span>) <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">        <span class="keyword">int</span>[] dp = <span class="keyword">new</span> <span class="keyword">int</span>[pairs.length];</span><br><span class="line"></span><br><span class="line">        <span class="keyword">int</span> max = <span class="number">1</span>;</span><br><span class="line">        <span class="keyword">for</span>(<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; pairs.length; i++) &#123;</span><br><span class="line">            <span class="keyword">for</span>(<span class="keyword">int</span> j = <span class="number">0</span>; j &lt; i; j++) &#123;</span><br><span class="line">                <span class="keyword">if</span>(pairs[j][<span class="number">1</span>] &lt; pairs[i][<span class="number">0</span>]) &#123;</span><br><span class="line">                    dp[i] = Math.max(dp[i],dp[j]+<span class="number">1</span>);</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">            max = Math.max(dp[i]+<span class="number">1</span>,max);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> max;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
 
       
 
@@ -1638,19 +1674,11 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">同步</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color4">线程池</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">面经</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">Java8</a>
+                <a href="javascript:void(0)" class="js-tag color3">同步</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -1658,11 +1686,19 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">集合</a>
+                <a href="javascript:void(0)" class="js-tag color3">面经</a>
               </li>
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color4">序列化</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color1">Java8</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">集合</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -1678,15 +1714,11 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">AOP</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color4">IOC</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">事务</a>
+                <a href="javascript:void(0)" class="js-tag color4">AOP</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -1694,7 +1726,11 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">StringBuilder</a>
+                <a href="javascript:void(0)" class="js-tag color5">SpringMVC</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">事务</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -1702,11 +1738,7 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">内部类</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">SpringMVC</a>
+                <a href="javascript:void(0)" class="js-tag color4">StringBuilder</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -1714,11 +1746,15 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">剑指Offer</a>
+                <a href="javascript:void(0)" class="js-tag color4">多线程</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">多线程</a>
+                <a href="javascript:void(0)" class="js-tag color4">内部类</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">剑指Offer</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -1750,15 +1786,11 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">泛型</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color5">sync</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">ThreadLocal</a>
+                <a href="javascript:void(0)" class="js-tag color3">泛型</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -1766,11 +1798,15 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">无锁</a>
+                <a href="javascript:void(0)" class="js-tag color5">错误处理</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">错误处理</a>
+                <a href="javascript:void(0)" class="js-tag color2">ThreadLocal</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">无锁</a>
               </li>
              
               <li class="article-tag-list-item">
