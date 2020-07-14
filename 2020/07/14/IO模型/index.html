@@ -6,14 +6,19 @@
   <meta name="renderer" content="webkit">
   <meta http-equiv="X-UA-Compatible" content="IE=edge" >
   <link rel="dns-prefetch" href="http://yoursite.com">
-  <title>Tag: 函数式编程 | HanBlog</title>
+  <title>IO模型 | HanBlog</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta property="og:type" content="website">
-<meta property="og:title" content="HanBlog">
-<meta property="og:url" content="http://yoursite.com/tags/%E5%87%BD%E6%95%B0%E5%BC%8F%E7%BC%96%E7%A8%8B/index.html">
+  <meta name="description" content="同步阻塞当对面Socket来了IO请求的时候，对面的Socket在等(同步)，我也在准备数据，准备了一段时间(阻塞)准备好了返回给对方 同步非阻塞当对面Socket来了IO请求的时候，对面的Socket在等(同步)，我还没准备好，就先返回给对面Error，对面一看Error知道我还没准备好，他就去做别的事情了(非阻塞)，等过段时间再来询问。 异步阻塞(IO多路复用)I&#x2F;O 多路复用模型是利用sel">
+<meta property="og:type" content="article">
+<meta property="og:title" content="IO模型">
+<meta property="og:url" content="http://yoursite.com/2020/07/14/IO%E6%A8%A1%E5%9E%8B/index.html">
 <meta property="og:site_name" content="HanBlog">
+<meta property="og:description" content="同步阻塞当对面Socket来了IO请求的时候，对面的Socket在等(同步)，我也在准备数据，准备了一段时间(阻塞)准备好了返回给对方 同步非阻塞当对面Socket来了IO请求的时候，对面的Socket在等(同步)，我还没准备好，就先返回给对面Error，对面一看Error知道我还没准备好，他就去做别的事情了(非阻塞)，等过段时间再来询问。 异步阻塞(IO多路复用)I&#x2F;O 多路复用模型是利用sel">
 <meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2020-07-14T02:28:28.000Z">
+<meta property="article:modified_time" content="2020-07-14T02:39:30.238Z">
 <meta property="article:author" content="Xuesong">
+<meta property="article:tag" content="IO模型">
 <meta name="twitter:card" content="summary">
   
     <link rel="alternative" href="/atom.xml" title="HanBlog" type="application/atom+xml">
@@ -148,64 +153,184 @@
             <canvas data-colors="#eaeaea" data-sectionHeight="100" data-contentId="js-content" id="myCanvas1" class="anm-canvas"></canvas>
           </div>
           <div id="js-content" class="content-ll">
-            
-  
-  
+            <article id="post-IO模型" class="article article-type-post " itemscope itemprop="blogPost">
+  <div class="article-inner">
     
-    
-      
-      
-      <section class="archives-wrap">
-        <div class="archive-year-wrap">
-          <a href="/archives/2019" class="archive-year">2019</a>
-        </div>
-        <div class="archives">
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2019/09/20/%E5%87%BD%E6%95%B0%E5%BC%8F%E7%BC%96%E7%A8%8B%E7%AE%80%E4%BB%8B/" class="archive-article-date">
-  	<time datetime="2019-09-20T04:00:00.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2019-09-20</time>
-</a>
-        </div>
-    	 
+      <header class="article-header">
+        
   
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2019/09/20/%E5%87%BD%E6%95%B0%E5%BC%8F%E7%BC%96%E7%A8%8B%E7%AE%80%E4%BB%8B/">函数式编程简介</a>
+    <h1 class="article-title" itemprop="name">
+      IO模型
     </h1>
   
 
-        <div class="article-info info-on-right">
-          
+        
+        <a href="/2020/07/14/IO%E6%A8%A1%E5%9E%8B/" class="archive-article-date">
+  	<time datetime="2020-07-14T02:28:28.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2020-07-14</time>
+</a>
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h4 id="同步阻塞"><a href="#同步阻塞" class="headerlink" title="同步阻塞"></a>同步阻塞</h4><p>当对面Socket来了IO请求的时候，对面的Socket在等(同步)，我也在准备数据，准备了一段时间(阻塞)准备好了返回给对方</p>
+<h4 id="同步非阻塞"><a href="#同步非阻塞" class="headerlink" title="同步非阻塞"></a>同步非阻塞</h4><p>当对面Socket来了IO请求的时候，对面的Socket在等(同步)，我还没准备好，就先返回给对面Error，对面一看Error知道我还没准备好，他就去做别的事情了(非阻塞)，等过段时间再来询问。</p>
+<h4 id="异步阻塞-IO多路复用"><a href="#异步阻塞-IO多路复用" class="headerlink" title="异步阻塞(IO多路复用)"></a>异步阻塞(IO多路复用)</h4><p>I/O 多路复用模型是利用select、poll、epoll可以同时监察多个流的 I/O 事件的能力，在空闲的时候，会把当前线程阻塞掉，当有一个或多个流有I/O事件时，就从阻塞态中唤醒，于是程序就会轮询一遍所有的流（epoll是只轮询那些真正发出了事件的流），依次顺序的处理就绪的流，这种做法就避免了大量的无用操作。</p>
+<p>当用户进程Socket调用了select，那么整个进程会被block，而同时，kernel会“监视”所有select负责的用户Socket，当任何一个Socket中的数据准备好了，select就会返回。等用户进程再调用read操作，将数据从kernel拷贝到用户进程。</p>
+<p>这里的所说的阻塞是指select函数执行时线程被阻塞，而不是指socket。异步指的是Socket请求后就去做别的事情了，下次再来read的时候对面数据就准备好了。</p>
+<p>下面举一个例子，模拟一个tcp服务器处理30个客户socket。<br>假设你是一个老师，让30个学生解答一道题目，然后检查学生做的是否正确，你有下面几个选择：</p>
+<p>\1. 第一种选择：<strong>按顺序逐个检查</strong>，先检查A，然后是B，之后是C、D。。。这中间如果有一个学生卡主，全班都会被耽误。<br>这种模式就好比，你用循环挨个处理socket，根本不具有并发能力。<br>\2. 第二种选择：你<strong>创建30个分身</strong>，每个分身检查一个学生的答案是否正确。 这种类似于为每一个用户创建一个进程或者线程处理连接。<br>\3. 第三种选择，你<strong>站在讲台上等，谁解答完谁举手</strong>。这时C、D举手，表示他们解答问题完毕，你下去依次检查C、D的答案，然后继续回到讲台上等。此时E、A又举手，然后去处理E和A。。。<br>这种就是IO复用模型，Linux下的select、poll和epoll就是干这个的。将用户socket对应的fd注册进epoll，然后epoll帮你监听哪些socket上有消息到达(poll是全部轮询一遍，epoll只轮询那些真正发出了事件的流)，这样就避免了大量的无用操作。此时的socket应该采用<strong>非阻塞模式</strong>。<br>这样，整个过程只在调用select、poll、epoll这些调用的时候才会阻塞，收发客户消息是不会阻塞的(因为用户Socket下次来的时候数据已经准备好了)，整个进程或者线程就被充分利用起来，这就是<strong>事件驱动</strong>，所谓的reactor模式</p>
+<h4 id="异步非阻塞"><a href="#异步非阻塞" class="headerlink" title="异步非阻塞"></a>异步非阻塞</h4><p>在异步IO模型中，当用户线程发起read操作之后，立刻就可以开始去做其它的事。而另一方面，从内核的角度，当它受到一个asynchronous read之后，它会立刻返回，说明read请求已经成功发起了，因此不会对用户线程产生任何block。然后，内核会等待数据准备完成，当这一切都完成之后，内核会给用户线程发送一个信号，告诉它read操作完成了。(同步的话是等着用户线程下次再来询问)也就说用户线程完全不需要关心实际的整个IO操作是如何进行的，只需要先发起一个请求，当接收内核返回的成功信号时表示IO操作已经完成，可以直接去使用数据了。</p>
+
+      
+
+      
+        <div class="page-reward">
+          <a href="javascript:;" class="page-reward-btn tooltip-top">
+            <div class="tooltip tooltip-east">
+            <span class="tooltip-item">
+              赏
+            </span>
+            <span class="tooltip-content">
+              <span class="tooltip-text">
+                <span class="tooltip-inner">
+                  <p class="reward-p"><i class="icon icon-quo-left"></i>谢谢<i class="icon icon-quo-right"></i></p>
+                  <div class="reward-box">
+                    
+                    <div class="reward-box-item">
+                      <img class="reward-img" src="/assets/img/alipay.jpg">
+                      <span class="reward-type">支付宝</span>
+                    </div>
+                    
+                    
+                    <div class="reward-box-item">
+                      <img class="reward-img" src="/assets/img/wechat.jpg">
+                      <span class="reward-type">微信</span>
+                    </div>
+                    
+                  </div>
+                </span>
+              </span>
+            </span>
+          </div>
+          </a>
+        </div>
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
 	<div class="article-tag tagcloud">
 		<i class="icon-price-tags icon"></i>
 		<ul class="article-tag-list">
 			 
         		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">实战Java高并发程序设计</a>
-        		</li>
-      		 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color1">函数式编程</a>
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color5">IO模型</a>
         		</li>
       		
 		</ul>
 	</div>
 
-          
+      
 
+      
+
+      
+        
+<div class="share-btn share-icons tooltip-left">
+  <div class="tooltip tooltip-east">
+    <span class="tooltip-item">
+      <a href="javascript:;" class="share-sns share-outer">
+        <i class="icon icon-share"></i>
+      </a>
+    </span>
+    <span class="tooltip-content">
+      <div class="share-wrap">
+        <div class="share-icons">
+          <a class="weibo share-sns" href="javascript:;" data-type="weibo">
+            <i class="icon icon-weibo"></i>
+          </a>
+          <a class="weixin share-sns wxFab" href="javascript:;" data-type="weixin">
+            <i class="icon icon-weixin"></i>
+          </a>
+          <a class="qq share-sns" href="javascript:;" data-type="qq">
+            <i class="icon icon-qq"></i>
+          </a>
+          <a class="douban share-sns" href="javascript:;" data-type="douban">
+            <i class="icon icon-douban"></i>
+          </a>
+          <a class="qzone share-sns" href="javascript:;" data-type="qzone">
+            <i class="icon icon-qzone"></i>
+          </a>
+          <a class="facebook share-sns" href="javascript:;" data-type="facebook">
+            <i class="icon icon-facebook"></i>
+          </a>
+          <a class="twitter share-sns" href="javascript:;" data-type="twitter">
+            <i class="icon icon-twitter"></i>
+          </a>
+          <a class="google share-sns" href="javascript:;" data-type="google">
+            <i class="icon icon-google"></i>
+          </a>
         </div>
-        <div class="clearfix"></div>
-    </header>
+      </div>
+    </span>
+  </div>
+</div>
+
+<div class="page-modal wx-share js-wx-box">
+    <a class="close js-modal-close" href="javascript:;"><i class="icon icon-close"></i></a>
+    <p>扫一扫，分享到微信</p>
+    <div class="wx-qrcode">
+      <img src="//pan.baidu.com/share/qrcode?url=http://yoursite.com/2020/07/14/IO%E6%A8%A1%E5%9E%8B/" alt="微信分享二维码">
+    </div>
+</div>
+
+<div class="mask js-mask"></div>
+      
+      <div class="clearfix"></div>
+    </div>
   </div>
 </article>
+
+  
+<nav id="article-nav">
   
   
-    </div></section>
+    <a href="/2020/07/05/JVM%E9%9D%A2%E7%BB%8F/" id="article-nav-older" class="article-nav-link-wrap">
+      <div class="article-nav-title">JVM面经</div>
+      <i class="icon-circle-right"></i>
+    </a>
+  
+</nav>
+
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+    </div>
+</aside>
+
+
+
+  
+  
   
 
-    
+  
+
+  
+
+  
 
 
           </div>
@@ -228,9 +353,9 @@
 	var yiliaConfig = {
 		mathjax: false,
 		isHome: false,
-		isPost: false,
+		isPost: true,
 		isArchive: false,
-		isTag: true,
+		isTag: false,
 		isCategory: false,
 		open_in_new: false,
 		toc_hide_index: true,
