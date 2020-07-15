@@ -5,12 +5,12 @@
   
   <meta name="renderer" content="webkit">
   <meta http-equiv="X-UA-Compatible" content="IE=edge" >
-  <link rel="dns-prefetch" href="http://yoursite.com">
+  <link rel="dns-prefetch" href="http://KeepInMemory.github.io">
   <title>HanBlog</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
   <meta property="og:type" content="website">
 <meta property="og:title" content="HanBlog">
-<meta property="og:url" content="http://yoursite.com/page/2/index.html">
+<meta property="og:url" content="http://keepinmemory.github.io/page/2/index.html">
 <meta property="og:site_name" content="HanBlog">
 <meta property="og:locale" content="en_US">
 <meta property="article:author" content="Xuesong">
@@ -174,7 +174,7 @@
 <p>​    控制：资源的获取方式由主动的new变为被动的从容器接收，容器相当于婚介所</p>
 <p>DI：依赖注入</p>
 <p>​    容器能知道哪个组件运行的时候需要另一个组件；容器通过反射的形式，将容器准备好的对象注入（利用反射给属性赋值）</p>
-<p><img src="C:%5CUsers%5C75959%5CAppData%5CRoaming%5CTypora%5Ctypora-user-images%5Cimage-20200612150607383.png" alt="image-20200612150607383"></p>
+<p><img src="/2020/06/12/Spring%20IOC/C:%5CUsers%5C75959%5CAppData%5CRoaming%5CTypora%5Ctypora-user-images%5Cimage-20200612150607383.png" alt="image-20200612150607383"></p>
 <p>1.导入Spring开发的基本包坐标 2.编写Dao接口和实现类 3.创建Spring核心配置文件 4.在Spring配置文件中配置UserDaoImpl 5.使用Spring的API获得Bean实例</p>
 <h4 id="Bean属性"><a href="#Bean属性" class="headerlink" title="Bean属性"></a>Bean属性</h4><p><strong>scope</strong></p>
 <figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&lt;bean id="userDao" class="com.it.dao.impl.UserDaoImpl" scope="singleton"&gt;&lt;/bean&gt;</span><br></pre></td></tr></table></figure>
@@ -229,7 +229,7 @@
 <p><strong>集合数据类型</strong></p>
 <figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">&lt;bean id="userDao" class="com.it.dao.impl.UserDaoImpl"&gt;&lt;/bean&gt;</span><br><span class="line">	&lt;property name=<span class="string">"strList"</span>&gt;</span><br><span class="line">		&lt;list&gt;</span><br><span class="line">			&lt;value&gt;aaa&lt;/value&gt;</span><br><span class="line">			&lt;value&gt;bbb&lt;/value&gt;</span><br><span class="line">		&lt;/list&gt;</span><br><span class="line">	&lt;/property&gt;</span><br><span class="line">&lt;/bean&gt;</span><br></pre></td></tr></table></figure>
 
-<p>通过使用property里的子标签，集合是List就用<List>,是Map就用<Map>。类似的是List<String>就用<value>，是List<userDao>就用<ref></p>
+<p>通过使用property里的子标签，集合是List就用<List>,是Map就用<Map>。类似的是List<String>就用<value>，是List<userDao>就用<ref></ref></userDao></value></String></Map></List></p>
 <p><strong>依赖注入完整实例</strong></p>
 <p>xml文件</p>
 <figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">&lt;bean id = "userDao" factory-bean="factory" factory-method="getUserDao"&gt;&lt;/bean&gt;</span><br><span class="line">&lt;bean id=<span class="string">"userService"</span> <span class="class"><span class="keyword">class</span></span>=<span class="string">"com.it.service.impl.UserServiceImpl"</span>&gt;</span><br><span class="line">    &lt;property name="userDao" ref="userDao"&gt;&lt;/property&gt;</span><br><span class="line">&lt;/bean&gt;</span><br></pre></td></tr></table></figure>
@@ -355,7 +355,7 @@
 <p>1.导入Spring集成Juint坐标    2.使用@Runwith注解替换原来的运行期    3.使用@ContextConfiguration指定配置文件    4.使用@Autowired注入需要测试的对象    5.创建测试方法测试</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com.it.test;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> com.it.config.SpringConfiguration;</span><br><span class="line"><span class="keyword">import</span> com.it.service.UserService;</span><br><span class="line"><span class="keyword">import</span> org.junit.Test;</span><br><span class="line"><span class="keyword">import</span> org.junit.runner.RunWith;</span><br><span class="line"><span class="keyword">import</span> org.springframework.beans.factory.annotation.Autowired;</span><br><span class="line"><span class="keyword">import</span> org.springframework.test.context.ContextConfiguration;</span><br><span class="line"><span class="keyword">import</span> org.springframework.test.context.junit4.SpringJUnit4ClassRunner;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> javax.sql.DataSource;</span><br><span class="line"></span><br><span class="line"><span class="meta">@RunWith</span>(SpringJUnit4ClassRunner<span class="class">.<span class="keyword">class</span>)</span></span><br><span class="line">//@ContextConfiguration("classpath:applicaionContext.xml")</span><br><span class="line"><span class="meta">@ContextConfiguration</span>(classes = &#123;SpringConfiguration<span class="class">.<span class="keyword">class</span>&#125;)</span></span><br><span class="line"><span class="class"><span class="title">public</span> <span class="title">class</span> <span class="title">SpringJuintTest</span> </span>&#123;</span><br><span class="line">    <span class="meta">@Autowired</span></span><br><span class="line">    <span class="keyword">private</span> UserService userService;</span><br><span class="line">    <span class="meta">@Autowired</span></span><br><span class="line">    <span class="keyword">private</span> DataSource dataSource;</span><br><span class="line">    <span class="meta">@Test</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">test1</span><span class="params">()</span><span class="keyword">throws</span> Exception</span>&#123;</span><br><span class="line">        userService.save();</span><br><span class="line">        System.out.println(dataSource.getConnection());</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
-<p>在<dependency>里导入Juint和Spring-test坐标后，用@RunWith指定SpringJuint4ClassRunner测试内核，用@ContextConfiguration指定.xml或者SpringConfiguration类作为核心配置文件，每次测试的时候用@Autowired注入Spring容器的对象，在底下创建测试方法测试即可</p>
+<p>在<dependency>里导入Juint和Spring-test坐标后，用@RunWith指定SpringJuint4ClassRunner测试内核，用@ContextConfiguration指定.xml或者SpringConfiguration类作为核心配置文件，每次测试的时候用@Autowired注入Spring容器的对象，在底下创建测试方法测试即可</dependency></p>
 
       
 
@@ -1699,14 +1699,6 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
           <ul class="article-tag-list" q-show="showTags">
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">IO模型</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">LeetCode</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color4">实战Java高并发程序设计</a>
               </li>
              
@@ -1715,7 +1707,15 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">面经</a>
+                <a href="javascript:void(0)" class="js-tag color4">LeetCode</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color5">IO模型</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">同步</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -1723,7 +1723,7 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">序列化</a>
+                <a href="javascript:void(0)" class="js-tag color3">面经</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -1735,7 +1735,7 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">同步</a>
+                <a href="javascript:void(0)" class="js-tag color4">序列化</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -1751,15 +1751,15 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">IOC</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color4">AOP</a>
               </li>
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color5">Jdbc</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color4">IOC</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -1775,23 +1775,11 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">SpringMVC</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">内部类</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">反射</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color4">多线程</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">未来日记</a>
+                <a href="javascript:void(0)" class="js-tag color5">SpringMVC</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -1803,11 +1791,19 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">抽象类</a>
+                <a href="javascript:void(0)" class="js-tag color4">内部类</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">数组</a>
+                <a href="javascript:void(0)" class="js-tag color5">未来日记</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">反射</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color4">抽象类</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -1819,11 +1815,15 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">sync</a>
+                <a href="javascript:void(0)" class="js-tag color3">数组</a>
               </li>
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color3">泛型</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color5">sync</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -1839,15 +1839,15 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">无锁</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color3">静态</a>
               </li>
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color5">错误处理</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">无锁</a>
               </li>
              
               <li class="article-tag-list-item">
