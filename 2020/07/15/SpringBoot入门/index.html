@@ -46,7 +46,7 @@
 <meta property="og:image" content="http://keepinmemory.github.io/2020/07/15/SpringBoot%E5%85%A5%E9%97%A8/%E6%90%9C%E7%8B%97%E6%88%AA%E5%9B%BE20180306145727.png">
 <meta property="og:image" content="http://keepinmemory.github.io/2020/07/15/SpringBoot%E5%85%A5%E9%97%A8/Users/75959/Desktop/blog/source/_posts/images/%E6%90%9C%E7%8B%97%E6%88%AA%E5%9B%BE20180306145855.png">
 <meta property="article:published_time" content="2020-07-15T08:39:15.000Z">
-<meta property="article:modified_time" content="2020-07-15T09:08:20.501Z">
+<meta property="article:modified_time" content="2020-07-20T08:05:27.968Z">
 <meta property="article:author" content="Xuesong">
 <meta property="article:tag" content="SpringBoot">
 <meta name="twitter:card" content="summary">
@@ -1140,7 +1140,7 @@
 <p><strong>EmbeddedServletContainerCustomizer</strong>：定制器帮我们修改了Servlet容器的配置？</p>
 <p>怎么修改的原理？</p>
 <p>5）、容器中导入了<strong>EmbeddedServletContainerCustomizerBeanPostProcessor</strong></p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//初始化之前</span></span><br><span class="line"><span class="meta">@Override</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> Object <span class="title">postProcessBeforeInitialization</span><span class="params">(Object bean, String beanName)</span></span></span><br><span class="line"><span class="function">      <span class="keyword">throws</span> BeansException </span>&#123;</span><br><span class="line">    <span class="comment">//如果当前初始化的是一个ConfigurableEmbeddedServletContainer类型的组件</span></span><br><span class="line">   <span class="keyword">if</span> (bean <span class="keyword">instanceof</span> ConfigurableEmbeddedServletContainer) &#123;</span><br><span class="line">       <span class="comment">//</span></span><br><span class="line">      postProcessBeforeInitialization((ConfigurableEmbeddedServletContainer) bean);</span><br><span class="line">   &#125;</span><br><span class="line">   <span class="keyword">return</span> bean;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">postProcessBeforeInitialization</span><span class="params">(</span></span></span><br><span class="line"><span class="function"><span class="params">			ConfigurableEmbeddedServletContainer bean)</span> </span>&#123;</span><br><span class="line">    <span class="comment">//获取所有的定制器，调用每一个定制器的customize方法来给Servlet容器进行属性赋值；</span></span><br><span class="line">    <span class="keyword">for</span> (EmbeddedServletContainerCustomizer customizer : getCustomizers()) &#123;</span><br><span class="line">        customizer.customize(bean);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">private</span> Collection&lt;EmbeddedServletContainerCustomizer&gt; <span class="title">getCustomizers</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (<span class="keyword">this</span>.customizers == <span class="keyword">null</span>) &#123;</span><br><span class="line">        <span class="comment">// Look up does not include the parent context</span></span><br><span class="line">        <span class="keyword">this</span>.customizers = <span class="keyword">new</span> ArrayList&lt;EmbeddedServletContainerCustomizer&gt;(</span><br><span class="line">            <span class="keyword">this</span>.beanFactory</span><br><span class="line">            <span class="comment">//从容器中获取所有这葛类型的组件：EmbeddedServletContainerCustomizer</span></span><br><span class="line">            <span class="comment">//定制Servlet容器，给容器中可以添加一个EmbeddedServletContainerCustomizer类型的组件</span></span><br><span class="line">            .getBeansOfType(EmbeddedServletContainerCustomizer<span class="class">.<span class="keyword">class</span>,</span></span><br><span class="line"><span class="class">                            <span class="title">false</span>, <span class="title">false</span>)</span></span><br><span class="line"><span class="class">            .<span class="title">values</span>())</span>;</span><br><span class="line">        Collections.sort(<span class="keyword">this</span>.customizers, AnnotationAwareOrderComparator.INSTANCE);</span><br><span class="line">        <span class="keyword">this</span>.customizers = Collections.unmodifiableList(<span class="keyword">this</span>.customizers);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">this</span>.customizers;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">ServerProperties也是定制器</span><br></pre></td></tr></table></figure>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//初始化之前</span></span><br><span class="line"><span class="meta">@Override</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> Object <span class="title">postProcessBeforeInitialization</span><span class="params">(Object bean, String beanName)</span></span></span><br><span class="line"><span class="function">      <span class="keyword">throws</span> BeansException </span>&#123;</span><br><span class="line">    <span class="comment">//如果当前初始化的是一个ConfigurableEmbeddedServletContainer类型的组件</span></span><br><span class="line">   <span class="keyword">if</span> (bean <span class="keyword">instanceof</span> ConfigurableEmbeddedServletContainer) &#123;</span><br><span class="line">       <span class="comment">//</span></span><br><span class="line">      postProcessBeforeInitialization((ConfigurableEmbeddedServletContainer) bean);</span><br><span class="line">   &#125;</span><br><span class="line">   <span class="keyword">return</span> bean;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">postProcessBeforeInitialization</span><span class="params">(</span></span></span><br><span class="line"><span class="function"><span class="params">			ConfigurableEmbeddedServletContainer bean)</span> </span>&#123;</span><br><span class="line">    <span class="comment">//获取所有的定制器，调用每一个定制器的customize方法来给Servlet容器进行属性赋值；</span></span><br><span class="line">    <span class="keyword">for</span> (EmbeddedServletContainerCustomizer customizer : getCustomizers()) &#123;</span><br><span class="line">        customizer.customize(bean);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">private</span> Collection&lt;EmbeddedServletContainerCustomizer&gt; <span class="title">getCustomizers</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (<span class="keyword">this</span>.customizers == <span class="keyword">null</span>) &#123;</span><br><span class="line">        <span class="comment">// Look up does not include the parent context</span></span><br><span class="line">        <span class="keyword">this</span>.customizers = <span class="keyword">new</span> ArrayList&lt;EmbeddedServletContainerCustomizer&gt;(</span><br><span class="line">            <span class="keyword">this</span>.beanFactory</span><br><span class="line">            <span class="comment">//从容器中获取所有这个类型的组件：EmbeddedServletContainerCustomizer</span></span><br><span class="line">            <span class="comment">//定制Servlet容器，给容器中可以添加一个EmbeddedServletContainerCustomizer类型的组件</span></span><br><span class="line">            .getBeansOfType(EmbeddedServletContainerCustomizer<span class="class">.<span class="keyword">class</span>,</span></span><br><span class="line"><span class="class">                            <span class="title">false</span>, <span class="title">false</span>)</span></span><br><span class="line"><span class="class">            .<span class="title">values</span>())</span>;</span><br><span class="line">        Collections.sort(<span class="keyword">this</span>.customizers, AnnotationAwareOrderComparator.INSTANCE);</span><br><span class="line">        <span class="keyword">this</span>.customizers = Collections.unmodifiableList(<span class="keyword">this</span>.customizers);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">this</span>.customizers;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">ServerProperties也是定制器</span><br></pre></td></tr></table></figure>
 
 <p>步骤：</p>
 <p>1）、SpringBoot根据导入的依赖情况，给容器中添加相应的EmbeddedServletContainerFactory【TomcatEmbeddedServletContainerFactory】</p>
@@ -1673,6 +1673,10 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">同步</a>
+              </li>
+             
+              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color4">LeetCode</a>
               </li>
              
@@ -1685,7 +1689,7 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">同步</a>
+                <a href="javascript:void(0)" class="js-tag color4">序列化</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -1694,10 +1698,6 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color3">Java核心卷</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">序列化</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -1717,10 +1717,6 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">事务</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color4">AOP</a>
               </li>
              
@@ -1729,11 +1725,11 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">多线程</a>
+                <a href="javascript:void(0)" class="js-tag color1">SpringBoot</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">SpringMVC</a>
+                <a href="javascript:void(0)" class="js-tag color3">事务</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -1741,7 +1737,11 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">反射</a>
+                <a href="javascript:void(0)" class="js-tag color4">StringBuilder</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color5">SpringMVC</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -1749,11 +1749,7 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">StringBuilder</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">未来日记</a>
+                <a href="javascript:void(0)" class="js-tag color4">多线程</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -1765,11 +1761,15 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">设计模式</a>
+                <a href="javascript:void(0)" class="js-tag color5">未来日记</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">数组</a>
+                <a href="javascript:void(0)" class="js-tag color3">反射</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color5">设计模式</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -1777,11 +1777,11 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">接口</a>
+                <a href="javascript:void(0)" class="js-tag color3">数组</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">线程</a>
+                <a href="javascript:void(0)" class="js-tag color3">接口</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -1789,11 +1789,11 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">锁</a>
+                <a href="javascript:void(0)" class="js-tag color3">泛型</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">泛型</a>
+                <a href="javascript:void(0)" class="js-tag color3">线程</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -1801,7 +1801,7 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">错误处理</a>
+                <a href="javascript:void(0)" class="js-tag color2">锁</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -1809,11 +1809,11 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">静态</a>
+                <a href="javascript:void(0)" class="js-tag color5">错误处理</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">SpringBoot</a>
+                <a href="javascript:void(0)" class="js-tag color3">静态</a>
               </li>
             
             <div class="clearfix"></div>

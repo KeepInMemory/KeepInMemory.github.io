@@ -150,19 +150,19 @@
           <div id="js-content" class="content-ll">
             
   
-    <article id="post-线程的基本操作3" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+    <article id="post-volatile-有序性-可见性" class="article article-type-post  article-index" itemscope itemprop="blogPost">
   <div class="article-inner">
     
       <header class="article-header">
         
   
     <h1 itemprop="name">
-      <a class="article-title" href="/2019/09/10/%E7%BA%BF%E7%A8%8B%E7%9A%84%E5%9F%BA%E6%9C%AC%E6%93%8D%E4%BD%9C3/">线程的基本操作3</a>
+      <a class="article-title" href="/2019/09/10/volatile-%E6%9C%89%E5%BA%8F%E6%80%A7-%E5%8F%AF%E8%A7%81%E6%80%A7/">volatile-有序性-可见性</a>
     </h1>
   
 
         
-        <a href="/2019/09/10/%E7%BA%BF%E7%A8%8B%E7%9A%84%E5%9F%BA%E6%9C%AC%E6%93%8D%E4%BD%9C3/" class="archive-article-date">
+        <a href="/2019/09/10/volatile-%E6%9C%89%E5%BA%8F%E6%80%A7-%E5%8F%AF%E8%A7%81%E6%80%A7/" class="archive-article-date">
   	<time datetime="2019-09-10T04:00:00.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2019-09-10</time>
 </a>
         
@@ -170,22 +170,17 @@
     
     <div class="article-entry" itemprop="articleBody">
       
-        <h3 id="线程组"><a href="#线程组" class="headerlink" title="线程组"></a>线程组</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">ThreadGroupName</span> <span class="keyword">implements</span> <span class="title">Runnable</span></span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span></span>&#123;</span><br><span class="line">        ThreadGroup tg = <span class="keyword">new</span> ThreadGroup(<span class="string">"PrintGroup"</span>);<span class="comment">//创建线程组</span></span><br><span class="line">        Thread t1 = <span class="keyword">new</span> Thread(tg,<span class="keyword">new</span> ThreadGroupName(),<span class="string">"T1"</span>);<span class="comment">//关联线程</span></span><br><span class="line">        Thread t2 = <span class="keyword">new</span> Thread(tg,<span class="keyword">new</span> ThreadGroupName(),<span class="string">"T2"</span>);</span><br><span class="line">        t1.start();</span><br><span class="line">        t2.start();</span><br><span class="line">        System.out.println(tg.activeCount());<span class="comment">//获取活动线程总数，这里为2</span></span><br><span class="line">        tg.list();<span class="comment">//打印线程组所有线程信息</span></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span><span class="params">()</span></span>&#123;</span><br><span class="line">        String groupAndName = Thread.currentThread().getThreadGroup().getName()+</span><br><span class="line">                <span class="string">"-"</span>+Thread.currentThread().getName();</span><br><span class="line">        <span class="keyword">while</span>(<span class="keyword">true</span>)&#123;</span><br><span class="line">            System.out.println(<span class="string">"I am"</span> + groupAndName);</span><br><span class="line">            <span class="keyword">try</span>&#123;</span><br><span class="line">                Thread.sleep(<span class="number">3000</span>);</span><br><span class="line">            &#125;<span class="keyword">catch</span>(InterruptedException e)&#123;</span><br><span class="line">                e.printStackTrace();</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<h3 id="守护线程"><a href="#守护线程" class="headerlink" title="守护线程"></a>守护线程</h3><p>线程分为守护线程和用户线程，守护线程负责后台的垃圾回收等服务，用户线程负责完成用户的要求。当用户线程完成它的工作之后就会结束，守护线程等用户线程都结束后自己也会结束，Java虚拟机退出。</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">DaemonDemo</span> </span>&#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="class"><span class="keyword">class</span> <span class="title">DaemonT</span> <span class="keyword">extends</span> <span class="title">Thread</span></span>&#123;</span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span><span class="params">()</span></span>&#123;</span><br><span class="line">            <span class="keyword">while</span>(<span class="keyword">true</span>)&#123;</span><br><span class="line">                System.out.println(<span class="string">"I am alive"</span>);</span><br><span class="line">                <span class="keyword">try</span>&#123;</span><br><span class="line">                    Thread.sleep(<span class="number">1000</span>);</span><br><span class="line">                &#125;<span class="keyword">catch</span> (InterruptedException e)&#123;</span><br><span class="line">                    e.printStackTrace();</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span><span class="keyword">throws</span> InterruptedException</span>&#123;</span><br><span class="line">        Thread t = <span class="keyword">new</span> DaemonT();</span><br><span class="line">        t.setDaemon(<span class="keyword">true</span>);</span><br><span class="line">        t.start();</span><br><span class="line"></span><br><span class="line">        Thread.sleep(<span class="number">2000</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>t.setDaemon(true)将普通线程设置成为守护线程，注意这里的设置要在start之前，否则会报异常。</p>
-<p>将t设置成为守护线程之后只有主线程一个用户线程，主线程睡了2秒后程序就结束了。如果t为用户线程，那么它将死循环输出。</p>
-<h3 id="线程优先级"><a href="#线程优先级" class="headerlink" title="线程优先级"></a>线程优先级</h3><p>Thread类内置三个静态常量表示优先级，数字越大优先级越大。</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">final</span> <span class="keyword">static</span> <span class="keyword">int</span> MIN_PRRORITY = <span class="number">1</span>;</span><br><span class="line"><span class="keyword">public</span> <span class="keyword">final</span> <span class="keyword">static</span> <span class="keyword">int</span> MORE_PRIORITY = <span class="number">5</span>;</span><br><span class="line"><span class="keyword">public</span> <span class="keyword">final</span> <span class="keyword">static</span> <span class="keyword">int</span> MAX_PRIORITY = <span class="number">10</span>;</span><br></pre></td></tr></table></figure>
-
-<p>让优先级低的线程和优先级高的线程一起执行，多次运行发现总是优先级高的先完成。</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">PriorityDemo</span> </span>&#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="class"><span class="keyword">class</span> <span class="title">HightPriority</span> <span class="keyword">extends</span> <span class="title">Thread</span></span>&#123;</span><br><span class="line">        <span class="keyword">static</span> <span class="keyword">int</span> count = <span class="number">0</span>;</span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span><span class="params">()</span></span>&#123;</span><br><span class="line">            <span class="keyword">while</span>(<span class="keyword">true</span>)&#123;</span><br><span class="line">                <span class="keyword">synchronized</span> (PriorityDemo<span class="class">.<span class="keyword">class</span>)</span>&#123;</span><br><span class="line">                    count ++;</span><br><span class="line">                    <span class="keyword">if</span>(count &gt; <span class="number">10000000</span>)&#123;</span><br><span class="line">                        System.out.println(<span class="string">"HightPriority is complete"</span>);</span><br><span class="line">                        <span class="keyword">break</span>;</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="class"><span class="keyword">class</span> <span class="title">LowPriority</span> <span class="keyword">extends</span> <span class="title">Thread</span></span>&#123;</span><br><span class="line">        <span class="keyword">static</span> <span class="keyword">int</span> count = <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line">        <span class="meta">@Override</span></span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span><span class="params">()</span> </span>&#123;</span><br><span class="line">            <span class="keyword">while</span>(<span class="keyword">true</span>)&#123;</span><br><span class="line">                <span class="keyword">synchronized</span> (PriorityDemo<span class="class">.<span class="keyword">class</span>)</span>&#123;</span><br><span class="line">                    count ++;</span><br><span class="line">                    <span class="keyword">if</span>(count &gt; <span class="number">10000000</span>)&#123;</span><br><span class="line">                        System.out.println(<span class="string">"LowPriority is complete"</span>);</span><br><span class="line">                        <span class="keyword">break</span>;</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span><span class="keyword">throws</span> InterruptedException</span>&#123;</span><br><span class="line">        Thread high = <span class="keyword">new</span> HightPriority();</span><br><span class="line">        Thread low = <span class="keyword">new</span> LowPriority();</span><br><span class="line">        high.setPriority(Thread.MAX_PRIORITY);</span><br><span class="line">        low.setPriority(Thread.MIN_PRIORITY);</span><br><span class="line">        low.start();</span><br><span class="line">        high.start();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>程序输出</p>
-<p>HightPriority is complete<br>LowPriority is complete</p>
-<p>注意这里使用了类对象锁<strong>synchronized(xxx.class)</strong>，因为每个类只有一个class对象，所以可以通过它实现互斥。</p>
+        <p>volatile会保证变量的可见性和有序性，但不能保证原子性。</p>
+<h3 id="有序性"><a href="#有序性" class="headerlink" title="有序性"></a>有序性</h3><hr>
+<p>对该变量的操作不会被指令重排。从而保证了对该变量操作的指令是顺序有序的，不会被打乱。</p>
+<h3 id="可见性"><a href="#可见性" class="headerlink" title="可见性"></a>可见性</h3><hr>
+<p>可见性与Java的内存模型有关，模型采用缓存与主存的方式对变量进行操作，也就是说，每个线程都有自己的缓存空间，对变量的操作都是在缓存中进行的，之后再将修改后的值返回到主存中，这就带来了问题，有可能一个线程在将共享变量修改后，还没有来的及将缓存中的变量返回给主存中，另外一个线程就对共享变量进行修改，那么这个线程拿到的值是主存中未被修改的值，这就是可见性的问题。</p>
+<p>意思就是说当一个共享变量被volatile修饰时，它会保证修改的值会立即被更新到主存，当有其他线程需要读取时，它会去内存中读取新值，这就保证了可见性。</p>
+<h3 id="原子性"><a href="#原子性" class="headerlink" title="原子性"></a>原子性</h3><hr>
+<p>既然它可以保证修改的值立即能更新到主存，其他线程也会捕捉到被修改后的值，那么为什么不能保证原子性呢？<br>首先需要了解的是，Java中只有对基本类型变量的赋值和读取是原子操作，如i = 1的赋值操作，但是像j = i或者i++这样的操作都不是原子操作，因为他们都进行了多次原子操作，比如先读取i的值，再将i的值赋值给j，两个原子操作加起来就不是原子操作了。</p>
+<p>所以，如果一个变量被volatile修饰了，那么肯定可以保证每次读取这个变量值的时候得到的值是最新的，但是一旦需要对变量进行自增这样的非原子操作，就不会保证这个变量的原子性了。</p>
+<p>例如</p>
+<p>一个变量i被volatile修饰，两个线程想对这个变量修改，都对其进行自增操作也就是i++，i++的过程可以分为三步，首先获取i的值，其次对i的值进行加1，最后将得到的新值写会到缓存中。<br>线程A首先得到了i的初始值100，但是还没来得及修改，就阻塞了，这时线程B开始了，它也得到了i的值，由于i的值未被修改，即使是被volatile修饰，主存的变量还没变化，那么线程B得到的值也是100，之后对其进行加1操作，得到101后，将新值写入到缓存中，再刷入主存中。根据可见性的原则，这个主存的值可以被其他线程可见。<br>问题来了，线程A已经读取到了i的值为100，也就是说读取的这个原子操作已经结束了，所以这个可见性来的有点晚，线程A阻塞结束后，继续将100这个值加1，得到101，再将值写到缓存，最后刷入主存，所以即便是volatile具有可见性，也不能保证对它修饰的变量具有原子性。</p>
 
       
 
@@ -203,7 +198,7 @@
         		</li>
       		 
         		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">线程</a>
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">多线程</a>
         		</li>
       		
 		</ul>
@@ -213,7 +208,7 @@
 
       
         <p class="article-more-link">
-          <a class="article-more-a" href="/2019/09/10/%E7%BA%BF%E7%A8%8B%E7%9A%84%E5%9F%BA%E6%9C%AC%E6%93%8D%E4%BD%9C3/">展开全文 >></a>
+          <a class="article-more-a" href="/2019/09/10/volatile-%E6%9C%89%E5%BA%8F%E6%80%A7-%E5%8F%AF%E8%A7%81%E6%80%A7/">展开全文 >></a>
         </p>
       
 
@@ -330,6 +325,99 @@
       
         <p class="article-more-link">
           <a class="article-more-a" href="/2019/09/10/%E7%BA%BF%E7%A8%8B%E7%9A%84%E5%9F%BA%E6%9C%AC%E6%93%8D%E4%BD%9C2/">展开全文 >></a>
+        </p>
+      
+
+      
+      <div class="clearfix"></div>
+    </div>
+  </div>
+</article>
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+    </div>
+</aside>
+
+
+
+
+  
+    <article id="post-线程的基本操作3" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2019/09/10/%E7%BA%BF%E7%A8%8B%E7%9A%84%E5%9F%BA%E6%9C%AC%E6%93%8D%E4%BD%9C3/">线程的基本操作3</a>
+    </h1>
+  
+
+        
+        <a href="/2019/09/10/%E7%BA%BF%E7%A8%8B%E7%9A%84%E5%9F%BA%E6%9C%AC%E6%93%8D%E4%BD%9C3/" class="archive-article-date">
+  	<time datetime="2019-09-10T04:00:00.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2019-09-10</time>
+</a>
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h3 id="线程组"><a href="#线程组" class="headerlink" title="线程组"></a>线程组</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">ThreadGroupName</span> <span class="keyword">implements</span> <span class="title">Runnable</span></span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span></span>&#123;</span><br><span class="line">        ThreadGroup tg = <span class="keyword">new</span> ThreadGroup(<span class="string">"PrintGroup"</span>);<span class="comment">//创建线程组</span></span><br><span class="line">        Thread t1 = <span class="keyword">new</span> Thread(tg,<span class="keyword">new</span> ThreadGroupName(),<span class="string">"T1"</span>);<span class="comment">//关联线程</span></span><br><span class="line">        Thread t2 = <span class="keyword">new</span> Thread(tg,<span class="keyword">new</span> ThreadGroupName(),<span class="string">"T2"</span>);</span><br><span class="line">        t1.start();</span><br><span class="line">        t2.start();</span><br><span class="line">        System.out.println(tg.activeCount());<span class="comment">//获取活动线程总数，这里为2</span></span><br><span class="line">        tg.list();<span class="comment">//打印线程组所有线程信息</span></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span><span class="params">()</span></span>&#123;</span><br><span class="line">        String groupAndName = Thread.currentThread().getThreadGroup().getName()+</span><br><span class="line">                <span class="string">"-"</span>+Thread.currentThread().getName();</span><br><span class="line">        <span class="keyword">while</span>(<span class="keyword">true</span>)&#123;</span><br><span class="line">            System.out.println(<span class="string">"I am"</span> + groupAndName);</span><br><span class="line">            <span class="keyword">try</span>&#123;</span><br><span class="line">                Thread.sleep(<span class="number">3000</span>);</span><br><span class="line">            &#125;<span class="keyword">catch</span>(InterruptedException e)&#123;</span><br><span class="line">                e.printStackTrace();</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="守护线程"><a href="#守护线程" class="headerlink" title="守护线程"></a>守护线程</h3><p>线程分为守护线程和用户线程，守护线程负责后台的垃圾回收等服务，用户线程负责完成用户的要求。当用户线程完成它的工作之后就会结束，守护线程等用户线程都结束后自己也会结束，Java虚拟机退出。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">DaemonDemo</span> </span>&#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="class"><span class="keyword">class</span> <span class="title">DaemonT</span> <span class="keyword">extends</span> <span class="title">Thread</span></span>&#123;</span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span><span class="params">()</span></span>&#123;</span><br><span class="line">            <span class="keyword">while</span>(<span class="keyword">true</span>)&#123;</span><br><span class="line">                System.out.println(<span class="string">"I am alive"</span>);</span><br><span class="line">                <span class="keyword">try</span>&#123;</span><br><span class="line">                    Thread.sleep(<span class="number">1000</span>);</span><br><span class="line">                &#125;<span class="keyword">catch</span> (InterruptedException e)&#123;</span><br><span class="line">                    e.printStackTrace();</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span><span class="keyword">throws</span> InterruptedException</span>&#123;</span><br><span class="line">        Thread t = <span class="keyword">new</span> DaemonT();</span><br><span class="line">        t.setDaemon(<span class="keyword">true</span>);</span><br><span class="line">        t.start();</span><br><span class="line"></span><br><span class="line">        Thread.sleep(<span class="number">2000</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>t.setDaemon(true)将普通线程设置成为守护线程，注意这里的设置要在start之前，否则会报异常。</p>
+<p>将t设置成为守护线程之后只有主线程一个用户线程，主线程睡了2秒后程序就结束了。如果t为用户线程，那么它将死循环输出。</p>
+<h3 id="线程优先级"><a href="#线程优先级" class="headerlink" title="线程优先级"></a>线程优先级</h3><p>Thread类内置三个静态常量表示优先级，数字越大优先级越大。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">final</span> <span class="keyword">static</span> <span class="keyword">int</span> MIN_PRRORITY = <span class="number">1</span>;</span><br><span class="line"><span class="keyword">public</span> <span class="keyword">final</span> <span class="keyword">static</span> <span class="keyword">int</span> MORE_PRIORITY = <span class="number">5</span>;</span><br><span class="line"><span class="keyword">public</span> <span class="keyword">final</span> <span class="keyword">static</span> <span class="keyword">int</span> MAX_PRIORITY = <span class="number">10</span>;</span><br></pre></td></tr></table></figure>
+
+<p>让优先级低的线程和优先级高的线程一起执行，多次运行发现总是优先级高的先完成。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">PriorityDemo</span> </span>&#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="class"><span class="keyword">class</span> <span class="title">HightPriority</span> <span class="keyword">extends</span> <span class="title">Thread</span></span>&#123;</span><br><span class="line">        <span class="keyword">static</span> <span class="keyword">int</span> count = <span class="number">0</span>;</span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span><span class="params">()</span></span>&#123;</span><br><span class="line">            <span class="keyword">while</span>(<span class="keyword">true</span>)&#123;</span><br><span class="line">                <span class="keyword">synchronized</span> (PriorityDemo<span class="class">.<span class="keyword">class</span>)</span>&#123;</span><br><span class="line">                    count ++;</span><br><span class="line">                    <span class="keyword">if</span>(count &gt; <span class="number">10000000</span>)&#123;</span><br><span class="line">                        System.out.println(<span class="string">"HightPriority is complete"</span>);</span><br><span class="line">                        <span class="keyword">break</span>;</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="class"><span class="keyword">class</span> <span class="title">LowPriority</span> <span class="keyword">extends</span> <span class="title">Thread</span></span>&#123;</span><br><span class="line">        <span class="keyword">static</span> <span class="keyword">int</span> count = <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line">        <span class="meta">@Override</span></span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span><span class="params">()</span> </span>&#123;</span><br><span class="line">            <span class="keyword">while</span>(<span class="keyword">true</span>)&#123;</span><br><span class="line">                <span class="keyword">synchronized</span> (PriorityDemo<span class="class">.<span class="keyword">class</span>)</span>&#123;</span><br><span class="line">                    count ++;</span><br><span class="line">                    <span class="keyword">if</span>(count &gt; <span class="number">10000000</span>)&#123;</span><br><span class="line">                        System.out.println(<span class="string">"LowPriority is complete"</span>);</span><br><span class="line">                        <span class="keyword">break</span>;</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span><span class="keyword">throws</span> InterruptedException</span>&#123;</span><br><span class="line">        Thread high = <span class="keyword">new</span> HightPriority();</span><br><span class="line">        Thread low = <span class="keyword">new</span> LowPriority();</span><br><span class="line">        high.setPriority(Thread.MAX_PRIORITY);</span><br><span class="line">        low.setPriority(Thread.MIN_PRIORITY);</span><br><span class="line">        low.start();</span><br><span class="line">        high.start();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>程序输出</p>
+<p>HightPriority is complete<br>LowPriority is complete</p>
+<p>注意这里使用了类对象锁<strong>synchronized(xxx.class)</strong>，因为每个类只有一个class对象，所以可以通过它实现互斥。</p>
+
+      
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
+	<div class="article-tag tagcloud">
+		<i class="icon-price-tags icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">实战Java高并发程序设计</a>
+        		</li>
+      		 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">线程</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
+      
+
+      
+        <p class="article-more-link">
+          <a class="article-more-a" href="/2019/09/10/%E7%BA%BF%E7%A8%8B%E7%9A%84%E5%9F%BA%E6%9C%AC%E6%93%8D%E4%BD%9C3/">展开全文 >></a>
         </p>
       
 
@@ -1002,108 +1090,6 @@
 
 
   
-    <article id="post-反射机制" class="article article-type-post  article-index" itemscope itemprop="blogPost">
-  <div class="article-inner">
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2019/09/04/%E5%8F%8D%E5%B0%84%E6%9C%BA%E5%88%B6/">反射机制</a>
-    </h1>
-  
-
-        
-        <a href="/2019/09/04/%E5%8F%8D%E5%B0%84%E6%9C%BA%E5%88%B6/" class="archive-article-date">
-  	<time datetime="2019-09-04T04:00:00.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2019-09-04</time>
-</a>
-        
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <p>能够分析类能力的程序称为反射。</p>
-<ul>
-<li><strong>静态编译</strong>：在编译时确定类型，绑定对象即通过。</li>
-<li><strong>动态编译</strong>：运行时确定类型，绑定对象。动态编译最大限度地发挥了Java的灵活性，体现了多态的应用，可以减低类之间的耦合性。</li>
-</ul>
-<p><strong>反射赋予了JVM动态编译的能力，这个机制允许程序在运行时透过Reflection APIs取得任何一个已知名称的class的内部信息，并可于运行时改变fields内容或唤起methods。</strong></p>
-<p><strong>在静态语言中，使用一个变量时，必须知道它的类型。在Java中，变量的类型信息在编译时都保存到了class文件中，这样在运行时才能保证准确无误；换句话说，程序在运行时的行为都是固定的。如果想在运行时改变，就需要反射这东西了。</strong></p>
-<p>反射机制的实现主要通过操作Class类，Class类存放着对象的运行时信息。</p>
-<p>在Java程序运行时，虚拟机为所有类型维护一个Class对象。意思是每种类型的Class对象只有一个，也即地址只有一个。</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 对于2个String类型对象，它们的Class对象相同</span></span><br><span class="line">Class c1 = <span class="string">"Carson"</span>.getClass();</span><br><span class="line">Class c2 =  Class.forName(<span class="string">"java.lang.String"</span>);</span><br><span class="line"><span class="comment">// 用==运算符实现两个类对象地址的比较</span></span><br><span class="line">System.out.println(c1 ==c2);</span><br><span class="line"><span class="comment">// 输出结果：true</span></span><br></pre></td></tr></table></figure>
-
-<p>除了类对象Class，还有类的构造器对象Constructor，类的属性对象Field，类的方法对象Method。</p>
-<p>在使用Java反射机制时，主要步骤包括：</p>
-<ol>
-<li>获取目标类型的Class对象</li>
-<li>通过 Class 对象分别获取Constructor类对象、Method类对象 、Field 类对象</li>
-<li>通过 Constructor类对象、Method类对象 、Field类对象分别获取类的构造函数、方法、属性的具体信息，并进行后续操作</li>
-</ol>
-<p>对应步骤一，获取Class对象的常用方法</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">&lt;-- 方式<span class="number">1</span>：Object.getClass() --&gt;</span><br><span class="line">    <span class="comment">// Object类中的getClass()返回一个Class类型的实例 </span></span><br><span class="line">    Boolean carson = <span class="keyword">true</span>; </span><br><span class="line">    Class&lt;?&gt; classType = carson.getClass(); </span><br><span class="line">    System.out.println(classType);</span><br><span class="line">    <span class="comment">// 输出结果：class java.lang.Boolean  </span></span><br><span class="line"></span><br><span class="line">&lt;-- 方式<span class="number">2</span>：T<span class="class">.<span class="keyword">class</span> 语法    --&gt;</span></span><br><span class="line"><span class="class">    // <span class="title">T</span> </span>= 任意Java类型</span><br><span class="line">    Class&lt;?&gt; classType = Boolean<span class="class">.<span class="keyword">class</span></span>; </span><br><span class="line">    System.out.println(classType);</span><br><span class="line">    <span class="comment">// 输出结果：class java.lang.Boolean  </span></span><br><span class="line">    <span class="comment">// 注：Class对象表示的是一个类型，而这个类型未必一定是类</span></span><br><span class="line">    <span class="comment">// 如，int不是类，但int.class是一个Class类型的对象</span></span><br></pre></td></tr></table></figure>
-
-<p>步骤二</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br></pre></td><td class="code"><pre><span class="line">&lt;-- <span class="number">1</span>. 获取类的构造函数（传入构造函数的参数类型）-&gt;&gt;</span><br><span class="line">  <span class="comment">// a. 获取指定的构造函数 （公共 / 继承）</span></span><br><span class="line">  <span class="function">Constructor&lt;T&gt; <span class="title">getConstructor</span><span class="params">(Class&lt;?&gt;... parameterTypes)</span></span></span><br><span class="line"><span class="function">  <span class="comment">// b. 获取所有的构造函数（公共 / 继承） </span></span></span><br><span class="line"><span class="function">  Constructor&lt;?&gt;[] <span class="title">getConstructors</span><span class="params">()</span></span>; </span><br><span class="line">  <span class="comment">// c. 获取指定的构造函数 （ 不包括继承）</span></span><br><span class="line">  <span class="function">Constructor&lt;T&gt; <span class="title">getDeclaredConstructor</span><span class="params">(Class&lt;?&gt;... parameterTypes)</span> </span></span><br><span class="line"><span class="function">  <span class="comment">// d. 获取所有的构造函数（ 不包括继承）</span></span></span><br><span class="line"><span class="function">  Constructor&lt;?&gt;[] <span class="title">getDeclaredConstructors</span><span class="params">()</span></span>; </span><br><span class="line"><span class="comment">// 最终都是获得一个Constructor类对象</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// 特别注意：</span></span><br><span class="line">  <span class="comment">// 1. 不带 "Declared"的方法支持取出包括继承、公有（Public） &amp; 不包括有（Private）的构造函数</span></span><br><span class="line">  <span class="comment">// 2. 带 "Declared"的方法是支持取出包括公共（Public）、保护（Protected）、默认（包）访问和私有（Private）的构造方法，但不包括继承的构造函数</span></span><br><span class="line">  <span class="comment">// 下面同理</span></span><br><span class="line"></span><br><span class="line">&lt;--  <span class="number">2</span>. 获取类的属性（传入属性名） --&gt;</span><br><span class="line">  <span class="comment">// a. 获取指定的属性（公共 / 继承）</span></span><br><span class="line">   <span class="function">Field <span class="title">getField</span><span class="params">(String name)</span> </span>;</span><br><span class="line">  <span class="comment">// b. 获取所有的属性（公共 / 继承）</span></span><br><span class="line">   Field[] getFields() ;</span><br><span class="line">  <span class="comment">// c. 获取指定的所有属性 （不包括继承）</span></span><br><span class="line">   <span class="function">Field <span class="title">getDeclaredField</span><span class="params">(String name)</span> ；</span></span><br><span class="line"><span class="function">  <span class="comment">// d. 获取所有的所有属性 （不包括继承）</span></span></span><br><span class="line"><span class="function">   Field[] <span class="title">getDeclaredFields</span><span class="params">()</span> ；</span></span><br><span class="line"><span class="function"><span class="comment">// 最终都是获得一个Field类对象</span></span></span><br><span class="line"><span class="function"></span></span><br><span class="line"><span class="function">&lt;-- 3. 获取类的方法（传入方法名 &amp; 参数类型）--&gt;</span></span><br><span class="line"><span class="function">  <span class="comment">// a. 获取指定的方法（公共 / 继承）</span></span></span><br><span class="line"><span class="function">    Method <span class="title">getMethod</span><span class="params">(String name, Class&lt;?&gt;... parameterTypes)</span> ；</span></span><br><span class="line"><span class="function">  <span class="comment">// b. 获取所有的方法（公共 / 继承）</span></span></span><br><span class="line"><span class="function">   Method[] <span class="title">getMethods</span><span class="params">()</span> ；</span></span><br><span class="line"><span class="function">  <span class="comment">// c. 获取指定的方法 （ 不包括继承）</span></span></span><br><span class="line"><span class="function">   Method <span class="title">getDeclaredMethod</span><span class="params">(String name, Class&lt;?&gt;... parameterTypes)</span> ；</span></span><br><span class="line"><span class="function">  <span class="comment">// d. 获取所有的方法（ 不包括继承）</span></span></span><br><span class="line"><span class="function">   Method[] <span class="title">getDeclaredMethods</span><span class="params">()</span> ；</span></span><br><span class="line"><span class="function"><span class="comment">// 最终都是获得一个Method类对象</span></span></span><br><span class="line"><span class="function"></span></span><br><span class="line"><span class="function">&lt;-- 4. Class类的其他常用方法 --&gt;</span></span><br><span class="line"><span class="function"><span class="title">getSuperclass</span><span class="params">()</span></span>; </span><br><span class="line"><span class="comment">// 返回父类</span></span><br><span class="line"></span><br><span class="line"><span class="function">String <span class="title">getName</span><span class="params">()</span></span>; </span><br><span class="line"><span class="comment">// 作用：返回完整的类名（含包名，如java.lang.String） </span></span><br><span class="line"> </span><br><span class="line"><span class="function">Object <span class="title">newInstance</span><span class="params">()</span></span>; </span><br><span class="line"><span class="comment">// 作用：快速地创建一个类的实例</span></span><br><span class="line"><span class="comment">// 具体过程：调用默认构造器（若该类无默认构造器，则抛出异常 </span></span><br><span class="line"><span class="comment">// 注：若需要为构造器提供参数需使用java.lang.reflect.Constructor中的newInstance（）</span></span><br></pre></td></tr></table></figure>
-
-<p>步骤三</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 即以下方法都分别属于`Constructor`类、`Method`类 &amp; `Field`类的方法。</span></span><br><span class="line"></span><br><span class="line">&lt;-- <span class="number">1</span>. 通过Constructor 类对象获取类构造函数信息 --&gt;</span><br><span class="line">  <span class="function">String <span class="title">getName</span><span class="params">()</span>；<span class="comment">// 获取构造器名</span></span></span><br><span class="line"><span class="function">  Class <span class="title">getDeclaringClass</span><span class="params">()</span>；<span class="comment">// 获取一个用于描述类中定义的构造器的Class对象</span></span></span><br><span class="line"><span class="function">  <span class="keyword">int</span> <span class="title">getModifiers</span><span class="params">()</span>；<span class="comment">// 返回整型数值，用不同的位开关描述访问修饰符的使用状况</span></span></span><br><span class="line"><span class="function">  Class[] <span class="title">getExceptionTypes</span><span class="params">()</span>；<span class="comment">// 获取描述方法抛出的异常类型的Class对象数组</span></span></span><br><span class="line"><span class="function">  Class[] <span class="title">getParameterTypes</span><span class="params">()</span>；<span class="comment">// 获取一个用于描述参数类型的Class对象数组</span></span></span><br><span class="line"><span class="function"></span></span><br><span class="line"><span class="function">&lt;-- 2. 通过Field类对象获取类属性信息 --&gt;</span></span><br><span class="line"><span class="function">  String <span class="title">getName</span><span class="params">()</span>；<span class="comment">// 返回属性的名称</span></span></span><br><span class="line"><span class="function">  Class <span class="title">getDeclaringClass</span><span class="params">()</span>； <span class="comment">// 获取属性类型的Class类型对象</span></span></span><br><span class="line"><span class="function">  Class <span class="title">getType</span><span class="params">()</span>；<span class="comment">// 获取属性类型的Class类型对象</span></span></span><br><span class="line"><span class="function">  <span class="keyword">int</span> <span class="title">getModifiers</span><span class="params">()</span>； <span class="comment">// 返回整型数值，用不同的位开关描述访问修饰符的使用状况</span></span></span><br><span class="line"><span class="function">  Object <span class="title">get</span><span class="params">(Object obj)</span> ；<span class="comment">// 返回指定对象上此属性的值</span></span></span><br><span class="line"><span class="function">  <span class="keyword">void</span> <span class="title">set</span><span class="params">(Object obj, Object value)</span> <span class="comment">// 设置 指定对象上此属性的值为value</span></span></span><br><span class="line"><span class="function"> </span></span><br><span class="line"><span class="function">&lt;-- 3. 通过Method 类对象获取类方法信息 --&gt;</span></span><br><span class="line"><span class="function">  String <span class="title">getName</span><span class="params">()</span>；<span class="comment">// 获取方法名</span></span></span><br><span class="line"><span class="function">  Class <span class="title">getDeclaringClass</span><span class="params">()</span>；<span class="comment">// 获取方法的Class对象 </span></span></span><br><span class="line"><span class="function">  <span class="keyword">int</span> <span class="title">getModifiers</span><span class="params">()</span>；<span class="comment">// 返回整型数值，用不同的位开关描述访问修饰符的使用状况</span></span></span><br><span class="line"><span class="function">  Class[] <span class="title">getExceptionTypes</span><span class="params">()</span>；<span class="comment">// 获取用于描述方法抛出的异常类型的Class对象数组</span></span></span><br><span class="line"><span class="function">  Class[] <span class="title">getParameterTypes</span><span class="params">()</span>；<span class="comment">// 获取一个用于描述参数类型的Class对象数组</span></span></span><br><span class="line"><span class="function"></span></span><br><span class="line"><span class="function">&lt;--额外：java.lang.reflect.Modifier类 --&gt;</span></span><br><span class="line"><span class="function"><span class="comment">// 作用：获取访问修饰符</span></span></span><br><span class="line"><span class="function"></span></span><br><span class="line"><span class="function"><span class="keyword">static</span> String <span class="title">toString</span><span class="params">(<span class="keyword">int</span> modifiers)</span>   </span></span><br><span class="line"><span class="function"><span class="comment">// 获取对应modifiers位设置的修饰符的字符串表示</span></span></span><br><span class="line"><span class="function"></span></span><br><span class="line"><span class="function"><span class="keyword">static</span> <span class="keyword">boolean</span> <span class="title">isXXX</span><span class="params">(<span class="keyword">int</span> modifiers)</span> </span></span><br><span class="line"><span class="function"><span class="comment">// 检测方法名中对应的修饰符在modifiers中的值</span></span></span><br></pre></td></tr></table></figure>
-      
-
-      
-    </div>
-    <div class="article-info article-info-index">
-      
-      
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">Java核心卷</a>
-        		</li>
-      		 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">反射</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-      
-
-      
-        <p class="article-more-link">
-          <a class="article-more-a" href="/2019/09/04/%E5%8F%8D%E5%B0%84%E6%9C%BA%E5%88%B6/">展开全文 >></a>
-        </p>
-      
-
-      
-      <div class="clearfix"></div>
-    </div>
-  </div>
-</article>
-
-<aside class="wrap-side-operation">
-    <div class="mod-side-operation">
-        
-        <div class="jump-container" id="js-jump-container" style="display:none;">
-            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
-                <i class="icon-font icon-back"></i>
-            </a>
-            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
-                <i class="icon-font icon-plane jump-plane"></i>
-            </div>
-        </div>
-        
-        
-    </div>
-</aside>
-
-
-
-
-  
     <article id="post-内部类" class="article article-type-post  article-index" itemscope itemprop="blogPost">
   <div class="article-inner">
     
@@ -1211,34 +1197,52 @@
 
 
   
-    <article id="post-数组列表ArrayList" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+    <article id="post-反射机制" class="article article-type-post  article-index" itemscope itemprop="blogPost">
   <div class="article-inner">
     
       <header class="article-header">
         
   
     <h1 itemprop="name">
-      <a class="article-title" href="/2019/09/03/%E6%95%B0%E7%BB%84%E5%88%97%E8%A1%A8ArrayList/">数组列表ArrayList</a>
+      <a class="article-title" href="/2019/09/04/%E5%8F%8D%E5%B0%84%E6%9C%BA%E5%88%B6/">反射机制</a>
     </h1>
   
 
         
-        <a href="/2019/09/03/%E6%95%B0%E7%BB%84%E5%88%97%E8%A1%A8ArrayList/" class="archive-article-date">
-  	<time datetime="2019-09-03T04:00:00.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2019-09-03</time>
+        <a href="/2019/09/04/%E5%8F%8D%E5%B0%84%E6%9C%BA%E5%88%B6/" class="archive-article-date">
+  	<time datetime="2019-09-04T04:00:00.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2019-09-04</time>
 </a>
         
       </header>
     
     <div class="article-entry" itemprop="articleBody">
       
-        <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> java.util.*;</span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">ArrayListTest</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span>  <span class="keyword">void</span> <span class="title">main</span> <span class="params">(String []args)</span></span>&#123;</span><br><span class="line">        ArrayList&lt;Integer&gt; arrayList = <span class="keyword">new</span> ArrayList&lt;&gt;();</span><br><span class="line">        arrayList.ensureCapacity(<span class="number">5</span>);<span class="comment">//预估元素个数为5，影响初始数组内存的分配</span></span><br><span class="line">        System.out.println(arrayList.size());<span class="comment">//数组列表的大小</span></span><br><span class="line">        arrayList.add(<span class="number">1</span>);<span class="comment">//添加元素</span></span><br><span class="line">        arrayList.add(<span class="number">2</span>);</span><br><span class="line">        arrayList.add(<span class="number">3</span>);</span><br><span class="line">        arrayList.add(<span class="number">4</span>);</span><br><span class="line">        arrayList.trimToSize();<span class="comment">//将比size大的预留空间去掉</span></span><br><span class="line">        arrayList.set(<span class="number">0</span>,<span class="number">2</span>);<span class="comment">//设置元素值，前下标后对象</span></span><br><span class="line">        arrayList.add(<span class="number">4</span>,<span class="number">5</span>);<span class="comment">//插入元素值，前下标后对象</span></span><br><span class="line">        System.out.println(arrayList.get(<span class="number">3</span>));<span class="comment">//获取某个元素值</span></span><br><span class="line">        System.out.println(arrayList.toString());</span><br><span class="line">        arrayList.remove(<span class="number">4</span>);<span class="comment">//去除元素，参数为下标</span></span><br><span class="line">        System.out.println(arrayList.size());</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+        <p>能够分析类能力的程序称为反射。</p>
+<ul>
+<li><strong>静态编译</strong>：在编译时确定类型，绑定对象即通过。</li>
+<li><strong>动态编译</strong>：运行时确定类型，绑定对象。动态编译最大限度地发挥了Java的灵活性，体现了多态的应用，可以减低类之间的耦合性。</li>
+</ul>
+<p><strong>反射赋予了JVM动态编译的能力，这个机制允许程序在运行时透过Reflection APIs取得任何一个已知名称的class的内部信息，并可于运行时改变fields内容或唤起methods。</strong></p>
+<p><strong>在静态语言中，使用一个变量时，必须知道它的类型。在Java中，变量的类型信息在编译时都保存到了class文件中，这样在运行时才能保证准确无误；换句话说，程序在运行时的行为都是固定的。如果想在运行时改变，就需要反射这东西了。</strong></p>
+<p>反射机制的实现主要通过操作Class类，Class类存放着对象的运行时信息。</p>
+<p>在Java程序运行时，虚拟机为所有类型维护一个Class对象。意思是每种类型的Class对象只有一个，也即地址只有一个。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 对于2个String类型对象，它们的Class对象相同</span></span><br><span class="line">Class c1 = <span class="string">"Carson"</span>.getClass();</span><br><span class="line">Class c2 =  Class.forName(<span class="string">"java.lang.String"</span>);</span><br><span class="line"><span class="comment">// 用==运算符实现两个类对象地址的比较</span></span><br><span class="line">System.out.println(c1 ==c2);</span><br><span class="line"><span class="comment">// 输出结果：true</span></span><br></pre></td></tr></table></figure>
 
-<p>ArrayList类解决了Java中数组不可变长的缺点，在添加和删除元素的时候可以自动调节数组的容量。</p>
-<p><strong>数组列表管理着对象引用的一个内部数组，当添加元素到数组预定的最大空间时，数组列表就自动地创建一个更大的数组，将所有的对象从小数组拷贝到大数组中去。</strong></p>
-<p>在本例中初始化了Integer的数组列表，<strong>ensureCapacity</strong>方法可以在填充元素前预估数组可能存储的元素数量5，<strong>但数组的大小仍然是0</strong>，用<strong>add</strong>方法添加元素，注意这里使用了<strong>自动装箱</strong>。随后使用<strong>trimToSize</strong>方法将数组预留的多余的空间去除，但不影响数组的大小。使用<strong>set</strong>方法将下标为0的元素赋值。使用<strong>add</strong>方法在下标4的位置插入元素5。使用<strong>remove</strong>方法去掉下标为4的元素，使用<strong>size</strong>方法显示元素数量。</p>
-<p>程序输出：</p>
-<p>0<br>4<br>[2, 2, 3, 4, 5]<br>4</p>
+<p>除了类对象Class，还有类的构造器对象Constructor，类的属性对象Field，类的方法对象Method。</p>
+<p>在使用Java反射机制时，主要步骤包括：</p>
+<ol>
+<li>获取目标类型的Class对象</li>
+<li>通过 Class 对象分别获取Constructor类对象、Method类对象 、Field 类对象</li>
+<li>通过 Constructor类对象、Method类对象 、Field类对象分别获取类的构造函数、方法、属性的具体信息，并进行后续操作</li>
+</ol>
+<p>对应步骤一，获取Class对象的常用方法</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">&lt;-- 方式<span class="number">1</span>：Object.getClass() --&gt;</span><br><span class="line">    <span class="comment">// Object类中的getClass()返回一个Class类型的实例 </span></span><br><span class="line">    Boolean carson = <span class="keyword">true</span>; </span><br><span class="line">    Class&lt;?&gt; classType = carson.getClass(); </span><br><span class="line">    System.out.println(classType);</span><br><span class="line">    <span class="comment">// 输出结果：class java.lang.Boolean  </span></span><br><span class="line"></span><br><span class="line">&lt;-- 方式<span class="number">2</span>：T<span class="class">.<span class="keyword">class</span> 语法    --&gt;</span></span><br><span class="line"><span class="class">    // <span class="title">T</span> </span>= 任意Java类型</span><br><span class="line">    Class&lt;?&gt; classType = Boolean<span class="class">.<span class="keyword">class</span></span>; </span><br><span class="line">    System.out.println(classType);</span><br><span class="line">    <span class="comment">// 输出结果：class java.lang.Boolean  </span></span><br><span class="line">    <span class="comment">// 注：Class对象表示的是一个类型，而这个类型未必一定是类</span></span><br><span class="line">    <span class="comment">// 如，int不是类，但int.class是一个Class类型的对象</span></span><br></pre></td></tr></table></figure>
 
+<p>步骤二</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br></pre></td><td class="code"><pre><span class="line">&lt;-- <span class="number">1</span>. 获取类的构造函数（传入构造函数的参数类型）-&gt;&gt;</span><br><span class="line">  <span class="comment">// a. 获取指定的构造函数 （公共 / 继承）</span></span><br><span class="line">  <span class="function">Constructor&lt;T&gt; <span class="title">getConstructor</span><span class="params">(Class&lt;?&gt;... parameterTypes)</span></span></span><br><span class="line"><span class="function">  <span class="comment">// b. 获取所有的构造函数（公共 / 继承） </span></span></span><br><span class="line"><span class="function">  Constructor&lt;?&gt;[] <span class="title">getConstructors</span><span class="params">()</span></span>; </span><br><span class="line">  <span class="comment">// c. 获取指定的构造函数 （ 不包括继承）</span></span><br><span class="line">  <span class="function">Constructor&lt;T&gt; <span class="title">getDeclaredConstructor</span><span class="params">(Class&lt;?&gt;... parameterTypes)</span> </span></span><br><span class="line"><span class="function">  <span class="comment">// d. 获取所有的构造函数（ 不包括继承）</span></span></span><br><span class="line"><span class="function">  Constructor&lt;?&gt;[] <span class="title">getDeclaredConstructors</span><span class="params">()</span></span>; </span><br><span class="line"><span class="comment">// 最终都是获得一个Constructor类对象</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// 特别注意：</span></span><br><span class="line">  <span class="comment">// 1. 不带 "Declared"的方法支持取出包括继承、公有（Public） &amp; 不包括有（Private）的构造函数</span></span><br><span class="line">  <span class="comment">// 2. 带 "Declared"的方法是支持取出包括公共（Public）、保护（Protected）、默认（包）访问和私有（Private）的构造方法，但不包括继承的构造函数</span></span><br><span class="line">  <span class="comment">// 下面同理</span></span><br><span class="line"></span><br><span class="line">&lt;--  <span class="number">2</span>. 获取类的属性（传入属性名） --&gt;</span><br><span class="line">  <span class="comment">// a. 获取指定的属性（公共 / 继承）</span></span><br><span class="line">   <span class="function">Field <span class="title">getField</span><span class="params">(String name)</span> </span>;</span><br><span class="line">  <span class="comment">// b. 获取所有的属性（公共 / 继承）</span></span><br><span class="line">   Field[] getFields() ;</span><br><span class="line">  <span class="comment">// c. 获取指定的所有属性 （不包括继承）</span></span><br><span class="line">   <span class="function">Field <span class="title">getDeclaredField</span><span class="params">(String name)</span> ；</span></span><br><span class="line"><span class="function">  <span class="comment">// d. 获取所有的所有属性 （不包括继承）</span></span></span><br><span class="line"><span class="function">   Field[] <span class="title">getDeclaredFields</span><span class="params">()</span> ；</span></span><br><span class="line"><span class="function"><span class="comment">// 最终都是获得一个Field类对象</span></span></span><br><span class="line"><span class="function"></span></span><br><span class="line"><span class="function">&lt;-- 3. 获取类的方法（传入方法名 &amp; 参数类型）--&gt;</span></span><br><span class="line"><span class="function">  <span class="comment">// a. 获取指定的方法（公共 / 继承）</span></span></span><br><span class="line"><span class="function">    Method <span class="title">getMethod</span><span class="params">(String name, Class&lt;?&gt;... parameterTypes)</span> ；</span></span><br><span class="line"><span class="function">  <span class="comment">// b. 获取所有的方法（公共 / 继承）</span></span></span><br><span class="line"><span class="function">   Method[] <span class="title">getMethods</span><span class="params">()</span> ；</span></span><br><span class="line"><span class="function">  <span class="comment">// c. 获取指定的方法 （ 不包括继承）</span></span></span><br><span class="line"><span class="function">   Method <span class="title">getDeclaredMethod</span><span class="params">(String name, Class&lt;?&gt;... parameterTypes)</span> ；</span></span><br><span class="line"><span class="function">  <span class="comment">// d. 获取所有的方法（ 不包括继承）</span></span></span><br><span class="line"><span class="function">   Method[] <span class="title">getDeclaredMethods</span><span class="params">()</span> ；</span></span><br><span class="line"><span class="function"><span class="comment">// 最终都是获得一个Method类对象</span></span></span><br><span class="line"><span class="function"></span></span><br><span class="line"><span class="function">&lt;-- 4. Class类的其他常用方法 --&gt;</span></span><br><span class="line"><span class="function"><span class="title">getSuperclass</span><span class="params">()</span></span>; </span><br><span class="line"><span class="comment">// 返回父类</span></span><br><span class="line"></span><br><span class="line"><span class="function">String <span class="title">getName</span><span class="params">()</span></span>; </span><br><span class="line"><span class="comment">// 作用：返回完整的类名（含包名，如java.lang.String） </span></span><br><span class="line"> </span><br><span class="line"><span class="function">Object <span class="title">newInstance</span><span class="params">()</span></span>; </span><br><span class="line"><span class="comment">// 作用：快速地创建一个类的实例</span></span><br><span class="line"><span class="comment">// 具体过程：调用默认构造器（若该类无默认构造器，则抛出异常 </span></span><br><span class="line"><span class="comment">// 注：若需要为构造器提供参数需使用java.lang.reflect.Constructor中的newInstance（）</span></span><br></pre></td></tr></table></figure>
+
+<p>步骤三</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 即以下方法都分别属于`Constructor`类、`Method`类 &amp; `Field`类的方法。</span></span><br><span class="line"></span><br><span class="line">&lt;-- <span class="number">1</span>. 通过Constructor 类对象获取类构造函数信息 --&gt;</span><br><span class="line">  <span class="function">String <span class="title">getName</span><span class="params">()</span>；<span class="comment">// 获取构造器名</span></span></span><br><span class="line"><span class="function">  Class <span class="title">getDeclaringClass</span><span class="params">()</span>；<span class="comment">// 获取一个用于描述类中定义的构造器的Class对象</span></span></span><br><span class="line"><span class="function">  <span class="keyword">int</span> <span class="title">getModifiers</span><span class="params">()</span>；<span class="comment">// 返回整型数值，用不同的位开关描述访问修饰符的使用状况</span></span></span><br><span class="line"><span class="function">  Class[] <span class="title">getExceptionTypes</span><span class="params">()</span>；<span class="comment">// 获取描述方法抛出的异常类型的Class对象数组</span></span></span><br><span class="line"><span class="function">  Class[] <span class="title">getParameterTypes</span><span class="params">()</span>；<span class="comment">// 获取一个用于描述参数类型的Class对象数组</span></span></span><br><span class="line"><span class="function"></span></span><br><span class="line"><span class="function">&lt;-- 2. 通过Field类对象获取类属性信息 --&gt;</span></span><br><span class="line"><span class="function">  String <span class="title">getName</span><span class="params">()</span>；<span class="comment">// 返回属性的名称</span></span></span><br><span class="line"><span class="function">  Class <span class="title">getDeclaringClass</span><span class="params">()</span>； <span class="comment">// 获取属性类型的Class类型对象</span></span></span><br><span class="line"><span class="function">  Class <span class="title">getType</span><span class="params">()</span>；<span class="comment">// 获取属性类型的Class类型对象</span></span></span><br><span class="line"><span class="function">  <span class="keyword">int</span> <span class="title">getModifiers</span><span class="params">()</span>； <span class="comment">// 返回整型数值，用不同的位开关描述访问修饰符的使用状况</span></span></span><br><span class="line"><span class="function">  Object <span class="title">get</span><span class="params">(Object obj)</span> ；<span class="comment">// 返回指定对象上此属性的值</span></span></span><br><span class="line"><span class="function">  <span class="keyword">void</span> <span class="title">set</span><span class="params">(Object obj, Object value)</span> <span class="comment">// 设置 指定对象上此属性的值为value</span></span></span><br><span class="line"><span class="function"> </span></span><br><span class="line"><span class="function">&lt;-- 3. 通过Method 类对象获取类方法信息 --&gt;</span></span><br><span class="line"><span class="function">  String <span class="title">getName</span><span class="params">()</span>；<span class="comment">// 获取方法名</span></span></span><br><span class="line"><span class="function">  Class <span class="title">getDeclaringClass</span><span class="params">()</span>；<span class="comment">// 获取方法的Class对象 </span></span></span><br><span class="line"><span class="function">  <span class="keyword">int</span> <span class="title">getModifiers</span><span class="params">()</span>；<span class="comment">// 返回整型数值，用不同的位开关描述访问修饰符的使用状况</span></span></span><br><span class="line"><span class="function">  Class[] <span class="title">getExceptionTypes</span><span class="params">()</span>；<span class="comment">// 获取用于描述方法抛出的异常类型的Class对象数组</span></span></span><br><span class="line"><span class="function">  Class[] <span class="title">getParameterTypes</span><span class="params">()</span>；<span class="comment">// 获取一个用于描述参数类型的Class对象数组</span></span></span><br><span class="line"><span class="function"></span></span><br><span class="line"><span class="function">&lt;--额外：java.lang.reflect.Modifier类 --&gt;</span></span><br><span class="line"><span class="function"><span class="comment">// 作用：获取访问修饰符</span></span></span><br><span class="line"><span class="function"></span></span><br><span class="line"><span class="function"><span class="keyword">static</span> String <span class="title">toString</span><span class="params">(<span class="keyword">int</span> modifiers)</span>   </span></span><br><span class="line"><span class="function"><span class="comment">// 获取对应modifiers位设置的修饰符的字符串表示</span></span></span><br><span class="line"><span class="function"></span></span><br><span class="line"><span class="function"><span class="keyword">static</span> <span class="keyword">boolean</span> <span class="title">isXXX</span><span class="params">(<span class="keyword">int</span> modifiers)</span> </span></span><br><span class="line"><span class="function"><span class="comment">// 检测方法名中对应的修饰符在modifiers中的值</span></span></span><br></pre></td></tr></table></figure>
       
 
       
@@ -1255,7 +1259,7 @@
         		</li>
       		 
         		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">数组</a>
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">反射</a>
         		</li>
       		
 		</ul>
@@ -1265,7 +1269,7 @@
 
       
         <p class="article-more-link">
-          <a class="article-more-a" href="/2019/09/03/%E6%95%B0%E7%BB%84%E5%88%97%E8%A1%A8ArrayList/">展开全文 >></a>
+          <a class="article-more-a" href="/2019/09/04/%E5%8F%8D%E5%B0%84%E6%9C%BA%E5%88%B6/">展开全文 >></a>
         </p>
       
 
@@ -1400,6 +1404,10 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">同步</a>
+              </li>
+             
+              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color4">LeetCode</a>
               </li>
              
@@ -1412,7 +1420,7 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">同步</a>
+                <a href="javascript:void(0)" class="js-tag color4">序列化</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -1421,10 +1429,6 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color3">Java核心卷</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">序列化</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -1444,10 +1448,6 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">事务</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color4">AOP</a>
               </li>
              
@@ -1456,11 +1456,11 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">多线程</a>
+                <a href="javascript:void(0)" class="js-tag color1">SpringBoot</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">SpringMVC</a>
+                <a href="javascript:void(0)" class="js-tag color3">事务</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -1468,7 +1468,11 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">反射</a>
+                <a href="javascript:void(0)" class="js-tag color4">StringBuilder</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color5">SpringMVC</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -1476,11 +1480,7 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">StringBuilder</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">未来日记</a>
+                <a href="javascript:void(0)" class="js-tag color4">多线程</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -1492,11 +1492,15 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">设计模式</a>
+                <a href="javascript:void(0)" class="js-tag color5">未来日记</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">数组</a>
+                <a href="javascript:void(0)" class="js-tag color3">反射</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color5">设计模式</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -1504,11 +1508,11 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">接口</a>
+                <a href="javascript:void(0)" class="js-tag color3">数组</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">线程</a>
+                <a href="javascript:void(0)" class="js-tag color3">接口</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -1516,11 +1520,11 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">锁</a>
+                <a href="javascript:void(0)" class="js-tag color3">泛型</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">泛型</a>
+                <a href="javascript:void(0)" class="js-tag color3">线程</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -1528,7 +1532,7 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">错误处理</a>
+                <a href="javascript:void(0)" class="js-tag color2">锁</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -1536,11 +1540,11 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">静态</a>
+                <a href="javascript:void(0)" class="js-tag color5">错误处理</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">SpringBoot</a>
+                <a href="javascript:void(0)" class="js-tag color3">静态</a>
               </li>
             
             <div class="clearfix"></div>

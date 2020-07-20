@@ -150,6 +150,105 @@
           <div id="js-content" class="content-ll">
             
   
+    <article id="post-SpringBoot源码体会" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2020/07/20/SpringBoot%E6%BA%90%E7%A0%81%E4%BD%93%E4%BC%9A/">SpringBoot源码体会</a>
+    </h1>
+  
+
+        
+        <a href="/2020/07/20/SpringBoot%E6%BA%90%E7%A0%81%E4%BD%93%E4%BC%9A/" class="archive-article-date">
+  	<time datetime="2020-07-20T07:00:00.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2020-07-20</time>
+</a>
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>今天学到Spring Boot里嵌入式Servlet配置和启动的源码</p>
+<h4 id="定制嵌入式Servlet的相关配置的两种方式"><a href="#定制嵌入式Servlet的相关配置的两种方式" class="headerlink" title="定制嵌入式Servlet的相关配置的两种方式"></a>定制嵌入式Servlet的相关配置的两种方式</h4><p>发现以往定制嵌入式Servlet的相关配置都是使用两种方式，一是在properties或者yml文件中写servlet.port=8081、servlet.tomcat.uri-encoding=UTF-8这种，二是新建一个类继承EmbeddedServletContainerCustomizer（内嵌Servlet容器定制器），重写里面的customize方法。</p>
+<h4 id="两种方式的工作原理"><a href="#两种方式的工作原理" class="headerlink" title="两种方式的工作原理"></a>两种方式的工作原理</h4><p>EmbeddedServletContainerAutoConfiguration这个类是内置Servlet容器的自动配置类</p>
+<p>这个自动配置类会创建EmbeddedServletContainerFactory内置Servlet容器工厂，这个工厂包含有三种，分别是TomcatEmbeddedServletContainerFactory、JettyEmbeddedServletContainerFactory、UndertowEmbeddedServletContainerFactory。</p>
+<p>工厂会在需要的时候创建EmbeddedServletContainer内置Servlet容器，同样这个类也包含三种，分别是TomcatEmbeddedServletContainer、JettyEmbeddedServletContainer、UndertowEmbeddedServletContainer。</p>
+<p>EmbeddedServletContainerAutoConfiguration内置Servlet容器自动配置类引入了EmbeddedServletContainerCustomizerBeanPostProcessor内置Servlet容器定制化对象后置处理器类，这个后置处理器的作用就是在Servlet容器初始化之前，从容器中获取所有的定制器（EmbeddedServletContainerCustomizer），调用每一个定制器的customize方法来给Servlet容器进行属性赋值。</p>
+<p>这就对应了上面定制嵌入式Servlet的相关配置的方式，我写了一个配置类（@Configuration）继承了EmbeddedServletContainerCustomizer，将它放在容器中（@Bean），之后自动配置类创建了工厂，工厂在创建Serlvet容器时，会通过后置处理器类，将容器中所有的定制化组件的方法执行一遍。</p>
+<p><strong>为什么在properties或者yml文件的配置也会生效呢？</strong></p>
+<p>因为ServerProperties类也是实现了EmbeddedServletContainerCustomizer接口，所以它也是内嵌Servlet容器定制器的一种</p>
+<p>properties和yml的加载就是说到SpringBoot的自动配置原理了</p>
+<h4 id="SpringBoot自动配置原理"><a href="#SpringBoot自动配置原理" class="headerlink" title="SpringBoot自动配置原理"></a>SpringBoot自动配置原理</h4><p>SpringBoot在启动的时候加载加载所有的自动配置类（如果我们实现的功能没有自动配置类就需要我们自己写，有就用SpringBoot自带的）</p>
+<p>自动配置类上的@ConfigurationProperties(perfix = “spring.http.encoding”)注解的作用是把我们自己写的application.properties或者yml里的配置和这个自动配置类上的属性进行映射，比如是否存在spring.http.encoding开头的配置，有就赋值并生成相应的properties对象，比如HttpEncodingProperties，将properties对象放在容器中。</p>
+<p>自动配置类初始化各种组件的时候，有时候AotoConfiguration类的生成组件方法上有@ConditionalOnMissingXXX，意思是如果组件对象在容器中，那么就不重复生成了。</p>
+<p>具体的生成过程是：组件的各种定制器（xxxCustomizer、xxxConfigurer）既可以有我们自己设置的，也可以有SpringBoot帮我们生成的，而Spring Boot帮我们生成的对象所用的值就会从properties对象中获取属性，properties对象如果我们有在properties文件yml文件中设置属性值就用我们的，否则就用默认的。（properties对象的构造方法就初始化了很多默认值，然后再在配置文件里寻找对应的赋值）</p>
+<p><strong>举个例子</strong></p>
+<p>WebMvcAutoConfiguration自动配置类下有个ViewResolver视图解析器组件，下面这个图是它在AutoConfiguration里的创建方法。</p>
+<p><img src="/2020/07/20/SpringBoot%E6%BA%90%E7%A0%81%E4%BD%93%E4%BC%9A/1.png" alt="1"></p>
+<p>@ConditionalOnMissingBean如果容器内没有ViewResolver就创建一个，创建使用了this.mvcProperties，也就是上面说的通过扫描我们创建的配置文件结合Spring Boot自带的默认值构造的properties对象。</p>
+<p>下面是properties类和它的构造方法</p>
+<p><img src="/2020/07/20/SpringBoot%E6%BA%90%E7%A0%81%E4%BD%93%E4%BC%9A/2.png" alt="2"></p>
+<p>WebMvcAutoConfiguration自动配置类下还有一个生成视图解析器的方法</p>
+<p><img src="/2020/07/20/SpringBoot%E6%BA%90%E7%A0%81%E4%BD%93%E4%BC%9A/3.png" alt="3"></p>
+<p>ContentNegotiatingViewResolver组合容器中所有的视图解析器</p>
+<h4 id="如何修改SpringBoot的默认配置"><a href="#如何修改SpringBoot的默认配置" class="headerlink" title="如何修改SpringBoot的默认配置"></a>如何修改SpringBoot的默认配置</h4><p>SpringBoot在自动配置很多组件的时候，先看容器中有没有用户自己配置的（@Bean、@Component）如果有就用用户配置的，如果没有，才自动配置；如果有些组件可以有多个（比如ViewResolver）将用户配置的和自己默认的组合起来（可以借助implements xxxCustomizer、xxxConfigurer，也可以借助直接implements要实现的组件类等其他的方式）；</p>
+<p>在SpringBoot中会有非常多的xxxConfigurer帮助我们进行扩展配置</p>
+<p>在SpringBoot中会有很多的xxxCustomizer帮助我们进行定制配置</p>
+
+      
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
+	<div class="article-tag tagcloud">
+		<i class="icon-price-tags icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color1">SpringBoot</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
+      
+
+      
+        <p class="article-more-link">
+          <a class="article-more-a" href="/2020/07/20/SpringBoot%E6%BA%90%E7%A0%81%E4%BD%93%E4%BC%9A/">展开全文 >></a>
+        </p>
+      
+
+      
+      <div class="clearfix"></div>
+    </div>
+  </div>
+</article>
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+    </div>
+</aside>
+
+
+
+
+  
     <article id="post-SpringBean线程安全问题" class="article article-type-post  article-index" itemscope itemprop="blogPost">
   <div class="article-inner">
     
@@ -1209,7 +1308,7 @@
 <p><strong>EmbeddedServletContainerCustomizer</strong>：定制器帮我们修改了Servlet容器的配置？</p>
 <p>怎么修改的原理？</p>
 <p>5）、容器中导入了<strong>EmbeddedServletContainerCustomizerBeanPostProcessor</strong></p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//初始化之前</span></span><br><span class="line"><span class="meta">@Override</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> Object <span class="title">postProcessBeforeInitialization</span><span class="params">(Object bean, String beanName)</span></span></span><br><span class="line"><span class="function">      <span class="keyword">throws</span> BeansException </span>&#123;</span><br><span class="line">    <span class="comment">//如果当前初始化的是一个ConfigurableEmbeddedServletContainer类型的组件</span></span><br><span class="line">   <span class="keyword">if</span> (bean <span class="keyword">instanceof</span> ConfigurableEmbeddedServletContainer) &#123;</span><br><span class="line">       <span class="comment">//</span></span><br><span class="line">      postProcessBeforeInitialization((ConfigurableEmbeddedServletContainer) bean);</span><br><span class="line">   &#125;</span><br><span class="line">   <span class="keyword">return</span> bean;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">postProcessBeforeInitialization</span><span class="params">(</span></span></span><br><span class="line"><span class="function"><span class="params">			ConfigurableEmbeddedServletContainer bean)</span> </span>&#123;</span><br><span class="line">    <span class="comment">//获取所有的定制器，调用每一个定制器的customize方法来给Servlet容器进行属性赋值；</span></span><br><span class="line">    <span class="keyword">for</span> (EmbeddedServletContainerCustomizer customizer : getCustomizers()) &#123;</span><br><span class="line">        customizer.customize(bean);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">private</span> Collection&lt;EmbeddedServletContainerCustomizer&gt; <span class="title">getCustomizers</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (<span class="keyword">this</span>.customizers == <span class="keyword">null</span>) &#123;</span><br><span class="line">        <span class="comment">// Look up does not include the parent context</span></span><br><span class="line">        <span class="keyword">this</span>.customizers = <span class="keyword">new</span> ArrayList&lt;EmbeddedServletContainerCustomizer&gt;(</span><br><span class="line">            <span class="keyword">this</span>.beanFactory</span><br><span class="line">            <span class="comment">//从容器中获取所有这葛类型的组件：EmbeddedServletContainerCustomizer</span></span><br><span class="line">            <span class="comment">//定制Servlet容器，给容器中可以添加一个EmbeddedServletContainerCustomizer类型的组件</span></span><br><span class="line">            .getBeansOfType(EmbeddedServletContainerCustomizer<span class="class">.<span class="keyword">class</span>,</span></span><br><span class="line"><span class="class">                            <span class="title">false</span>, <span class="title">false</span>)</span></span><br><span class="line"><span class="class">            .<span class="title">values</span>())</span>;</span><br><span class="line">        Collections.sort(<span class="keyword">this</span>.customizers, AnnotationAwareOrderComparator.INSTANCE);</span><br><span class="line">        <span class="keyword">this</span>.customizers = Collections.unmodifiableList(<span class="keyword">this</span>.customizers);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">this</span>.customizers;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">ServerProperties也是定制器</span><br></pre></td></tr></table></figure>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//初始化之前</span></span><br><span class="line"><span class="meta">@Override</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> Object <span class="title">postProcessBeforeInitialization</span><span class="params">(Object bean, String beanName)</span></span></span><br><span class="line"><span class="function">      <span class="keyword">throws</span> BeansException </span>&#123;</span><br><span class="line">    <span class="comment">//如果当前初始化的是一个ConfigurableEmbeddedServletContainer类型的组件</span></span><br><span class="line">   <span class="keyword">if</span> (bean <span class="keyword">instanceof</span> ConfigurableEmbeddedServletContainer) &#123;</span><br><span class="line">       <span class="comment">//</span></span><br><span class="line">      postProcessBeforeInitialization((ConfigurableEmbeddedServletContainer) bean);</span><br><span class="line">   &#125;</span><br><span class="line">   <span class="keyword">return</span> bean;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">postProcessBeforeInitialization</span><span class="params">(</span></span></span><br><span class="line"><span class="function"><span class="params">			ConfigurableEmbeddedServletContainer bean)</span> </span>&#123;</span><br><span class="line">    <span class="comment">//获取所有的定制器，调用每一个定制器的customize方法来给Servlet容器进行属性赋值；</span></span><br><span class="line">    <span class="keyword">for</span> (EmbeddedServletContainerCustomizer customizer : getCustomizers()) &#123;</span><br><span class="line">        customizer.customize(bean);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">private</span> Collection&lt;EmbeddedServletContainerCustomizer&gt; <span class="title">getCustomizers</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (<span class="keyword">this</span>.customizers == <span class="keyword">null</span>) &#123;</span><br><span class="line">        <span class="comment">// Look up does not include the parent context</span></span><br><span class="line">        <span class="keyword">this</span>.customizers = <span class="keyword">new</span> ArrayList&lt;EmbeddedServletContainerCustomizer&gt;(</span><br><span class="line">            <span class="keyword">this</span>.beanFactory</span><br><span class="line">            <span class="comment">//从容器中获取所有这个类型的组件：EmbeddedServletContainerCustomizer</span></span><br><span class="line">            <span class="comment">//定制Servlet容器，给容器中可以添加一个EmbeddedServletContainerCustomizer类型的组件</span></span><br><span class="line">            .getBeansOfType(EmbeddedServletContainerCustomizer<span class="class">.<span class="keyword">class</span>,</span></span><br><span class="line"><span class="class">                            <span class="title">false</span>, <span class="title">false</span>)</span></span><br><span class="line"><span class="class">            .<span class="title">values</span>())</span>;</span><br><span class="line">        Collections.sort(<span class="keyword">this</span>.customizers, AnnotationAwareOrderComparator.INSTANCE);</span><br><span class="line">        <span class="keyword">this</span>.customizers = Collections.unmodifiableList(<span class="keyword">this</span>.customizers);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">this</span>.customizers;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">ServerProperties也是定制器</span><br></pre></td></tr></table></figure>
 
 <p>步骤：</p>
 <p>1）、SpringBoot根据导入的依赖情况，给容器中添加相应的EmbeddedServletContainerFactory【TomcatEmbeddedServletContainerFactory】</p>
@@ -2249,7 +2348,7 @@
 
 <p>拦截器链MyInterceptor1、MyInterceptor2，1的方法内套着2的方法</p>
 <p>所以执行顺序是preHandle1-&gt;preHandle2-&gt;postHandle2-&gt;postHandle1-&gt;afterCompletion2-&gt;afterCompletion1</p>
-<h4 id="SpringMVC异常处理"><a href="#SpringMVC异常处理" class="headerlink" title="SpringMVC异常处理"></a>SpringMVC异常处理</h4><p><img src="/2020/06/15/SpringMVC%E7%AE%80%E4%BB%8B/C:%5CUsers%5C75959%5CAppData%5CRoaming%5CTypora%5Ctypora-user-images%5Cimage-20200618105544097.png" alt="image-20200618105544097"></p>
+<h4 id="SpringMVC异常处理"><a href="#SpringMVC异常处理" class="headerlink" title="SpringMVC异常处理"></a>SpringMVC异常处理</h4><p><img src="/2020/06/15/SpringMVC%E7%AE%80%E4%BB%8B/SpringMVC%E7%AE%80%E4%BB%8B%5Cimage-20200618105544097.png" alt="image-20200618105544097"></p>
 <h5 id="异常处理两种方式"><a href="#异常处理两种方式" class="headerlink" title="异常处理两种方式"></a>异常处理两种方式</h5><p>1.简单异常处理器SimpleMappingExceptionResolver </p>
 <p>SpringMVC已经定义好了，在使用时可以根据需求对异常和视图的映射进行配置</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">&lt;!--配置简单映射异常处理器--&gt;</span><br><span class="line">&lt;bean <span class="class"><span class="keyword">class</span></span>=<span class="string">""</span>org.springframework.web.servlet.handler.SimpleMappingExceptionResolver<span class="string">"&gt;</span></span><br><span class="line"><span class="string">	&lt;property name="</span>defaultErrorView<span class="string">" value="</span>error<span class="string">"/&gt;</span></span><br><span class="line"><span class="string">	&lt;property name="</span>exceptionMappings<span class="string">"&gt;</span></span><br><span class="line"><span class="string">		&lt;map&gt;</span></span><br><span class="line"><span class="string">			&lt;entry key="</span>com.it.exception.MyException<span class="string">" value="</span>error1<span class="string">"/&gt;</span></span><br><span class="line"><span class="string">			&lt;entry key="</span>java.lang.ClassCastException<span class="string">" value='error2'/&gt;</span></span><br><span class="line"><span class="string">		&lt;/map&gt;</span></span><br><span class="line"><span class="string">	&lt;/property&gt;</span></span><br><span class="line"><span class="string">&lt;/bean&gt;</span></span><br></pre></td></tr></table></figure>
@@ -2421,104 +2520,6 @@
 
 
   
-    <article id="post-Spring-JdbcTemplate" class="article article-type-post  article-index" itemscope itemprop="blogPost">
-  <div class="article-inner">
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2020/06/14/Spring-JdbcTemplate/">Spring JdbcTemplate</a>
-    </h1>
-  
-
-        
-        <a href="/2020/06/14/Spring-JdbcTemplate/" class="archive-article-date">
-  	<time datetime="2020-06-14T01:55:57.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2020-06-14</time>
-</a>
-        
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <p>Spring对Jdbc API的简单封装,还有很多相似的模板类,例如RedisTemplate</p>
-<p>开发步骤:1.导入Spring-jdbc和Spring-tx坐标 2.创建数据库实体 3.创建JdbcTemplate对象 4.执行数据库操作</p>
-<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">&lt;dependency&gt;</span><br><span class="line">  &lt;groupId&gt;org.springframework&lt;/groupId&gt;</span><br><span class="line">  &lt;artifactId&gt;spring-jdbc&lt;/artifactId&gt;</span><br><span class="line">  &lt;version&gt;5.0.5.RELEASE&lt;/version&gt;</span><br><span class="line">&lt;/dependency&gt;</span><br><span class="line">&lt;dependency&gt;</span><br><span class="line">  &lt;groupId&gt;org.springframework&lt;/groupId&gt;</span><br><span class="line">  &lt;artifactId&gt;spring-tx&lt;/artifactId&gt;</span><br><span class="line">  &lt;version&gt;5.0.5.RELEASE&lt;/version&gt;</span><br><span class="line">&lt;/dependency&gt;</span><br><span class="line">&lt;dependency&gt;</span><br><span class="line">  &lt;groupId&gt;c3p0&lt;/groupId&gt;</span><br><span class="line">  &lt;artifactId&gt;c3p0&lt;/artifactId&gt;</span><br><span class="line">  &lt;version&gt;0.9.1.2&lt;/version&gt;</span><br><span class="line">&lt;/dependency&gt;</span><br><span class="line">&lt;dependency&gt;</span><br><span class="line">  &lt;groupId&gt;mysql&lt;/groupId&gt;</span><br><span class="line">  &lt;artifactId&gt;mysql-connector-java&lt;/artifactId&gt;</span><br><span class="line">  &lt;version&gt;8.0.20&lt;/version&gt;</span><br><span class="line">&lt;/dependency&gt;</span><br></pre></td></tr></table></figure>
-
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com.it.test;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> com.mchange.v2.c3p0.ComboPooledDataSource;</span><br><span class="line"><span class="keyword">import</span> org.junit.Test;</span><br><span class="line"><span class="keyword">import</span> org.springframework.jdbc.core.JdbcTemplate;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> java.beans.PropertyVetoException;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">JdbcTemplateTest</span> </span>&#123;</span><br><span class="line">    <span class="meta">@Test</span></span><br><span class="line">    <span class="comment">//测试Jdbc开发步骤</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">test1</span><span class="params">()</span> <span class="keyword">throws</span> PropertyVetoException </span>&#123;</span><br><span class="line">        <span class="comment">//创建数据源对象</span></span><br><span class="line">        ComboPooledDataSource dataSource = <span class="keyword">new</span> ComboPooledDataSource();</span><br><span class="line">        dataSource.setDriverClass(<span class="string">"com.mysql.cj.jdbc.Driver"</span>);</span><br><span class="line">        dataSource.setJdbcUrl(<span class="string">"jdbc:mysql://127.0.0.1:3306/test?serverTimezone=GMT"</span>);</span><br><span class="line">        dataSource.setUser(<span class="string">"root"</span>);</span><br><span class="line">        dataSource.setPassword(<span class="string">"root"</span>);</span><br><span class="line">        JdbcTemplate jdbcTemplate = <span class="keyword">new</span> JdbcTemplate();</span><br><span class="line">        <span class="comment">//设置数据源对象</span></span><br><span class="line">        jdbcTemplate.setDataSource(dataSource);</span><br><span class="line">        <span class="comment">//执行操作</span></span><br><span class="line">        <span class="keyword">int</span> row = jdbcTemplate.update(<span class="string">"insert into account values(?,?)"</span>,<span class="string">"tom"</span>,<span class="number">5000</span>);</span><br><span class="line">        System.out.println(row);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>jdbc:mysql://127.0.0.1:3306/test?serverTimezone=GMT里的test是数据库名,加?serverTimezone=GMT解决时区错误</p>
-<h3 id="Spring产生JdbcTemplate"><a href="#Spring产生JdbcTemplate" class="headerlink" title="Spring产生JdbcTemplate"></a>Spring产生JdbcTemplate</h3><p>applicationContext.xml</p>
-<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">&lt;?xml version=<span class="string">"1.0"</span> encoding=<span class="string">"UTF-8"</span>?&gt;</span><br><span class="line">&lt;beans xmlns=<span class="string">"http://www.springframework.org/schema/beans"</span></span><br><span class="line">       xmlns:xsi=<span class="string">"http://www.w3.org/2001/XMLSchema-instance"</span></span><br><span class="line">       xsi:schemaLocation=<span class="string">"http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd"</span>&gt;</span><br><span class="line"></span><br><span class="line">&lt;!--配置数据源对象--&gt;</span><br><span class="line">    &lt;bean id=<span class="string">"dataSource"</span> <span class="class"><span class="keyword">class</span></span>=<span class="string">"com.mchange.v2.c3p0.ComboPooledDataSource"</span>&gt;</span><br><span class="line">        &lt;property name="driverClass" value="com.mysql.cj.jdbc.Driver"&gt;&lt;/property&gt;</span><br><span class="line">        &lt;property name="jdbcUrl" value="jdbc:mysql://127.0.0.1:3306/test?serverTimezone=GMT"&gt;&lt;/property&gt;</span><br><span class="line">        &lt;property name="user" value="root"&gt;&lt;/property&gt;</span><br><span class="line">        &lt;property name="password" value="root"&gt;&lt;/property&gt;</span><br><span class="line">    &lt;/bean&gt;</span><br><span class="line">&lt;!--配置Jdbc模板对象--&gt;</span><br><span class="line">    &lt;bean id=<span class="string">"jdbcTemplate"</span> <span class="class"><span class="keyword">class</span></span>=<span class="string">"org.springframework.jdbc.core.JdbcTemplate"</span>&gt;</span><br><span class="line">        &lt;property name="dataSource" ref="dataSource"&gt;&lt;/property&gt;</span><br><span class="line">    &lt;/bean&gt;</span><br><span class="line">&lt;/beans&gt;</span><br></pre></td></tr></table></figure>
-
-<p>JdbcTemplateTest.java</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com.it.test;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> com.mchange.v2.c3p0.ComboPooledDataSource;</span><br><span class="line"><span class="keyword">import</span> org.junit.Test;</span><br><span class="line"><span class="keyword">import</span> org.springframework.context.ApplicationContext;</span><br><span class="line"><span class="keyword">import</span> org.springframework.context.support.ClassPathXmlApplicationContext;</span><br><span class="line"><span class="keyword">import</span> org.springframework.jdbc.core.JdbcTemplate;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> javax.sql.DataSource;</span><br><span class="line"><span class="keyword">import</span> java.beans.PropertyVetoException;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">JdbcTemplateTest</span> </span>&#123;</span><br><span class="line">    <span class="meta">@Test</span></span><br><span class="line">    <span class="comment">//测试Jdbc开发步骤</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">test1</span><span class="params">()</span> <span class="keyword">throws</span> PropertyVetoException </span>&#123;</span><br><span class="line">        <span class="comment">//创建数据源对象</span></span><br><span class="line">        ComboPooledDataSource dataSource = <span class="keyword">new</span> ComboPooledDataSource();</span><br><span class="line">        dataSource.setDriverClass(<span class="string">"com.mysql.cj.jdbc.Driver"</span>);</span><br><span class="line">        dataSource.setJdbcUrl(<span class="string">"jdbc:mysql://127.0.0.1:3306/test?serverTimezone=GMT"</span>);</span><br><span class="line">        dataSource.setUser(<span class="string">"root"</span>);</span><br><span class="line">        dataSource.setPassword(<span class="string">"root"</span>);</span><br><span class="line">        JdbcTemplate jdbcTemplate = <span class="keyword">new</span> JdbcTemplate();</span><br><span class="line">        <span class="comment">//设置数据源对象</span></span><br><span class="line">        jdbcTemplate.setDataSource(dataSource);</span><br><span class="line">        <span class="comment">//执行操作</span></span><br><span class="line">        <span class="keyword">int</span> row = jdbcTemplate.update(<span class="string">"insert into account values(?,?)"</span>,<span class="string">"tom"</span>,<span class="number">5000</span>);</span><br><span class="line">        System.out.println(row);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="meta">@Test</span></span><br><span class="line">    <span class="comment">//测试Spring产生Jdbc模板对象</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">test2</span><span class="params">()</span></span>&#123;</span><br><span class="line">        ApplicationContext app = <span class="keyword">new</span> ClassPathXmlApplicationContext(<span class="string">"applicationContext.xml"</span>);</span><br><span class="line">        DataSource dataSource = (DataSource) app.getBean(<span class="string">"dataSource"</span>);</span><br><span class="line">        JdbcTemplate jdbcTemplate = (JdbcTemplate)app.getBean(JdbcTemplate<span class="class">.<span class="keyword">class</span>)</span>;</span><br><span class="line">        <span class="keyword">int</span> row = jdbcTemplate.update(<span class="string">"insert into account values(?,?)"</span>,<span class="string">"amy"</span>,<span class="number">3000</span>);</span><br><span class="line">        System.out.println(row);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<h3 id="JdbcTemplate常用操作"><a href="#JdbcTemplate常用操作" class="headerlink" title="JdbcTemplate常用操作"></a>JdbcTemplate常用操作</h3><h4 id="update更新操作"><a href="#update更新操作" class="headerlink" title="update更新操作"></a>update更新操作</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com.it.test;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> org.junit.Test;</span><br><span class="line"><span class="keyword">import</span> org.junit.runner.RunWith;</span><br><span class="line"><span class="keyword">import</span> org.springframework.beans.factory.annotation.Autowired;</span><br><span class="line"><span class="keyword">import</span> org.springframework.jdbc.core.JdbcTemplate;</span><br><span class="line"><span class="keyword">import</span> org.springframework.test.context.ContextConfiguration;</span><br><span class="line"><span class="keyword">import</span> org.springframework.test.context.junit4.SpringJUnit4ClassRunner;</span><br><span class="line"></span><br><span class="line"><span class="meta">@RunWith</span>(SpringJUnit4ClassRunner<span class="class">.<span class="keyword">class</span>)</span></span><br><span class="line">@ContextConfiguration("classpath:applicationContext.xml")</span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">JdbcTemplateCRUDTest</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Autowired</span></span><br><span class="line">    <span class="keyword">private</span> JdbcTemplate jdbcTemplate;</span><br><span class="line">    <span class="meta">@Test</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">testUpdate</span><span class="params">()</span></span>&#123;</span><br><span class="line">        jdbcTemplate.update(<span class="string">"update account set money= ? where name = ?"</span>,<span class="number">10000</span>,<span class="string">"amy"</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="meta">@Test</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">testDelete</span><span class="params">()</span></span>&#123;</span><br><span class="line">        jdbcTemplate.update(<span class="string">"delete from account where name = ?"</span>,<span class="string">"tom"</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>用Spring整合Juint测试,测试update和delete操作</p>
-<h4 id="query查询操作"><a href="#query查询操作" class="headerlink" title="query查询操作"></a>query查询操作</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com.it.test;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> com.it.domain.Account;</span><br><span class="line"><span class="keyword">import</span> org.junit.Test;</span><br><span class="line"><span class="keyword">import</span> org.junit.runner.RunWith;</span><br><span class="line"><span class="keyword">import</span> org.springframework.beans.factory.annotation.Autowired;</span><br><span class="line"><span class="keyword">import</span> org.springframework.jdbc.core.BeanPropertyRowMapper;</span><br><span class="line"><span class="keyword">import</span> org.springframework.jdbc.core.JdbcTemplate;</span><br><span class="line"><span class="keyword">import</span> org.springframework.test.context.ContextConfiguration;</span><br><span class="line"><span class="keyword">import</span> org.springframework.test.context.junit4.SpringJUnit4ClassRunner;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> java.util.List;</span><br><span class="line"></span><br><span class="line"><span class="meta">@RunWith</span>(SpringJUnit4ClassRunner<span class="class">.<span class="keyword">class</span>)</span></span><br><span class="line">@ContextConfiguration("classpath:applicationContext.xml")</span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">JdbcTemplateCRUDTest</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Autowired</span></span><br><span class="line">    <span class="keyword">private</span> JdbcTemplate jdbcTemplate;</span><br><span class="line">    <span class="meta">@Test</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">testUpdate</span><span class="params">()</span></span>&#123;</span><br><span class="line">        jdbcTemplate.update(<span class="string">"update account set money= ? where name = ?"</span>,<span class="number">10000</span>,<span class="string">"amy"</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="meta">@Test</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">testDelete</span><span class="params">()</span></span>&#123;</span><br><span class="line">        jdbcTemplate.update(<span class="string">"delete from account where name = ?"</span>,<span class="string">"tom"</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="meta">@Test</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">testQueryAll</span><span class="params">()</span></span>&#123;</span><br><span class="line">        List&lt;Account&gt; accountList = jdbcTemplate.query(<span class="string">"select * from account"</span>,<span class="keyword">new</span> BeanPropertyRowMapper&lt;Account&gt;(Account<span class="class">.<span class="keyword">class</span>))</span>;</span><br><span class="line">        System.out.println(accountList);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="meta">@Test</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">testQueryOne</span><span class="params">()</span></span>&#123;</span><br><span class="line">        Account account = jdbcTemplate.queryForObject("select * from account where name = ?",new BeanPropertyRowMapper&lt;Account&gt;(Account.class),"amy");</span><br><span class="line">        System.out.println(account);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="meta">@Test</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">testQueryCount</span><span class="params">()</span></span>&#123;</span><br><span class="line">        Long count = jdbcTemplate.queryForObject(<span class="string">"select count(*) from count"</span>,Long<span class="class">.<span class="keyword">class</span>)</span>;</span><br><span class="line">        System.out.println(count);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>如果要返回的值是个实体,就需要BeanPropertyRowMapper<Account>(Account.class)进行映射,让方法帮我封装实体</Account></p>
-<p>如果要返回的值是个简单值,就直接传Long.class,不用上面那么麻烦</p>
-<p>queryForObject是用来查询单个结果,query查询多个结果</p>
-
-      
-
-      
-    </div>
-    <div class="article-info article-info-index">
-      
-      
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color2">spring</a>
-        		</li>
-      		 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color5">Jdbc</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-      
-
-      
-        <p class="article-more-link">
-          <a class="article-more-a" href="/2020/06/14/Spring-JdbcTemplate/">展开全文 >></a>
-        </p>
-      
-
-      
-      <div class="clearfix"></div>
-    </div>
-  </div>
-</article>
-
-<aside class="wrap-side-operation">
-    <div class="mod-side-operation">
-        
-        <div class="jump-container" id="js-jump-container" style="display:none;">
-            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
-                <i class="icon-font icon-back"></i>
-            </a>
-            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
-                <i class="icon-font icon-plane jump-plane"></i>
-            </div>
-        </div>
-        
-        
-    </div>
-</aside>
-
-
-
-
-  
   
     <nav id="page-nav">
       <span class="page-number current">1</span><a class="page-number" href="/page/2/">2</a><a class="page-number" href="/page/3/">3</a><span class="space">&hellip;</span><a class="page-number" href="/page/5/">5</a><a class="extend next" rel="next" href="/page/2/">Next &amp;raquo;</a>
@@ -2624,6 +2625,10 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">同步</a>
+              </li>
+             
+              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color4">LeetCode</a>
               </li>
              
@@ -2636,7 +2641,7 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">同步</a>
+                <a href="javascript:void(0)" class="js-tag color4">序列化</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -2645,10 +2650,6 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color3">Java核心卷</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">序列化</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -2668,10 +2669,6 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">事务</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color4">AOP</a>
               </li>
              
@@ -2680,11 +2677,11 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">多线程</a>
+                <a href="javascript:void(0)" class="js-tag color1">SpringBoot</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">SpringMVC</a>
+                <a href="javascript:void(0)" class="js-tag color3">事务</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -2692,7 +2689,11 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">反射</a>
+                <a href="javascript:void(0)" class="js-tag color4">StringBuilder</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color5">SpringMVC</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -2700,11 +2701,7 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">StringBuilder</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">未来日记</a>
+                <a href="javascript:void(0)" class="js-tag color4">多线程</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -2716,11 +2713,15 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">设计模式</a>
+                <a href="javascript:void(0)" class="js-tag color5">未来日记</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">数组</a>
+                <a href="javascript:void(0)" class="js-tag color3">反射</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color5">设计模式</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -2728,11 +2729,11 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">接口</a>
+                <a href="javascript:void(0)" class="js-tag color3">数组</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">线程</a>
+                <a href="javascript:void(0)" class="js-tag color3">接口</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -2740,11 +2741,11 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">锁</a>
+                <a href="javascript:void(0)" class="js-tag color3">泛型</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">泛型</a>
+                <a href="javascript:void(0)" class="js-tag color3">线程</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -2752,7 +2753,7 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">错误处理</a>
+                <a href="javascript:void(0)" class="js-tag color2">锁</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -2760,11 +2761,11 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">静态</a>
+                <a href="javascript:void(0)" class="js-tag color5">错误处理</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">SpringBoot</a>
+                <a href="javascript:void(0)" class="js-tag color3">静态</a>
               </li>
             
             <div class="clearfix"></div>
