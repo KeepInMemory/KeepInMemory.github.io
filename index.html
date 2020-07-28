@@ -150,6 +150,80 @@
           <div id="js-content" class="content-ll">
             
   
+    <article id="post-二分算法" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2020/07/21/%E4%BA%8C%E5%88%86%E7%AE%97%E6%B3%95/">二分算法</a>
+    </h1>
+  
+
+        
+        <a href="/2020/07/21/%E4%BA%8C%E5%88%86%E7%AE%97%E6%B3%95/" class="archive-article-date">
+  	<time datetime="2020-07-21T02:41:29.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2020-07-21</time>
+</a>
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>二分算法模板</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">binary_search</span><span class="params">(<span class="keyword">int</span>[] nums, <span class="keyword">int</span> target)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">int</span> left = <span class="number">0</span>, right = nums.length - <span class="number">1</span>; </span><br><span class="line">    <span class="keyword">while</span>(left &lt;= right) &#123;</span><br><span class="line">        <span class="keyword">int</span> mid = left + (right - left) / <span class="number">2</span>;</span><br><span class="line">        <span class="keyword">if</span> (nums[mid] &lt; target) &#123;</span><br><span class="line">            left = mid + <span class="number">1</span>;</span><br><span class="line">        &#125; <span class="keyword">else</span> <span class="keyword">if</span> (nums[mid] &gt; target) &#123;</span><br><span class="line">            right = mid - <span class="number">1</span>; </span><br><span class="line">        &#125; <span class="keyword">else</span> <span class="keyword">if</span>(nums[mid] == target) &#123;</span><br><span class="line">            <span class="comment">// 直接返回</span></span><br><span class="line">            <span class="keyword">return</span> mid;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// 直接返回</span></span><br><span class="line">    <span class="keyword">return</span> -<span class="number">1</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">left_bound</span><span class="params">(<span class="keyword">int</span>[] nums, <span class="keyword">int</span> target)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">int</span> left = <span class="number">0</span>, right = nums.length - <span class="number">1</span>;</span><br><span class="line">    <span class="keyword">while</span> (left &lt;= right) &#123;</span><br><span class="line">        <span class="keyword">int</span> mid = left + (right - left) / <span class="number">2</span>;</span><br><span class="line">        <span class="keyword">if</span> (nums[mid] &lt; target) &#123;</span><br><span class="line">            left = mid + <span class="number">1</span>;</span><br><span class="line">        &#125; <span class="keyword">else</span> <span class="keyword">if</span> (nums[mid] &gt; target) &#123;</span><br><span class="line">            right = mid - <span class="number">1</span>;</span><br><span class="line">        &#125; <span class="keyword">else</span> <span class="keyword">if</span> (nums[mid] == target) &#123;</span><br><span class="line">            <span class="comment">// 别返回，锁定左侧边界</span></span><br><span class="line">            right = mid - <span class="number">1</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// 最后要检查 left 越界的情况</span></span><br><span class="line">    <span class="keyword">if</span> (left &gt;= nums.length || nums[left] != target)</span><br><span class="line">        <span class="keyword">return</span> -<span class="number">1</span>;</span><br><span class="line">    <span class="keyword">return</span> left;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">right_bound</span><span class="params">(<span class="keyword">int</span>[] nums, <span class="keyword">int</span> target)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">int</span> left = <span class="number">0</span>, right = nums.length - <span class="number">1</span>;</span><br><span class="line">    <span class="keyword">while</span> (left &lt;= right) &#123;</span><br><span class="line">        <span class="keyword">int</span> mid = left + (right - left) / <span class="number">2</span>;</span><br><span class="line">        <span class="keyword">if</span> (nums[mid] &lt; target) &#123;</span><br><span class="line">            left = mid + <span class="number">1</span>;</span><br><span class="line">        &#125; <span class="keyword">else</span> <span class="keyword">if</span> (nums[mid] &gt; target) &#123;</span><br><span class="line">            right = mid - <span class="number">1</span>;</span><br><span class="line">        &#125; <span class="keyword">else</span> <span class="keyword">if</span> (nums[mid] == target) &#123;</span><br><span class="line">            <span class="comment">// 别返回，锁定右侧边界</span></span><br><span class="line">            left = mid + <span class="number">1</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// 最后要检查 right 越界的情况</span></span><br><span class="line">    <span class="keyword">if</span> (right &lt; <span class="number">0</span> || nums[right] != target)</span><br><span class="line">        <span class="keyword">return</span> -<span class="number">1</span>;</span><br><span class="line">    <span class="keyword">return</span> right;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+      
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
+	<div class="article-tag tagcloud">
+		<i class="icon-price-tags icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">LeetCode</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
+      
+
+      
+        <p class="article-more-link">
+          <a class="article-more-a" href="/2020/07/21/%E4%BA%8C%E5%88%86%E7%AE%97%E6%B3%95/">展开全文 >></a>
+        </p>
+      
+
+      
+      <div class="clearfix"></div>
+    </div>
+  </div>
+</article>
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+    </div>
+</aside>
+
+
+
+
+  
     <article id="post-SpringBoot源码体会" class="article article-type-post  article-index" itemscope itemprop="blogPost">
   <div class="article-inner">
     
@@ -193,7 +267,7 @@
 <p>WebMvcAutoConfiguration自动配置类下还有一个生成视图解析器的方法</p>
 <p><img src="/2020/07/20/SpringBoot%E6%BA%90%E7%A0%81%E4%BD%93%E4%BC%9A/3.png" alt="3"></p>
 <p>ContentNegotiatingViewResolver组合容器中所有的视图解析器</p>
-<h4 id="如何修改SpringBoot的默认配置"><a href="#如何修改SpringBoot的默认配置" class="headerlink" title="如何修改SpringBoot的默认配置"></a>如何修改SpringBoot的默认配置</h4><p>SpringBoot在自动配置很多组件的时候，先看容器中有没有用户自己配置的（@Bean、@Component）如果有就用用户配置的，如果没有，才自动配置；如果有些组件可以有多个（比如ViewResolver）将用户配置的和自己默认的组合起来（可以借助implements xxxCustomizer、xxxConfigurer，也可以借助直接implements要实现的组件类等其他的方式）；</p>
+<h4 id="如何修改SpringBoot的默认配置"><a href="#如何修改SpringBoot的默认配置" class="headerlink" title="如何修改SpringBoot的默认配置"></a>如何修改SpringBoot的默认配置</h4><p>SpringBoot在自动配置很多组件的时候，先看容器中有没有用户自己配置的（@Bean、@Component）如果有就用用户配置的，如果没有，才自动配置；如果有些组件可以有多个（比如ViewResolver）将用户配置的和自己默认的组合起来（<strong>可以借助implements xxxCustomizer、xxxConfigurer，也可以借助直接implements要实现的组件类等其他的方式</strong>）；</p>
 <p>在SpringBoot中会有非常多的xxxConfigurer帮助我们进行扩展配置</p>
 <p>在SpringBoot中会有很多的xxxCustomizer帮助我们进行定制配置</p>
 
@@ -1581,7 +1655,14 @@
 
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com.atguigu.starter;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> org.springframework.beans.factory.annotation.Autowired;</span><br><span class="line"><span class="keyword">import</span> org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication;</span><br><span class="line"><span class="keyword">import</span> org.springframework.boot.context.properties.EnableConfigurationProperties;</span><br><span class="line"><span class="keyword">import</span> org.springframework.context.annotation.Bean;</span><br><span class="line"><span class="keyword">import</span> org.springframework.context.annotation.Configuration;</span><br><span class="line"></span><br><span class="line"><span class="meta">@Configuration</span></span><br><span class="line"><span class="meta">@ConditionalOnWebApplication</span> <span class="comment">//web应用才生效</span></span><br><span class="line"><span class="meta">@EnableConfigurationProperties</span>(HelloProperties<span class="class">.<span class="keyword">class</span>)</span></span><br><span class="line"><span class="class"><span class="title">public</span> <span class="title">class</span> <span class="title">HelloServiceAutoConfiguration</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Autowired</span></span><br><span class="line">    HelloProperties helloProperties;</span><br><span class="line">    <span class="meta">@Bean</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> HelloService <span class="title">helloService</span><span class="params">()</span></span>&#123;</span><br><span class="line">        HelloService service = <span class="keyword">new</span> HelloService();</span><br><span class="line">        service.setHelloProperties(helloProperties);</span><br><span class="line">        <span class="keyword">return</span> service;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
-<h1 id="更多SpringBoot整合示例"><a href="#更多SpringBoot整合示例" class="headerlink" title="更多SpringBoot整合示例"></a>更多SpringBoot整合示例</h1><p><a href="https://github.com/spring-projects/spring-boot/tree/master/spring-boot-samples" target="_blank" rel="noopener">https://github.com/spring-projects/spring-boot/tree/master/spring-boot-samples</a></p>
+
+
+<p>测试</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com.atguigu.springboot.controller;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> com.atguigu.starter.HelloService;</span><br><span class="line"><span class="keyword">import</span> org.springframework.beans.factory.annotation.Autowired;</span><br><span class="line"><span class="keyword">import</span> org.springframework.web.bind.annotation.GetMapping;</span><br><span class="line"><span class="keyword">import</span> org.springframework.web.bind.annotation.RestController;</span><br><span class="line"></span><br><span class="line"><span class="meta">@RestController</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">HelloController</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Autowired</span></span><br><span class="line">    HelloService helloService;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@GetMapping</span>(<span class="string">"/hello"</span>)</span><br><span class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">hello</span><span class="params">()</span></span>&#123;</span><br><span class="line">        <span class="keyword">return</span> helloService.sayHellAtguigu(<span class="string">"haha"</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>HelloProperties也是从容器中注入的，@ConfigurationProperties(prefix = “atguigu.hello”)读取类路径下的配置文件，选择前缀为atguigu.hello的属性</p>
+<p>自动配置类中通过@EnableConfigurationProperties(HelloProperties.class)引入了HelloProperties，new了一个要注册到容器的HelloService，将properties对象放到HelloService对象里，最后将HelloService通过@Bean放入容器中</p>
+<p>测试里直接从容器获取了HelloService对象，在它的sayhello方法里结合获取的HelloService.HelloProperties对象的属性值输出</p>
 
       
 
@@ -1655,14 +1736,49 @@
     
     <div class="article-entry" itemprop="articleBody">
       
-        <h4 id="同步阻塞"><a href="#同步阻塞" class="headerlink" title="同步阻塞"></a>同步阻塞</h4><p>当对面Socket来了IO请求的时候，对面的Socket在等(同步)，我也在准备数据，准备了一段时间(阻塞)准备好了返回给对方</p>
-<h4 id="同步非阻塞"><a href="#同步非阻塞" class="headerlink" title="同步非阻塞"></a>同步非阻塞</h4><p>当对面Socket来了IO请求的时候，对面的Socket在等(同步)，我还没准备好，就先返回给对面Error，对面一看Error知道我还没准备好，他就去做别的事情了(非阻塞)，等过段时间再来询问。</p>
-<h4 id="异步阻塞-IO多路复用"><a href="#异步阻塞-IO多路复用" class="headerlink" title="异步阻塞(IO多路复用)"></a>异步阻塞(IO多路复用)</h4><p>I/O 多路复用模型是利用select、poll、epoll可以同时监察多个流的 I/O 事件的能力，在空闲的时候，会把当前线程阻塞掉，当有一个或多个流有I/O事件时，就从阻塞态中唤醒，于是程序就会轮询一遍所有的流（epoll是只轮询那些真正发出了事件的流），依次顺序的处理就绪的流，这种做法就避免了大量的无用操作。</p>
-<p>当用户进程Socket调用了select，那么整个进程会被block，而同时，kernel会“监视”所有select负责的用户Socket，当任何一个Socket中的数据准备好了，select就会返回。等用户进程再调用read操作，将数据从kernel拷贝到用户进程。</p>
-<p>这里的所说的阻塞是指select函数执行时线程被阻塞，而不是指socket。异步指的是Socket请求后就去做别的事情了，下次再来read的时候对面数据就准备好了。</p>
-<p>下面举一个例子，模拟一个tcp服务器处理30个客户socket。<br>假设你是一个老师，让30个学生解答一道题目，然后检查学生做的是否正确，你有下面几个选择：</p>
-<p>\1. 第一种选择：<strong>按顺序逐个检查</strong>，先检查A，然后是B，之后是C、D。。。这中间如果有一个学生卡主，全班都会被耽误。<br>这种模式就好比，你用循环挨个处理socket，根本不具有并发能力。<br>\2. 第二种选择：你<strong>创建30个分身</strong>，每个分身检查一个学生的答案是否正确。 这种类似于为每一个用户创建一个进程或者线程处理连接。<br>\3. 第三种选择，你<strong>站在讲台上等，谁解答完谁举手</strong>。这时C、D举手，表示他们解答问题完毕，你下去依次检查C、D的答案，然后继续回到讲台上等。此时E、A又举手，然后去处理E和A。。。<br>这种就是IO复用模型，Linux下的select、poll和epoll就是干这个的。将用户socket对应的fd注册进epoll，然后epoll帮你监听哪些socket上有消息到达(poll是全部轮询一遍，epoll只轮询那些真正发出了事件的流)，这样就避免了大量的无用操作。此时的socket应该采用<strong>非阻塞模式</strong>。<br>这样，整个过程只在调用select、poll、epoll这些调用的时候才会阻塞，收发客户消息是不会阻塞的(因为用户Socket下次来的时候数据已经准备好了)，整个进程或者线程就被充分利用起来，这就是<strong>事件驱动</strong>，所谓的reactor模式</p>
-<h4 id="异步非阻塞"><a href="#异步非阻塞" class="headerlink" title="异步非阻塞"></a>异步非阻塞</h4><p>在异步IO模型中，当用户线程发起read操作之后，立刻就可以开始去做其它的事。而另一方面，从内核的角度，当它受到一个asynchronous read之后，它会立刻返回，说明read请求已经成功发起了，因此不会对用户线程产生任何block。然后，内核会等待数据准备完成，当这一切都完成之后，内核会给用户线程发送一个信号，告诉它read操作完成了。(同步的话是等着用户线程下次再来询问)也就说用户线程完全不需要关心实际的整个IO操作是如何进行的，只需要先发起一个请求，当接收内核返回的成功信号时表示IO操作已经完成，可以直接去使用数据了。</p>
+        <h1 id="10分钟看懂，-Java-NIO-底层原理"><a href="#10分钟看懂，-Java-NIO-底层原理" class="headerlink" title="10分钟看懂， Java  NIO   底层原理"></a><a href="https://www.cnblogs.com/crazymakercircle/p/10225159.html" target="_blank" rel="noopener">10分钟看懂， Java  NIO   底层原理</a></h1><p><img src="https://img-blog.csdnimg.cn/20190105163657587.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L2NyYXp5bWFrZXJjaXJjbGU=,size_16,color_FFFFFF,t_70" alt="0"></p>
+<p>操作系统使用read函数把数据从内核缓冲区复制到进程缓冲区，write把数据从进程缓冲区复制到内核缓冲区中。</p>
+<p>（1）客户端请求</p>
+<p>Linux通过网卡，读取客户断的请求数据，将数据读取到内核缓冲区。</p>
+<p>（2）获取请求数据</p>
+<p>服务器从内核缓冲区读取数据到Java进程缓冲区。</p>
+<p>（1）服务器端业务处理</p>
+<p>Java服务端在自己的用户空间中，处理客户端的请求。</p>
+<p>（2）服务器端返回数据</p>
+<p>Java服务端已构建好的响应，从用户缓冲区写入系统缓冲区。</p>
+<p>（3）发送给客户端</p>
+<p>Linux内核通过网络 I/O ，将内核缓冲区中的数据，写入网卡，网卡通过底层的通讯协议，会将数据发送给目标客户端。</p>
+<h4 id="同步阻塞（BIO）"><a href="#同步阻塞（BIO）" class="headerlink" title="同步阻塞（BIO）"></a>同步阻塞（BIO）</h4><p>同步阻塞io(Blocking, synchronous)：client在调用read（）方法时，stream里没有数据可读，线程停止向下执行，直至stream有数据。</p>
+<p><img src="https://img-blog.csdnimg.cn/20190105163801795.jpg?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L2NyYXp5bWFrZXJjaXJjbGU=,size_16,color_FFFFFF,t_70" alt="1"></p>
+<p>（1）当用户线程调用了read系统调用，内核（kernel）就开始了IO的第一个阶段：准备数据。很多时候，数据在一开始还没有到达（比如，还没有收到一个完整的Socket数据包），这个时候kernel就要等待足够的数据到来。</p>
+<p>（2）当kernel一直等到数据准备好了，它就会将数据从kernel内核缓冲区，拷贝到用户缓冲区（用户内存），然后kernel返回结果。</p>
+<p>（3）从开始IO读的read系统调用开始，用户线程就进入阻塞状态。一直到kernel返回结果后，用户线程才解除block的状态，重新运行起来。</p>
+<p>BIO的优点：</p>
+<p>程序简单，在阻塞等待数据期间，用户线程挂起。用户线程基本不会占用 CPU 资源。</p>
+<p>BIO的缺点：</p>
+<p>一般情况下，会为每个连接配套一条独立的线程，或者说一条线程维护一个连接成功的IO流的读写。在并发量小的情况下，这个没有什么问题。但是，当在高并发的场景下，需要大量的线程来维护大量的网络连接，内存、线程切换开销会非常巨大。因此，基本上，BIO模型在高并发场景下是不可用的。</p>
+<h4 id="同步非阻塞（NIO）"><a href="#同步非阻塞（NIO）" class="headerlink" title="同步非阻塞（NIO）"></a>同步非阻塞（NIO）</h4><p><img src="https://img-blog.csdnimg.cn/20190105163821398.jpg?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L2NyYXp5bWFrZXJjaXJjbGU=,size_16,color_FFFFFF,t_70" alt="2"></p>
+<p>（1）在内核数据没有准备好的阶段，用户线程发起IO请求时，立即返回。用户线程需要不断地发起IO系统调用。</p>
+<p>（2）内核数据到达后，用户线程发起系统调用，用户线程阻塞。内核开始复制数据。它就会将数据从kernel内核缓冲区，拷贝到用户缓冲区（用户内存），然后kernel返回结果。</p>
+<p>（3）用户线程才解除block的状态，重新运行起来。经过多次的尝试，用户线程终于真正读取到数据，继续执行。</p>
+<p>NIO的特点：</p>
+<p>应用程序的线程需要不断的进行 I/O 系统调用，轮询数据是否已经准备好，如果没有准备好，继续轮询，直到完成系统调用为止。</p>
+<p>NIO的优点：每次发起的 IO 系统调用，在内核的等待数据过程中可以立即返回。用户线程不会阻塞，实时性较好。</p>
+<p>NIO的缺点：需要不断的重复发起IO系统调用，这种不断的轮询，将会不断地询问内核，这将占用大量的 CPU 时间，系统资源利用率较低。</p>
+<p>总之，NIO模型在高并发场景下，也是不可用的。一般 Web 服务器不使用这种 IO 模型。一般很少直接使用这种模型，而是在其他IO模型中使用非阻塞IO这一特性。java的实际开发中，也不会涉及这种IO模型。</p>
+<p><strong>再次说明，Java NIO（New IO） 不是IO模型中的NIO模型，而是另外的一种模型，叫做IO多路复用模型（ IO multiplexing ）。</strong></p>
+<h4 id="IO多路复用"><a href="#IO多路复用" class="headerlink" title="IO多路复用"></a>IO多路复用</h4><p>I/O 多路复用模型是利用select、poll、epoll可以同时监察多个流的 I/O 事件的能力，在空闲的时候，会把当前线程阻塞掉，当有一个或多个流有I/O事件时，就从阻塞态中唤醒，于是程序就会轮询一遍所有的流（epoll是只轮询那些真正发出了事件的流），依次顺序的处理就绪的流，这种做法就避免了大量的无用操作。</p>
+<p>当用户进程Socket调用了select，那么整个进程会被block，而同时，kernel会“监视”所有select负责的用户Socket，当发给任何一个Socket中的数据准备好了，select就会返回。等用户进程再调用read操作，将数据从kernel拷贝到用户进程。</p>
+<p><img src="https://img-blog.csdnimg.cn/20190105163846560.jpg?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L2NyYXp5bWFrZXJjaXJjbGU=,size_16,color_FFFFFF,t_70" alt="3"></p>
+<p>多路复用IO的优点：</p>
+<p>用select/epoll的优势在于，它可以同时处理成千上万个连接（connection）。与一条线程维护一个连接相比，I/O多路复用技术的最大优势是：系统不必创建线程，也不必维护这些线程，从而大大减小了系统的开销。</p>
+<p>多路复用IO的缺点：</p>
+<p>本质上，select/epoll系统调用，属于同步IO，也是阻塞IO。都需要在读写事件就绪后，自己负责进行读写，也就是说这个读写过程是阻塞的。</p>
+<h4 id="异步IO（AIO）"><a href="#异步IO（AIO）" class="headerlink" title="异步IO（AIO）"></a>异步IO（AIO）</h4><p>（1）当用户线程调用了read系统调用，立刻就可以开始去做其它的事，用户线程不阻塞。</p>
+<p>（2）内核（kernel）就开始了IO的第一个阶段：准备数据。当kernel一直等到数据准备好了，它就会将数据从kernel内核缓冲区，拷贝到用户缓冲区（用户内存）。</p>
+<p>（3）kernel会给用户线程发送一个信号（signal），或者回调用户线程注册的回调接口，告诉用户线程read操作完成了。</p>
+<p>（4）用户线程读取用户缓冲区的数据，完成后续的业务操作。</p>
+<p><img src="https://img-blog.csdnimg.cn/20190105163914730.jpg?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L2NyYXp5bWFrZXJjaXJjbGU=,size_16,color_FFFFFF,t_70" alt="4"></p>
 
       
 
@@ -1793,19 +1909,19 @@
 
 
   
-    <article id="post-集合面经" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+    <article id="post-HashMap" class="article article-type-post  article-index" itemscope itemprop="blogPost">
   <div class="article-inner">
     
       <header class="article-header">
         
   
     <h1 itemprop="name">
-      <a class="article-title" href="/2020/06/29/%E9%9B%86%E5%90%88%E9%9D%A2%E7%BB%8F/">集合面经</a>
+      <a class="article-title" href="/2020/06/29/HashMap/">HashMap</a>
     </h1>
   
 
         
-        <a href="/2020/06/29/%E9%9B%86%E5%90%88%E9%9D%A2%E7%BB%8F/" class="archive-article-date">
+        <a href="/2020/06/29/HashMap/" class="archive-article-date">
   	<time datetime="2020-06-29T01:19:17.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2020-06-29</time>
 </a>
         
@@ -1815,12 +1931,15 @@
       
         <h3 id="HashMap"><a href="#HashMap" class="headerlink" title="HashMap"></a>HashMap</h3><h4 id="什么是HashMap"><a href="#什么是HashMap" class="headerlink" title="什么是HashMap"></a>什么是HashMap</h4><p>HashMap是基于哈希表的Map接口实现，它是以key-value存储形式存在，用来放键值对</p>
 <p>它的特点是，1.存取是无序的 2.键值都可以为null，但是键最多只能有一个null</p>
-<p>JDK1.8之前是由数组+链表组成的，数组是HashMap的主体，用数组是为了方便索引查询，链表则是为了解决哈希冲突。HashMap的默认初始长度是16，</p>
-<p>JDK1.8以前有两个缺点，一是线程不安全的，Rehash时可能会产生死锁。二是有安全漏洞，黑客可以通过精心构造的恶意请求进行Dos攻击。在哈希碰撞多了以后，哈希桶会退化成链表，查询效率也从O(1)变为O(n)</p>
+<p>JDK1.8之前是由数组+链表组成的，数组是HashMap的主体，用数组是为了方便索引查询，链表则是为了解决哈希冲突。HashMap的默认初始长度是16，采用头插法</p>
+<p>JDK1.8以前有两个缺点，一是线程不安全的，Rehash时可能会产生死锁。二是在哈希碰撞多了以后，哈希桶会退化成链表，查询效率也从O(1)变为O(n)</p>
+<p>JDK1.8为了解决Rehash时可能会产生死锁的问题采用了尾插法</p>
 <p>JDK1.8之后为了解决哈希碰撞严重后退化成链表的问题，数据结构改为了数组+链表+红黑树的形式，当链表长度大于阈值8并且当前数组的长度大于64时，此时该哈希桶上的所有数据改为红黑树存储，如果链表长度大于8但是数组长度小于64不会改成红黑树，而是进行数组扩容。这是因为数组较小，搜索时间相对较短，红黑树需要进行左旋右旋变色等操作来保持平衡，改成红黑树反而会降低效率。当哈希桶元素数量降到6就退化成为链表。</p>
 <p>JDK1.8虽然解决了Rehash时死锁的问题，但还是会存在其他多线程不安全的问题，并发环境下使用ConcurrentHashMap</p>
 <h4 id="为什么数组大小一定是2的幂"><a href="#为什么数组大小一定是2的幂" class="headerlink" title="为什么数组大小一定是2的幂"></a>为什么数组大小一定是2的幂</h4><p>Hash值范围大概是40亿个数，不可能创建一个40亿长度的数组，内存就爆了，所以计算后的hash值是不能拿来直接用的，还需要进行计算索引值，一般是进行取模操作，源码中在计算出hash值之后有个indexFor方法计算索引值，计算方法是hash&amp;(length-1)，如果是2的n次方，即10000…后面全是0，减一后会变成01111..后面全是1，此时跟哈希值按位与的话能让数据分配均匀，减少碰撞。如果不是2的幂，那么某些位会成为0，此时hash值和0与怎么样都是0，结果是有些Hash桶永远是空的。</p>
-<p>数组长度-1正好相当于一个“低位掩码”。“与”操作的结果就是散列值的高位全部归零，只保留低位值，用来做数组下标访问。</p>
+<p>数组长度-1正好相当于一个“低位掩码”。“与”操作的结果就是散列值的高位全部归零，只保留低位值，用来做数组下标访问。我们知道，位运算的代价比求模运算小的多，因此在进行这种计算时用位运算的话能带来更高的性能。</p>
+<p>确定桶下标的最后一步是将 key 的 hash 值对桶个数取模：hash%capacity，如果能保证 capacity 为 2 的 n 次方，那么就可以将这个操作转换为位运算。</p>
+<p>如果传入的数字不是2的n次幂，比如10，Hash Map会计算出大于这个数的最接近这个数的2的n次幂，为16</p>
 <h4 id="什么是红黑树"><a href="#什么是红黑树" class="headerlink" title="什么是红黑树"></a>什么是红黑树</h4><p>红黑树是一个二叉平衡树，二叉树的平均查找时间是O(logn)，如果不巧可能会成为一条线，退化成链表。所以红黑树通过旋转等的操作，保证自己是平衡的。</p>
 <h4 id="红黑树原则"><a href="#红黑树原则" class="headerlink" title="红黑树原则"></a>红黑树原则</h4><p>1.构成树的结点拥有一个颜色属性，要么是黑要么是红</p>
 <p>2.根节点必须是黑色的，叶子节点必须是黑色的</p>
@@ -1838,7 +1957,7 @@
 <p>一是slot==null，把put方法传进来的key,value包装成一个node对象，放到slot里</p>
 <p>二是slot!=null，node没有链化。先对比node.key与put传入的key是否完全相等，相等就直接替换，用传入的value替换node.value，不相等就是哈希冲突，在slot的node后插入</p>
 <p>三是slot!=null，node已经链化。迭代查找node.key与put传入的key是否完全相等，相等就直接替换，用传入的value替换node.value，不相等就是哈希冲突，在slot尾部的node后插入。插入后检查当前链表长度有没有达到树化阈值，如果达到阈值就在put中完成树化</p>
-<p>四是slot!-null，node已经树化。TreeNode继承了Node结构，增加了指向父节点的parent、指向左孩子的left、有孩子的right和颜色属性。红黑树的插入首先是找到插入的父节点，找父节点和二叉排序树是一样的，二叉排序树左孩子小于当前节点，右孩子大于当前节点。插入有两种情况，一是一直向下探测，直到叶子节点，将叶子节点作为父节点在左或者右插入，插入后有可能会打破平衡，有个平衡算法进行调整。二是向下探测过程中发现node.key和传入的key相同，进行一次替换操作。</p>
+<p>四是slot!-null，node已经树化。TreeNode继承了Node结构，增加了指向父节点的parent、指向左孩子的left、右孩子的right和颜色属性。红黑树的插入首先是找到插入的父节点，找父节点和二叉排序树是一样的，二叉排序树左孩子小于当前节点，右孩子大于当前节点。插入有两种情况，一是一直向下探测，直到叶子节点，将叶子节点作为父节点在左或者右插入，插入后有可能会打破平衡，有个平衡算法进行调整。二是向下探测过程中发现node.key和传入的key相同，进行一次替换操作。</p>
 <h4 id="Rehash操作"><a href="#Rehash操作" class="headerlink" title="Rehash操作"></a>Rehash操作</h4><p>根据槽内状态分为四种</p>
 <p>一是slot==null，不用进行迁移</p>
 <p>二是slot!=null，node没有链化。如果node.next为null，根据新表的table.length计算出下标，直接进行迁移</p>
@@ -1867,7 +1986,7 @@
 
       
         <p class="article-more-link">
-          <a class="article-more-a" href="/2020/06/29/%E9%9B%86%E5%90%88%E9%9D%A2%E7%BB%8F/">展开全文 >></a>
+          <a class="article-more-a" href="/2020/06/29/HashMap/">展开全文 >></a>
         </p>
       
 
@@ -2414,112 +2533,6 @@
 
 
   
-    <article id="post-Spring-事务控制" class="article article-type-post  article-index" itemscope itemprop="blogPost">
-  <div class="article-inner">
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2020/06/15/Spring-%E4%BA%8B%E5%8A%A1%E6%8E%A7%E5%88%B6/">Spring 事务控制</a>
-    </h1>
-  
-
-        
-        <a href="/2020/06/15/Spring-%E4%BA%8B%E5%8A%A1%E6%8E%A7%E5%88%B6/" class="archive-article-date">
-  	<time datetime="2020-06-15T01:07:24.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2020-06-15</time>
-</a>
-        
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <p>编程式事务控制：自己编写代码实现事务控制</p>
-<p>声明式事务控制：通过配置方式实现事务控制，解耦合</p>
-<p>运用到了AOP思想，Spring声明式事务控制底层就是AOP，切点是业务方法，通知是事务控制方法，通过在xml中织入可以形成切面</p>
-<h4 id="基于XML的Spring事务控制"><a href="#基于XML的Spring事务控制" class="headerlink" title="基于XML的Spring事务控制"></a>基于XML的Spring事务控制</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com.it.service.impl;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> com.it.dao.AccountDao;</span><br><span class="line"><span class="keyword">import</span> com.it.service.AccountService;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">AccountServiceImpl</span> <span class="keyword">implements</span> <span class="title">AccountService</span> </span>&#123;</span><br><span class="line">    <span class="keyword">private</span> AccountDao accountDao;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setAccountDao</span><span class="params">(AccountDao accountDao)</span></span>&#123;<span class="keyword">this</span>.accountDao = accountDao;&#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">//outMan把钱转给inMan</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">transfer</span><span class="params">(String outMan, String inMan, <span class="keyword">double</span> money)</span> </span>&#123;</span><br><span class="line">        accountDao.out(outMan, money);</span><br><span class="line">        accountDao.in(inMan, money);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>转账业务里，如果out执行后发生了异常，in得不到执行，会导致钱的不平衡</p>
-<p>声明式事务控制：1.平台事务管理器配置 2.事务通知配置 3.事务aop织入配置</p>
-<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br></pre></td><td class="code"><pre><span class="line">&lt;?xml version=<span class="string">"1.0"</span> encoding=<span class="string">"UTF-8"</span>?&gt;</span><br><span class="line">&lt;beans xmlns=<span class="string">"http://www.springframework.org/schema/beans"</span></span><br><span class="line">       xmlns:xsi=<span class="string">"http://www.w3.org/2001/XMLSchema-instance"</span></span><br><span class="line">       xmlns:aop=<span class="string">"http://www.springframework.org/schema/aop"</span></span><br><span class="line">       xmlns:tx=<span class="string">"http://www.springframework.org/schema/tx"</span></span><br><span class="line">       xsi:schemaLocation=<span class="string">"http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd</span></span><br><span class="line"><span class="string">                            http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd</span></span><br><span class="line"><span class="string">                            http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd"</span>&gt;</span><br><span class="line"></span><br><span class="line">&lt;!--配置数据源对象--&gt;</span><br><span class="line">    &lt;bean id=<span class="string">"dataSource"</span> <span class="class"><span class="keyword">class</span></span>=<span class="string">"com.mchange.v2.c3p0.ComboPooledDataSource"</span>&gt;</span><br><span class="line">        &lt;property name="driverClass" value="com.mysql.cj.jdbc.Driver"&gt;&lt;/property&gt;</span><br><span class="line">        &lt;property name="jdbcUrl" value="jdbc:mysql://127.0.0.1:3306/test?serverTimezone=GMT"&gt;&lt;/property&gt;</span><br><span class="line">        &lt;property name="user" value="root"&gt;&lt;/property&gt;</span><br><span class="line">        &lt;property name="password" value="root"&gt;&lt;/property&gt;</span><br><span class="line">    &lt;/bean&gt;</span><br><span class="line">&lt;!--配置Jdbc模板对象--&gt;</span><br><span class="line">    &lt;bean id=<span class="string">"jdbcTemplate"</span> <span class="class"><span class="keyword">class</span></span>=<span class="string">"org.springframework.jdbc.core.JdbcTemplate"</span>&gt;</span><br><span class="line">        &lt;property name="dataSource" ref="dataSource"&gt;&lt;/property&gt;</span><br><span class="line">    &lt;/bean&gt;</span><br><span class="line"></span><br><span class="line">    &lt;bean id=<span class="string">"accountDao"</span> <span class="class"><span class="keyword">class</span></span>=<span class="string">"com.it.dao.impl.AccountDaoImpl"</span>&gt;</span><br><span class="line">        &lt;property name="jdbcTemplate" ref="jdbcTemplate"&gt;&lt;/property&gt;</span><br><span class="line">    &lt;/bean&gt;</span><br><span class="line"></span><br><span class="line">&lt;!--目标对象，切点--&gt;</span><br><span class="line">    &lt;bean id=<span class="string">"accountService"</span> <span class="class"><span class="keyword">class</span></span>=<span class="string">"com.it.service.impl.AccountServiceImpl"</span>&gt;</span><br><span class="line">        &lt;property name="accountDao" ref="accountDao"&gt;&lt;/property&gt;</span><br><span class="line">    &lt;/bean&gt;</span><br><span class="line"></span><br><span class="line">&lt;!--配置平台事务管理器--&gt;</span><br><span class="line">    &lt;bean id=<span class="string">"transactionManger"</span> <span class="class"><span class="keyword">class</span></span>=<span class="string">"org.springframework.jdbc.datasource.DataSourceTransactionManager"</span>&gt;</span><br><span class="line">        &lt;!-- 会从dataSource里getConnection()--&gt;</span><br><span class="line">        &lt;property name="dataSource" ref="dataSource"&gt;&lt;/property&gt;</span><br><span class="line">    &lt;/bean&gt;</span><br><span class="line">&lt;!--通知 事务的增强--&gt;</span><br><span class="line">    &lt;tx:advice id=<span class="string">"txAdvice"</span> transaction-manager=<span class="string">"transactionManger"</span>&gt;</span><br><span class="line">        &lt;!--设置事务的属性信息--&gt;</span><br><span class="line">        &lt;tx:attributes&gt;</span><br><span class="line">            &lt;tx:method name="tranfer" isolation="DEFAULT" read-only="false"&gt;&lt;/tx:method&gt;</span><br><span class="line">            &lt;tx:method name=<span class="string">"*"</span>/&gt;</span><br><span class="line">        &lt;/tx:attributes&gt;</span><br><span class="line">    &lt;/tx:advice&gt;</span><br><span class="line"></span><br><span class="line">&lt;!--配置事务AOP织入 事务的增强用aop:advisor--&gt;</span><br><span class="line">    &lt;aop:config&gt;</span><br><span class="line">        &lt;aop:advisor advice-ref="txAdvice" pointcut="execution(* com.it.service.impl.*.*(..))"&gt;&lt;/aop:advisor&gt;</span><br><span class="line">    &lt;/aop:config&gt;</span><br><span class="line">&lt;/beans&gt;</span><br></pre></td></tr></table></figure>
-
-<p>进行事务控制后，上面的转账代码出现异常，也不会出现outMan钱少InMan钱不变的情况，结果会是OutMan和InMan的钱都没动</p>
-<p>平台事务管理器根据需求变，不同的Dao层用不同的事务管理器</p>
-<p><a href="tx:attributes">tx:attributes</a>里面用tx:method代表切点方法事务的具体参数配置，*代表所有方法，后面可以配置事务属性isolation隔离级别，read-only只读属性等等</p>
-<p>配置AOP织入时，不用aop:aspect，用专门事务增强的ad:advisor</p>
-<h4 id="基于注解的Spring事务控制"><a href="#基于注解的Spring事务控制" class="headerlink" title="基于注解的Spring事务控制"></a>基于注解的Spring事务控制</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com.it.service.impl;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> com.it.dao.AccountDao;</span><br><span class="line"><span class="keyword">import</span> com.it.service.AccountService;</span><br><span class="line"><span class="keyword">import</span> org.springframework.beans.factory.annotation.Autowired;</span><br><span class="line"><span class="keyword">import</span> org.springframework.stereotype.Service;</span><br><span class="line"><span class="keyword">import</span> org.springframework.transaction.annotation.Isolation;</span><br><span class="line"><span class="keyword">import</span> org.springframework.transaction.annotation.Transactional;</span><br><span class="line"></span><br><span class="line"><span class="meta">@Service</span>(<span class="string">"accountService"</span>)</span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">AccountServiceImpl</span> <span class="keyword">implements</span> <span class="title">AccountService</span> </span>&#123;</span><br><span class="line">    <span class="meta">@Autowired</span></span><br><span class="line">    <span class="keyword">private</span> AccountDao accountDao;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setAccountDao</span><span class="params">(AccountDao accountDao)</span></span>&#123;<span class="keyword">this</span>.accountDao = accountDao;&#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Transactional</span>(isolation = Isolation.DEFAULT,readOnly = <span class="keyword">false</span>)</span><br><span class="line">    <span class="comment">//outMan把钱转给inMan</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">transfer</span><span class="params">(String outMan, String inMan, <span class="keyword">double</span> money)</span> </span>&#123;</span><br><span class="line">        accountDao.out(outMan, money);</span><br><span class="line">        <span class="keyword">int</span> i = <span class="number">1</span>/<span class="number">0</span>;</span><br><span class="line">        accountDao.in(inMan, money);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>@Transactional事务注解，写在切点方法上，可以指定事务属性</p>
-<p>xml中要增加事务注解驱动，读事务注解</p>
-<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">&lt;!-- 事务注解驱动--&gt;</span><br><span class="line">    &lt;tx:annotation-driven transaction-manager="transactionManger"&gt;&lt;/tx:annotation-driven&gt;</span><br></pre></td></tr></table></figure>
-
-<h3 id="Spring集成Web环境"><a href="#Spring集成Web环境" class="headerlink" title="Spring集成Web环境"></a>Spring集成Web环境</h3><p>应用上下文对象通过new ClassPathXmlApplicatonContext(Spring配置文件)方式获取的，但是每次从容器中获得Bean时都要编写这个语句，使得配置文件加载多次，应用上下文对象创建多次</p>
-<p>在Web项目中，可以使用ServletContextListener监听Web项目的启动，因此我们可以在Web项目启动时就加载Spring配置文件，创建应用上下文对象ApplicationContext，再将其存储到最大的域servletContext，这样就可以在任意位置从域中获得应用上下文对象了</p>
-<p>现在Spring提供了一个监听器ContextLoaderListener就是对上述功能的封装</p>
-<p>1.在web.xml中配置ContextLoaderListener(导入spring-web坐标)</p>
-<p>2.使用WebApplicationContextUtils获得应用对象上下文ApplicationContext</p>
-<p>web.xml</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">&lt;!--全局初始化参数--&gt;</span><br><span class="line">  &lt;context-param&gt;</span><br><span class="line">    &lt;param-name&gt;contextConfigLocation&lt;/param-name&gt;</span><br><span class="line">    &lt;param-value&gt;classpath:applicationContext.xml&lt;/param-value&gt;</span><br><span class="line">  &lt;/context-param&gt;</span><br><span class="line">&lt;!--  配置监听器--&gt;</span><br><span class="line">  &lt;listener&gt;</span><br><span class="line">    &lt;listener-<span class="class"><span class="keyword">class</span>&gt;<span class="title">org</span>.<span class="title">springframework</span>.<span class="title">web</span>.<span class="title">context</span>.<span class="title">ContextLoaderListener</span>&lt;/<span class="title">listener</span>-<span class="title">class</span>&gt;</span></span><br><span class="line"><span class="class">  &lt;/<span class="title">listener</span>&gt;</span></span><br></pre></td></tr></table></figure>
-
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com.it.web;</span><br><span class="line"><span class="keyword">import</span> com.it.service.UserService;</span><br><span class="line"><span class="keyword">import</span> org.springframework.web.context.WebApplicationContext;</span><br><span class="line"><span class="keyword">import</span> org.springframework.web.context.support.WebApplicationContextUtils;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> javax.servlet.ServletContext;</span><br><span class="line"><span class="keyword">import</span> javax.servlet.ServletException;</span><br><span class="line"><span class="keyword">import</span> javax.servlet.http.HttpServlet;</span><br><span class="line"><span class="keyword">import</span> javax.servlet.http.HttpServletRequest;</span><br><span class="line"><span class="keyword">import</span> javax.servlet.http.HttpServletResponse;</span><br><span class="line"><span class="keyword">import</span> java.io.IOException;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">UserServlet</span> <span class="keyword">extends</span> <span class="title">HttpServlet</span> </span>&#123;</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">doGet</span><span class="params">(HttpServletRequest req, HttpServletResponse resp)</span> <span class="keyword">throws</span> ServletException, IOException </span>&#123;</span><br><span class="line">        <span class="comment">//ApplicationContext app = new ClassPathXmlApplicationContext("applicationContext.xml");</span></span><br><span class="line">        ServletContext servletContext = <span class="keyword">this</span>.getServletContext();</span><br><span class="line">        <span class="comment">//ApplicationContext app = (ApplicationContext) servletContext.getAttribute("app");</span></span><br><span class="line">        <span class="comment">//ApplicationContext app = WebApplicationContextUtils.getWebApplicationContext(servletContext);</span></span><br><span class="line">        WebApplicationContext app = WebApplicationContextUtils.getWebApplicationContext(servletContext);</span><br><span class="line">        UserService userService = app.getBean(UserService<span class="class">.<span class="keyword">class</span>)</span>;</span><br><span class="line">        userService.save();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-
-      
-
-      
-    </div>
-    <div class="article-info article-info-index">
-      
-      
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color2">spring</a>
-        		</li>
-      		 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">事务</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-      
-
-      
-        <p class="article-more-link">
-          <a class="article-more-a" href="/2020/06/15/Spring-%E4%BA%8B%E5%8A%A1%E6%8E%A7%E5%88%B6/">展开全文 >></a>
-        </p>
-      
-
-      
-      <div class="clearfix"></div>
-    </div>
-  </div>
-</article>
-
-<aside class="wrap-side-operation">
-    <div class="mod-side-operation">
-        
-        <div class="jump-container" id="js-jump-container" style="display:none;">
-            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
-                <i class="icon-font icon-back"></i>
-            </a>
-            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
-                <i class="icon-font icon-plane jump-plane"></i>
-            </div>
-        </div>
-        
-        
-    </div>
-</aside>
-
-
-
-
-  
   
     <nav id="page-nav">
       <span class="page-number current">1</span><a class="page-number" href="/page/2/">2</a><a class="page-number" href="/page/3/">3</a><span class="space">&hellip;</span><a class="page-number" href="/page/5/">5</a><a class="extend next" rel="next" href="/page/2/">Next &amp;raquo;</a>
@@ -2613,11 +2626,7 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
           <ul class="article-tag-list" q-show="showTags">
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">实战Java高并发程序设计</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">容器</a>
+                <a href="javascript:void(0)" class="js-tag color3">面经</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -2625,15 +2634,11 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">同步</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color4">LeetCode</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">Java8</a>
+                <a href="javascript:void(0)" class="js-tag color4">实战Java高并发程序设计</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -2641,11 +2646,11 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">序列化</a>
+                <a href="javascript:void(0)" class="js-tag color3">同步</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">面经</a>
+                <a href="javascript:void(0)" class="js-tag color3">容器</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -2653,15 +2658,15 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color4">序列化</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color1">Java8</a>
+              </li>
+             
+              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color3">集合</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">spring</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">Jdbc</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -2669,7 +2674,7 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">AOP</a>
+                <a href="javascript:void(0)" class="js-tag color2">spring</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -2677,7 +2682,11 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">SpringBoot</a>
+                <a href="javascript:void(0)" class="js-tag color4">AOP</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color5">Jdbc</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -2685,7 +2694,7 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">Java基础</a>
+                <a href="javascript:void(0)" class="js-tag color1">SpringBoot</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -2693,11 +2702,11 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">SpringMVC</a>
+                <a href="javascript:void(0)" class="js-tag color2">Java基础</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">函数式编程</a>
+                <a href="javascript:void(0)" class="js-tag color5">SpringMVC</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -2709,6 +2718,10 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color1">函数式编程</a>
+              </li>
+             
+              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color3">剑指Offer</a>
               </li>
              
@@ -2717,11 +2730,15 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color5">设计模式</a>
+              </li>
+             
+              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color3">反射</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">设计模式</a>
+                <a href="javascript:void(0)" class="js-tag color3">接口</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -2733,15 +2750,11 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">接口</a>
+                <a href="javascript:void(0)" class="js-tag color3">泛型</a>
               </li>
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color5">sync</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">泛型</a>
               </li>
              
               <li class="article-tag-list-item">
