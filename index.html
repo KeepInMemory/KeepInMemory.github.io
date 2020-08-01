@@ -150,6 +150,108 @@
           <div id="js-content" class="content-ll">
             
   
+    <article id="post-ThreadLocal底层原理" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2020/08/01/ThreadLocal%E5%BA%95%E5%B1%82%E5%8E%9F%E7%90%86/">ThreadLocal底层原理</a>
+    </h1>
+  
+
+        
+        <a href="/2020/08/01/ThreadLocal%E5%BA%95%E5%B1%82%E5%8E%9F%E7%90%86/" class="archive-article-date">
+  	<time datetime="2020-08-01T02:06:44.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2020-08-01</time>
+</a>
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>ThreadLocal类用来提供线程内部的局部变量</p>
+<h3 id="底层设计"><a href="#底层设计" class="headerlink" title="底层设计"></a>底层设计</h3><p><img src="/2020/08/01/ThreadLocal%E5%BA%95%E5%B1%82%E5%8E%9F%E7%90%86/1.png" alt="1"></p>
+<p>早期的设计是每个ThreadLocal维护一个ThreadLocalMap，里面的Entry&lt;Thread,value&gt;</p>
+<p>JDK8的改进：每个Thread维护一个ThreadLocalMap，里面的Entry&lt;ThreadLocal,value&gt;</p>
+<p>改进的好处：</p>
+<p>1.每个Map存储的Entry数量变少 </p>
+<p>2.当Thread销毁的时候，ThreadLocalMap也随之销毁</p>
+<h3 id="ThreadLocalMap源码分析"><a href="#ThreadLocalMap源码分析" class="headerlink" title="ThreadLocalMap源码分析"></a>ThreadLocalMap源码分析</h3><h4 id="基本结构"><a href="#基本结构" class="headerlink" title="基本结构"></a>基本结构</h4><p>ThreadLocalMap是ThreadLocal的静态内部类， 没有实现Map接口，用独立的方式实现了Map的功能， 其内部的Entry也是独立实现</p>
+<p><img src="/2020/08/01/ThreadLocal%E5%BA%95%E5%B1%82%E5%8E%9F%E7%90%86/2.png" alt="2"></p>
+<h4 id="成员变量"><a href="#成员变量" class="headerlink" title="成员变量"></a>成员变量</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment">       * The initial capacity -- MUST be a power of two.</span></span><br><span class="line"><span class="comment">       * 初始化容量,必须是2的整数次幂</span></span><br><span class="line"><span class="comment">       */</span></span><br><span class="line">      <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">int</span> INITIAL_CAPACITY = <span class="number">16</span>;</span><br><span class="line"></span><br><span class="line">      <span class="comment">/**</span></span><br><span class="line"><span class="comment">       * 存放数据的table, 同样数组长度必须是2的整数次幂</span></span><br><span class="line"><span class="comment">       * The table, resized as necessary.</span></span><br><span class="line"><span class="comment">       * table.length MUST always be a power of two.</span></span><br><span class="line"><span class="comment">       */</span></span><br><span class="line">      <span class="keyword">private</span> Entry[] table;</span><br><span class="line"></span><br><span class="line">      <span class="comment">/**</span></span><br><span class="line"><span class="comment">       * 数组里entrys的个数,可以判断table是否超过阈值 (存储的格式)</span></span><br><span class="line"><span class="comment">       * The number of entries in the table.</span></span><br><span class="line"><span class="comment">       */</span></span><br><span class="line">      <span class="keyword">private</span> <span class="keyword">int</span> size = <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line">      <span class="comment">/**</span></span><br><span class="line"><span class="comment">       * 阈值 进行扩容的阈值,表使用大于他的时候,进行扩容</span></span><br><span class="line"><span class="comment">       * The next size value at which to resize.</span></span><br><span class="line"><span class="comment">       */</span></span><br><span class="line">      <span class="keyword">private</span> <span class="keyword">int</span> threshold; <span class="comment">// Default to 0</span></span><br></pre></td></tr></table></figure>
+
+<h4 id="Entry结构"><a href="#Entry结构" class="headerlink" title="Entry结构"></a>Entry结构</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment">    * The entries in this hash map extend WeakReference, using</span></span><br><span class="line"><span class="comment">    * its main ref field as the key (which is always a</span></span><br><span class="line"><span class="comment">    * ThreadLocal object).  Note that null keys (i.e. entry.get()</span></span><br><span class="line"><span class="comment">    * == null) mean that the key is no longer referenced, so the</span></span><br><span class="line"><span class="comment">    * entry can be expunged from table.  Such entries are referred to</span></span><br><span class="line"><span class="comment">    * as "stale entries" in the code that follows.</span></span><br><span class="line"><span class="comment">    翻译:</span></span><br><span class="line"><span class="comment">    * Entry继承WeakReference, 并且用ThreadLocal作为key</span></span><br><span class="line"><span class="comment">    * 如果key为null(entry.get() == null)意味着key不在被引用,因此这时候entry也可以从table</span></span><br><span class="line"><span class="comment">    * 中清除(被垃圾回收器回收) </span></span><br><span class="line"><span class="comment">    */</span></span><br><span class="line">   <span class="keyword">static</span> <span class="class"><span class="keyword">class</span> <span class="title">Entry</span> <span class="keyword">extends</span> <span class="title">WeakReference</span>&lt;<span class="title">ThreadLocal</span>&lt;?&gt;&gt; </span>&#123;</span><br><span class="line">       <span class="comment">/** The value associated with this ThreadLocal. */</span></span><br><span class="line">       Object value;</span><br><span class="line"></span><br><span class="line">       Entry(ThreadLocal&lt;?&gt; k, Object v) &#123;</span><br><span class="line">           <span class="keyword">super</span>(k);</span><br><span class="line">           value = v;</span><br><span class="line">       &#125;</span><br><span class="line">   &#125;</span><br></pre></td></tr></table></figure>
+<h3 id="强弱引用和内存泄露"><a href="#强弱引用和内存泄露" class="headerlink" title="强弱引用和内存泄露"></a>强弱引用和内存泄露</h3><h4 id="内存泄漏相关概念"><a href="#内存泄漏相关概念" class="headerlink" title="内存泄漏相关概念"></a>内存泄漏相关概念</h4><ul>
+<li>内存溢出: Memory overflow 没有足够的内存提供申请者使用.</li>
+<li>内存泄漏: Memory Leak 程序中已经动态分配的堆内存由于某种原因, 程序未释放或者无法释放, 造成系统内部的浪费, 导致程序运行速度减缓甚至系统崩溃等严重结果. 内存泄漏的堆积终将导致内存溢出</li>
+</ul>
+<h4 id="如果Key是强引用"><a href="#如果Key是强引用" class="headerlink" title="如果Key是强引用"></a>如果Key是强引用</h4><p><img src="/2020/08/01/ThreadLocal%E5%BA%95%E5%B1%82%E5%8E%9F%E7%90%86/3.png" alt="3"></p>
+<h4 id="如果Key是弱引用"><a href="#如果Key是弱引用" class="headerlink" title="如果Key是弱引用"></a>如果Key是弱引用</h4><p><img src="/2020/08/01/ThreadLocal%E5%BA%95%E5%B1%82%E5%8E%9F%E7%90%86/4.png" alt="4"></p>
+<p>在以上两种内存泄漏的情况，都有两个前提：<br> 1.没有手动删除这个Entry    2.CurrentThread依然运行</p>
+<p>无论 ThreadLocalMap 中的 key 使用哪种类型引用都无法完全避免内存泄漏，跟使用弱引用没有关系。</p>
+<h4 id="为什么使用弱引用"><a href="#为什么使用弱引用" class="headerlink" title="为什么使用弱引用"></a>为什么使用弱引用</h4><p>在 ThreadLocalMap 中的<code>set/getEntry</code> 方法中，会对 key 为 null （也即是 ThreadLocal 为 null ）进行判断，如果为 null 的话会进行清除</p>
+<p>这就意味着使用完 ThreadLocal , CurrentThread 依然运行的前提下。就算忘记调用 remove 方法，弱引用比强引用可以多一层保障：弱引用的 ThreadLocal 会被回收，而对应value在下一次 ThreadLocaIMap 调用 <code>set/get/remove</code> 中的任一方法的时候会被清除，从而避免内存泄漏。（在下一次ThreadLocaIMap 调用 <code>set/get/remove</code> 前是有内存泄露的）</p>
+<h3 id="ThreadLocalMap的Hash冲突解决"><a href="#ThreadLocalMap的Hash冲突解决" class="headerlink" title="ThreadLocalMap的Hash冲突解决"></a>ThreadLocalMap的Hash冲突解决</h3><h4 id="代码流程"><a href="#代码流程" class="headerlink" title="代码流程"></a>代码流程</h4><p>1.首先还是根据key计算索引，查找索引位置上的Entry</p>
+<p>2.若Entry已经存在且Key等于传入的Key，直接更改Entry里的Value</p>
+<p>3.若Entry存在且Key位null，调用replaceStaleEntry来更换这个Key为空的Entry</p>
+<p>4.循环检测，直到Entry为null，在这里新建Entry插入</p>
+<p>5.最后调用cleanSomeSlots，清理key为null的Entry，判断Size是否达到了rehash条件，达到就执行rehash执行全表扫描清理</p>
+<h4 id="重点"><a href="#重点" class="headerlink" title="重点"></a>重点</h4><p>ThreadLocalMap使用线性探测方法来解决哈希冲突，当检测到数组末尾会从数据开头接着找</p>
+<p>HashMap采用拉链法解决哈希冲突</p>
+
+      
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
+	<div class="article-tag tagcloud">
+		<i class="icon-price-tags icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color2">ThreadLocal</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
+      
+
+      
+        <p class="article-more-link">
+          <a class="article-more-a" href="/2020/08/01/ThreadLocal%E5%BA%95%E5%B1%82%E5%8E%9F%E7%90%86/">展开全文 >></a>
+        </p>
+      
+
+      
+      <div class="clearfix"></div>
+    </div>
+  </div>
+</article>
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+    </div>
+</aside>
+
+
+
+
+  
     <article id="post-error-bad-operand-types-for-binary-operator" class="article article-type-post  article-index" itemscope itemprop="blogPost">
   <div class="article-inner">
     
@@ -2217,116 +2319,9 @@
 
 
   
-    <article id="post-HashMap" class="article article-type-post  article-index" itemscope itemprop="blogPost">
-  <div class="article-inner">
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2020/06/29/HashMap/">HashMap</a>
-    </h1>
-  
-
-        
-        <a href="/2020/06/29/HashMap/" class="archive-article-date">
-  	<time datetime="2020-06-29T01:19:17.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2020-06-29</time>
-</a>
-        
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <h3 id="HashMap"><a href="#HashMap" class="headerlink" title="HashMap"></a>HashMap</h3><h4 id="什么是HashMap"><a href="#什么是HashMap" class="headerlink" title="什么是HashMap"></a>什么是HashMap</h4><p>HashMap是基于哈希表的Map接口实现，它是以key-value存储形式存在，用来放键值对</p>
-<p>它的特点是，1.存取是无序的 2.键值都可以为null，但是键最多只能有一个null</p>
-<p>JDK1.8之前是由数组+链表组成的，数组是HashMap的主体，用数组是为了方便索引查询，链表则是为了解决哈希冲突。HashMap的默认初始长度是16，采用头插法</p>
-<p>JDK1.8以前有两个缺点，一是线程不安全的，Rehash时可能会产生死锁。二是在哈希碰撞多了以后，哈希桶会退化成链表，查询效率也从O(1)变为O(n)</p>
-<p>JDK1.8为了解决Rehash时可能会产生死锁的问题采用了尾插法</p>
-<p>JDK1.8之后为了解决哈希碰撞严重后退化成链表的问题，数据结构改为了数组+链表+红黑树的形式，当链表长度大于阈值8并且当前数组的长度大于64时，此时该哈希桶上的所有数据改为红黑树存储，如果链表长度大于8但是数组长度小于64不会改成红黑树，而是进行数组扩容。这是因为数组较小，搜索时间相对较短，红黑树需要进行左旋右旋变色等操作来保持平衡，改成红黑树反而会降低效率。当哈希桶元素数量降到6就退化成为链表。</p>
-<p>JDK1.8虽然解决了Rehash时死锁的问题，但还是会存在其他多线程不安全的问题，并发环境下使用ConcurrentHashMap</p>
-<h4 id="为什么数组大小一定是2的幂"><a href="#为什么数组大小一定是2的幂" class="headerlink" title="为什么数组大小一定是2的幂"></a>为什么数组大小一定是2的幂</h4><p>Hash值范围大概是40亿个数，不可能创建一个40亿长度的数组，内存就爆了，所以计算后的hash值是不能拿来直接用的，还需要进行计算索引值，一般是进行取模操作，源码中在计算出hash值之后有个indexFor方法计算索引值，计算方法是hash&amp;(length-1)，如果是2的n次方，即10000…后面全是0，减一后会变成01111..后面全是1，此时跟哈希值按位与的话能让数据分配均匀，减少碰撞。如果不是2的幂，那么某些位会成为0，此时hash值和0与怎么样都是0，结果是有些Hash桶永远是空的。</p>
-<p>数组长度-1正好相当于一个“低位掩码”。“与”操作的结果就是散列值的高位全部归零，只保留低位值，用来做数组下标访问。我们知道，位运算的代价比求模运算小的多，因此在进行这种计算时用位运算的话能带来更高的性能。</p>
-<p>确定桶下标的最后一步是将 key 的 hash 值对桶个数取模：hash%capacity，如果能保证 capacity 为 2 的 n 次方，那么就可以将这个操作转换为位运算。</p>
-<p>如果传入的数字不是2的n次幂，比如10，Hash Map会计算出大于这个数的最接近这个数的2的n次幂，为16</p>
-<h4 id="什么是红黑树"><a href="#什么是红黑树" class="headerlink" title="什么是红黑树"></a>什么是红黑树</h4><p>红黑树是一个二叉平衡树，二叉树的平均查找时间是O(logn)，如果不巧可能会成为一条线，退化成链表。所以红黑树通过旋转等的操作，保证自己是平衡的。</p>
-<h4 id="红黑树原则"><a href="#红黑树原则" class="headerlink" title="红黑树原则"></a>红黑树原则</h4><p>1.构成树的结点拥有一个颜色属性，要么是黑要么是红</p>
-<p>2.根节点必须是黑色的，叶子节点必须是黑色的</p>
-<p>3.从叶节点到根节点的路径上，每条路径黑色节点一定是一致的</p>
-<p>4.不能有两个红色节点相连</p>
-<h4 id="为什么负载因子是0-75"><a href="#为什么负载因子是0-75" class="headerlink" title="为什么负载因子是0.75"></a>为什么负载因子是0.75</h4><p>是空间和时间的一个折中，负载因子是0.75的时候，空间利用率比较高，而且避免了相当多的Hash冲突，使得底层的链表或者是红黑树的高度比较低。</p>
-<h4 id="为什么树化的阈值是8"><a href="#为什么树化的阈值是8" class="headerlink" title="为什么树化的阈值是8"></a>为什么树化的阈值是8</h4><p>源码的注释里说，理想情况下随机hashCode算法下哈希桶中节点的个数服从参数为0.5的泊松分布，一个桶里面有大于8个元素的概率是小于十万分之一的，因为超过8的概率已经非常小了，所以采用8作为阈值。 </p>
-<h4 id="Node的hash值计算方法"><a href="#Node的hash值计算方法" class="headerlink" title="Node的hash值计算方法"></a>Node的hash值计算方法</h4><p>Node.hash不是key对象的hashcode()返回值，而是key.hashCode返回值高16位异或低16位，作用是优化hash算法，因为这样就算散列值分布再松散，要是只取最后几位的话，碰撞也会很严重。更要命的是如果散列本身做得不好，分布上成等差数列的漏洞，如果正好让最后几个低位呈现规律性重复，就很难受。</p>
-<p>key.hashCode返回值高16位异或低16位，以此来加大低位的随机性。而且混合后的低位掺杂了高位的部分特征，这样高位的信息也被变相保留下来。</p>
-<h4 id="put操作"><a href="#put操作" class="headerlink" title="put操作"></a>put操作</h4><p>计算索引的算法是先经过key.hashCode()经过高低位异或之后，再按位与table.length-1，得到一个下标</p>
-<p>根据槽内状态分为四种</p>
-<p>一是slot==null，把put方法传进来的key,value包装成一个node对象，放到slot里</p>
-<p>二是slot!=null，node没有链化。先对比node.key与put传入的key是否完全相等，相等就直接替换，用传入的value替换node.value，不相等就是哈希冲突，在slot的node后插入</p>
-<p>三是slot!=null，node已经链化。迭代查找node.key与put传入的key是否完全相等，相等就直接替换，用传入的value替换node.value，不相等就是哈希冲突，在slot尾部的node后插入。插入后检查当前链表长度有没有达到树化阈值，如果达到阈值就在put中完成树化</p>
-<p>四是slot!-null，node已经树化。TreeNode继承了Node结构，增加了指向父节点的parent、指向左孩子的left、右孩子的right和颜色属性。红黑树的插入首先是找到插入的父节点，找父节点和二叉排序树是一样的，二叉排序树左孩子小于当前节点，右孩子大于当前节点。插入有两种情况，一是一直向下探测，直到叶子节点，将叶子节点作为父节点在左或者右插入，插入后有可能会打破平衡，有个平衡算法进行调整。二是向下探测过程中发现node.key和传入的key相同，进行一次替换操作。</p>
-<h4 id="散列表扩容"><a href="#散列表扩容" class="headerlink" title="散列表扩容"></a>散列表扩容</h4><p>resize()扩容方法，只有在两种情况下会被调用：</p>
-<p>HashMap实行了懒加载: 新建HashMap时不会对Node[] table进行赋值, 而是到第一次插入时, 进行resize时构建Node[] table，Node对象内部有hash、next、key、value字段</p>
-<p>当HashMap的大小值大于 threshold16*0.75=12时, 会进行扩容，扩容成2倍。</p>
-<h4 id="Rehash操作"><a href="#Rehash操作" class="headerlink" title="Rehash操作"></a>Rehash操作</h4><p>根据槽内状态分为四种</p>
-<p>一是slot==null，不用进行迁移</p>
-<p>二是slot!=null，node没有链化。如果node.next为null，根据新表的table.length计算出下标，直接进行迁移</p>
-<p>三是slot!=null，node已经链化。如果node.next不为null，说明发生过hash冲突，将slot里的链表拆成高位链和低位链。因为老表的链表中这些node的hash值低位全是相同的，但是高位有0有1，于是将原先的链表分成了两部分</p>
-<p>四是slot!-null，node已经树化。TreeNode对象仍然保留着next字段，这个slot的拆分也是根据分为高位链和低位链，但是拆分完成后需要看两个链的长度，如果长度&lt;=6退化成一个普通的node链表，如果长度&gt;6继续维持红黑树结构</p>
-
-      
-
-      
-    </div>
-    <div class="article-info article-info-index">
-      
-      
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">面经</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-      
-
-      
-        <p class="article-more-link">
-          <a class="article-more-a" href="/2020/06/29/HashMap/">展开全文 >></a>
-        </p>
-      
-
-      
-      <div class="clearfix"></div>
-    </div>
-  </div>
-</article>
-
-<aside class="wrap-side-operation">
-    <div class="mod-side-operation">
-        
-        <div class="jump-container" id="js-jump-container" style="display:none;">
-            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
-                <i class="icon-font icon-back"></i>
-            </a>
-            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
-                <i class="icon-font icon-plane jump-plane"></i>
-            </div>
-        </div>
-        
-        
-    </div>
-</aside>
-
-
-
-
-  
   
     <nav id="page-nav">
-      <span class="page-number current">1</span><a class="page-number" href="/page/2/">2</a><a class="page-number" href="/page/3/">3</a><span class="space">&hellip;</span><a class="page-number" href="/page/6/">6</a><a class="extend next" rel="next" href="/page/2/">Next &amp;raquo;</a>
+      <span class="page-number current">1</span><a class="page-number" href="/page/2/">2</a><a class="page-number" href="/page/3/">3</a><span class="space">&hellip;</span><a class="page-number" href="/page/5/">5</a><a class="extend next" rel="next" href="/page/2/">Next &amp;raquo;</a>
     </nav>
   
 
@@ -2417,27 +2412,7 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
           <ul class="article-tag-list" q-show="showTags">
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">IO模型</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color4">实战Java高并发程序设计</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">容器</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">LeetCode</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">面经</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">线程池</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -2445,11 +2420,23 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">Java8</a>
+                <a href="javascript:void(0)" class="js-tag color3">面经</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">JMM</a>
+                <a href="javascript:void(0)" class="js-tag color5">IO模型</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color4">LeetCode</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color4">线程池</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color1">Java8</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -2457,7 +2444,7 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">集合</a>
+                <a href="javascript:void(0)" class="js-tag color4">JMM</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -2465,11 +2452,7 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">spring</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">IOC</a>
+                <a href="javascript:void(0)" class="js-tag color3">集合</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -2477,11 +2460,15 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color2">spring</a>
+              </li>
+             
+              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color4">AOP</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">Jdbc</a>
+                <a href="javascript:void(0)" class="js-tag color4">IOC</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -2489,27 +2476,11 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color5">Jdbc</a>
+              </li>
+             
+              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color1">SpringBoot</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">StringBuilder</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">SpringMVC</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">函数式编程</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">Java基础</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">反射</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -2517,11 +2488,11 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">未来日记</a>
+                <a href="javascript:void(0)" class="js-tag color2">ThreadLocal</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">剑指Offer</a>
+                <a href="javascript:void(0)" class="js-tag color2">Java基础</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -2529,11 +2500,11 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">数组</a>
+                <a href="javascript:void(0)" class="js-tag color3">剑指Offer</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">接口</a>
+                <a href="javascript:void(0)" class="js-tag color5">SpringMVC</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -2541,15 +2512,15 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">抽象类</a>
+                <a href="javascript:void(0)" class="js-tag color1">函数式编程</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">线程</a>
+                <a href="javascript:void(0)" class="js-tag color5">未来日记</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">泛型</a>
+                <a href="javascript:void(0)" class="js-tag color3">数组</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -2557,7 +2528,19 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">ThreadLocal</a>
+                <a href="javascript:void(0)" class="js-tag color3">反射</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">泛型</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">接口</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">线程</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -2565,7 +2548,7 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">错误处理</a>
+                <a href="javascript:void(0)" class="js-tag color3">静态</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -2573,7 +2556,7 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">静态</a>
+                <a href="javascript:void(0)" class="js-tag color5">错误处理</a>
               </li>
             
             <div class="clearfix"></div>
