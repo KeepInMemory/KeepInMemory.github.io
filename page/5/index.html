@@ -150,6 +150,104 @@
           <div id="js-content" class="content-ll">
             
   
+    <article id="post-错误处理机制：异常-断言-日志" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2019/09/06/%E9%94%99%E8%AF%AF%E5%A4%84%E7%90%86%E6%9C%BA%E5%88%B6%EF%BC%9A%E5%BC%82%E5%B8%B8-%E6%96%AD%E8%A8%80-%E6%97%A5%E5%BF%97/">错误处理机制:异常|断言|日志</a>
+    </h1>
+  
+
+        
+        <a href="/2019/09/06/%E9%94%99%E8%AF%AF%E5%A4%84%E7%90%86%E6%9C%BA%E5%88%B6%EF%BC%9A%E5%BC%82%E5%B8%B8-%E6%96%AD%E8%A8%80-%E6%97%A5%E5%BF%97/" class="archive-article-date">
+  	<time datetime="2019-09-06T04:00:00.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2019-09-06</time>
+</a>
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h3 id="异常"><a href="#异常" class="headerlink" title="异常"></a>异常</h3><h4 id="Exception与Error"><a href="#Exception与Error" class="headerlink" title="Exception与Error"></a>Exception与Error</h4><p><img src="https://www.runoob.com/wp-content/uploads/2013/12/12-130Q1234I6223.jpg" alt="img"></p>
+<p>Error和Exception都派生于Throwable，Error描述了 Java 运行时系统的内部错误和资源耗尽错误，出现了Error抛出来也没有用，只能终止程序。</p>
+<h4 id="再次抛出异常"><a href="#再次抛出异常" class="headerlink" title="再次抛出异常"></a>再次抛出异常</h4><p>再次抛出异常有两种方式，第一种方式是使用异常的构造器</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">try</span></span><br><span class="line">&#123;</span><br><span class="line">    </span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">catch</span>(SQLException e)</span><br><span class="line">&#123;</span><br><span class="line">    <span class="function">thorw new <span class="title">ServletException</span><span class="params">(<span class="string">"database error:"</span> + e.getMessage()</span>)</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>第二种方式是使用initCause和getCause方法。因为在程序开发中，项目越到底层抛出的异常类型会越多，导致上层需要很多catch来捕获异常，为了避免这样，可以在捕获异常后，将多种异常统一成一个异常再抛出，需要注意的问题是统一的那个异常会丢失原异常的信息，所以使用initCause方法，将原异常进行包装，再使用getCause可以获取原异常。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">try</span></span><br><span class="line">&#123;</span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">catch</span>(SQLException e)</span><br><span class="line">&#123;</span><br><span class="line">	Throwable se = <span class="keyword">new</span> ServletException(<span class="string">"database error"</span>);</span><br><span class="line">    se.initCause(e);<span class="comment">//包装原异常给更大的异常，减少异常种类和上层catch数量。</span></span><br><span class="line">    <span class="keyword">throw</span> se;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">//Thorwable e = se.getCause();获取原异常</span></span><br></pre></td></tr></table></figure>
+
+<h4 id="finally"><a href="#finally" class="headerlink" title="finally"></a>finally</h4><p>try-catch-finally按顺序执行，其中可以没有catch部分，只有try-finally部分。也可以有多个catch，捕获多个异常类型。</p>
+<p>不管是否有异常被catch到，finally都会执行，finally中一般进行资源的释放、关闭数据库的连接等操作。</p>
+<p>try、catch中有返回值，而try中抛出的异常恰好与catch中的异常匹配，则返回catch中的return值。</p>
+<p>如果finally块中有return，则返回finally的返回值，不返回try或catch中的返回值。</p>
+<p>如果finally块中抛出异常，则整个try、catch、finally块中抛出异常，并且没有返回值。所以推荐如下的嵌套写法。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">InputStream in = ...;</span><br><span class="line"><span class="keyword">try</span>&#123;</span><br><span class="line">    <span class="keyword">try</span>&#123;</span><br><span class="line">        ...</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">finally</span>&#123;</span><br><span class="line">        in.close();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">catch</span>(IOException e)</span><br><span class="line">&#123;</span><br><span class="line">    </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="断言"><a href="#断言" class="headerlink" title="断言"></a>断言</h3><p>断言机制允许在测试期间向代码中插入一些检查语句，当代码发布时，这些插入的断言语句会自动地被移走。</p>
+<p>断言的语法为</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">assert</span> 条件；</span><br><span class="line"><span class="keyword">assert</span> 条件:表达式；</span><br></pre></td></tr></table></figure>
+
+<p>这两种方式都会对条件进行检测，如果结果为false，则抛出一个AssertionError异常。在第二种形式中，表达式会传入AssertionError的构造器来构造异常。</p>
+<p>例如判断x是否是大于等于0</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">assert</span> x &gt;= <span class="number">0</span>;</span><br><span class="line"><span class="keyword">assert</span> x&gt;=<span class="number">0</span>:x;</span><br></pre></td></tr></table></figure>
+      
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
+	<div class="article-tag tagcloud">
+		<i class="icon-price-tags icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">Java核心卷</a>
+        		</li>
+      		 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color5">错误处理</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
+      
+
+      
+        <p class="article-more-link">
+          <a class="article-more-a" href="/2019/09/06/%E9%94%99%E8%AF%AF%E5%A4%84%E7%90%86%E6%9C%BA%E5%88%B6%EF%BC%9A%E5%BC%82%E5%B8%B8-%E6%96%AD%E8%A8%80-%E6%97%A5%E5%BF%97/">展开全文 >></a>
+        </p>
+      
+
+      
+      <div class="clearfix"></div>
+    </div>
+  </div>
+</article>
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+    </div>
+</aside>
+
+
+
+
+  
     <article id="post-LeetCode刷题记录-数组" class="article article-type-post  article-index" itemscope itemprop="blogPost">
   <div class="article-inner">
     
@@ -502,90 +600,6 @@
 
 
   
-    <article id="post-数组列表ArrayList" class="article article-type-post  article-index" itemscope itemprop="blogPost">
-  <div class="article-inner">
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2019/09/03/%E6%95%B0%E7%BB%84%E5%88%97%E8%A1%A8ArrayList/">数组列表ArrayList</a>
-    </h1>
-  
-
-        
-        <a href="/2019/09/03/%E6%95%B0%E7%BB%84%E5%88%97%E8%A1%A8ArrayList/" class="archive-article-date">
-  	<time datetime="2019-09-03T04:00:00.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2019-09-03</time>
-</a>
-        
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> java.util.*;</span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">ArrayListTest</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span>  <span class="keyword">void</span> <span class="title">main</span> <span class="params">(String []args)</span></span>&#123;</span><br><span class="line">        ArrayList&lt;Integer&gt; arrayList = <span class="keyword">new</span> ArrayList&lt;&gt;();</span><br><span class="line">        arrayList.ensureCapacity(<span class="number">5</span>);<span class="comment">//预估元素个数为5，影响初始数组内存的分配</span></span><br><span class="line">        System.out.println(arrayList.size());<span class="comment">//数组列表的大小</span></span><br><span class="line">        arrayList.add(<span class="number">1</span>);<span class="comment">//添加元素</span></span><br><span class="line">        arrayList.add(<span class="number">2</span>);</span><br><span class="line">        arrayList.add(<span class="number">3</span>);</span><br><span class="line">        arrayList.add(<span class="number">4</span>);</span><br><span class="line">        arrayList.trimToSize();<span class="comment">//将比size大的预留空间去掉</span></span><br><span class="line">        arrayList.set(<span class="number">0</span>,<span class="number">2</span>);<span class="comment">//设置元素值，前下标后对象</span></span><br><span class="line">        arrayList.add(<span class="number">4</span>,<span class="number">5</span>);<span class="comment">//插入元素值，前下标后对象</span></span><br><span class="line">        System.out.println(arrayList.get(<span class="number">3</span>));<span class="comment">//获取某个元素值</span></span><br><span class="line">        System.out.println(arrayList.toString());</span><br><span class="line">        arrayList.remove(<span class="number">4</span>);<span class="comment">//去除元素，参数为下标</span></span><br><span class="line">        System.out.println(arrayList.size());</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>ArrayList类解决了Java中数组不可变长的缺点，在添加和删除元素的时候可以自动调节数组的容量。</p>
-<p><strong>数组列表管理着对象引用的一个内部数组，当添加元素到数组预定的最大空间时，数组列表就自动地创建一个更大的数组，将所有的对象从小数组拷贝到大数组中去。</strong></p>
-<p>在本例中初始化了Integer的数组列表，<strong>ensureCapacity</strong>方法可以在填充元素前预估数组可能存储的元素数量5，<strong>但数组的大小仍然是0</strong>，用<strong>add</strong>方法添加元素，注意这里使用了<strong>自动装箱</strong>。随后使用<strong>trimToSize</strong>方法将数组预留的多余的空间去除，但不影响数组的大小。使用<strong>set</strong>方法将下标为0的元素赋值。使用<strong>add</strong>方法在下标4的位置插入元素5。使用<strong>remove</strong>方法去掉下标为4的元素，使用<strong>size</strong>方法显示元素数量。</p>
-<p>程序输出：</p>
-<p>0<br>4<br>[2, 2, 3, 4, 5]<br>4</p>
-
-      
-
-      
-    </div>
-    <div class="article-info article-info-index">
-      
-      
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">Java核心卷</a>
-        		</li>
-      		 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">数组</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-      
-
-      
-        <p class="article-more-link">
-          <a class="article-more-a" href="/2019/09/03/%E6%95%B0%E7%BB%84%E5%88%97%E8%A1%A8ArrayList/">展开全文 >></a>
-        </p>
-      
-
-      
-      <div class="clearfix"></div>
-    </div>
-  </div>
-</article>
-
-<aside class="wrap-side-operation">
-    <div class="mod-side-operation">
-        
-        <div class="jump-container" id="js-jump-container" style="display:none;">
-            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
-                <i class="icon-font icon-back"></i>
-            </a>
-            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
-                <i class="icon-font icon-plane jump-plane"></i>
-            </div>
-        </div>
-        
-        
-    </div>
-</aside>
-
-
-
-
-  
     <article id="post-接口详情" class="article article-type-post  article-index" itemscope itemprop="blogPost">
   <div class="article-inner">
     
@@ -679,6 +693,90 @@
       
         <p class="article-more-link">
           <a class="article-more-a" href="/2019/09/03/%E6%8E%A5%E5%8F%A3%E8%AF%A6%E6%83%85/">展开全文 >></a>
+        </p>
+      
+
+      
+      <div class="clearfix"></div>
+    </div>
+  </div>
+</article>
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+    </div>
+</aside>
+
+
+
+
+  
+    <article id="post-数组列表ArrayList" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2019/09/03/%E6%95%B0%E7%BB%84%E5%88%97%E8%A1%A8ArrayList/">数组列表ArrayList</a>
+    </h1>
+  
+
+        
+        <a href="/2019/09/03/%E6%95%B0%E7%BB%84%E5%88%97%E8%A1%A8ArrayList/" class="archive-article-date">
+  	<time datetime="2019-09-03T04:00:00.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2019-09-03</time>
+</a>
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> java.util.*;</span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">ArrayListTest</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span>  <span class="keyword">void</span> <span class="title">main</span> <span class="params">(String []args)</span></span>&#123;</span><br><span class="line">        ArrayList&lt;Integer&gt; arrayList = <span class="keyword">new</span> ArrayList&lt;&gt;();</span><br><span class="line">        arrayList.ensureCapacity(<span class="number">5</span>);<span class="comment">//预估元素个数为5，影响初始数组内存的分配</span></span><br><span class="line">        System.out.println(arrayList.size());<span class="comment">//数组列表的大小</span></span><br><span class="line">        arrayList.add(<span class="number">1</span>);<span class="comment">//添加元素</span></span><br><span class="line">        arrayList.add(<span class="number">2</span>);</span><br><span class="line">        arrayList.add(<span class="number">3</span>);</span><br><span class="line">        arrayList.add(<span class="number">4</span>);</span><br><span class="line">        arrayList.trimToSize();<span class="comment">//将比size大的预留空间去掉</span></span><br><span class="line">        arrayList.set(<span class="number">0</span>,<span class="number">2</span>);<span class="comment">//设置元素值，前下标后对象</span></span><br><span class="line">        arrayList.add(<span class="number">4</span>,<span class="number">5</span>);<span class="comment">//插入元素值，前下标后对象</span></span><br><span class="line">        System.out.println(arrayList.get(<span class="number">3</span>));<span class="comment">//获取某个元素值</span></span><br><span class="line">        System.out.println(arrayList.toString());</span><br><span class="line">        arrayList.remove(<span class="number">4</span>);<span class="comment">//去除元素，参数为下标</span></span><br><span class="line">        System.out.println(arrayList.size());</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>ArrayList类解决了Java中数组不可变长的缺点，在添加和删除元素的时候可以自动调节数组的容量。</p>
+<p><strong>数组列表管理着对象引用的一个内部数组，当添加元素到数组预定的最大空间时，数组列表就自动地创建一个更大的数组，将所有的对象从小数组拷贝到大数组中去。</strong></p>
+<p>在本例中初始化了Integer的数组列表，<strong>ensureCapacity</strong>方法可以在填充元素前预估数组可能存储的元素数量5，<strong>但数组的大小仍然是0</strong>，用<strong>add</strong>方法添加元素，注意这里使用了<strong>自动装箱</strong>。随后使用<strong>trimToSize</strong>方法将数组预留的多余的空间去除，但不影响数组的大小。使用<strong>set</strong>方法将下标为0的元素赋值。使用<strong>add</strong>方法在下标4的位置插入元素5。使用<strong>remove</strong>方法去掉下标为4的元素，使用<strong>size</strong>方法显示元素数量。</p>
+<p>程序输出：</p>
+<p>0<br>4<br>[2, 2, 3, 4, 5]<br>4</p>
+
+      
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
+	<div class="article-tag tagcloud">
+		<i class="icon-price-tags icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">Java核心卷</a>
+        		</li>
+      		 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">数组</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
+      
+
+      
+        <p class="article-more-link">
+          <a class="article-more-a" href="/2019/09/03/%E6%95%B0%E7%BB%84%E5%88%97%E8%A1%A8ArrayList/">展开全文 >></a>
         </p>
       
 
@@ -1174,14 +1272,6 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
           <ul class="article-tag-list" q-show="showTags">
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">实战Java高并发程序设计</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">同步</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color3">面经</a>
               </li>
              
@@ -1190,15 +1280,23 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color4">实战Java高并发程序设计</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">同步</a>
+              </li>
+             
+              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color4">LeetCode</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">线程池</a>
+                <a href="javascript:void(0)" class="js-tag color1">Java8</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">Java8</a>
+                <a href="javascript:void(0)" class="js-tag color4">线程池</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -1226,10 +1324,6 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">AOP</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color4">IOC</a>
               </li>
              
@@ -1242,6 +1336,10 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color4">AOP</a>
+              </li>
+             
+              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color1">SpringBoot</a>
               </li>
              
@@ -1250,11 +1348,23 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color5">SpringMVC</a>
+              </li>
+             
+              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color2">ThreadLocal</a>
               </li>
              
               <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">项目</a>
+              </li>
+             
+              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color2">Java基础</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color1">函数式编程</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -1266,7 +1376,11 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">SpringMVC</a>
+                <a href="javascript:void(0)" class="js-tag color5">未来日记</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">反射</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -1274,11 +1388,7 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">函数式编程</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">未来日记</a>
+                <a href="javascript:void(0)" class="js-tag color3">接口</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -1290,15 +1400,7 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">反射</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color3">泛型</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">接口</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -1310,15 +1412,15 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">静态</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color3">无锁</a>
               </li>
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color5">错误处理</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">静态</a>
               </li>
             
             <div class="clearfix"></div>
