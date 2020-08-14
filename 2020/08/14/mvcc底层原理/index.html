@@ -6,20 +6,25 @@
   <meta name="renderer" content="webkit">
   <meta http-equiv="X-UA-Compatible" content="IE=edge" >
   <link rel="dns-prefetch" href="http://KeepInMemory.github.io">
-  <title>JVM面经 | HanBlog</title>
+  <title>mvcc底层原理 | HanBlog</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta name="description" content="分配担保在发生Minor GC之前，虚拟机会先检查老年代最大可用的连续空间是否大于新生代所有对象总空间。如果这个条件成立，那么Minor  GC可以确保是安全的。如果不成立，则虚拟机会查看HandlerPromotionFailure设置是否允许担保失败。如果允许，那么会继续检查老年代最大可用的连续空间是否大于历次晋升到老年代对象的平均大小。如果大于，将尝试着进行一次Monitor GC，尽管这次">
+  <meta name="description" content="MVCC主要为了提高并发的读写性能，不用加锁就能让多个事务并发读写">
 <meta property="og:type" content="article">
-<meta property="og:title" content="JVM面经">
-<meta property="og:url" content="http://keepinmemory.github.io/2020/07/05/JVM%E9%9D%A2%E7%BB%8F/index.html">
+<meta property="og:title" content="mvcc底层原理">
+<meta property="og:url" content="http://keepinmemory.github.io/2020/08/14/mvcc%E5%BA%95%E5%B1%82%E5%8E%9F%E7%90%86/index.html">
 <meta property="og:site_name" content="HanBlog">
-<meta property="og:description" content="分配担保在发生Minor GC之前，虚拟机会先检查老年代最大可用的连续空间是否大于新生代所有对象总空间。如果这个条件成立，那么Minor  GC可以确保是安全的。如果不成立，则虚拟机会查看HandlerPromotionFailure设置是否允许担保失败。如果允许，那么会继续检查老年代最大可用的连续空间是否大于历次晋升到老年代对象的平均大小。如果大于，将尝试着进行一次Monitor GC，尽管这次">
+<meta property="og:description" content="MVCC主要为了提高并发的读写性能，不用加锁就能让多个事务并发读写">
 <meta property="og:locale" content="en_US">
-<meta property="article:published_time" content="2020-07-05T01:03:24.000Z">
-<meta property="article:modified_time" content="2020-08-02T11:38:54.398Z">
+<meta property="og:image" content="http://keepinmemory.github.io/2020/08/14/mvcc%E5%BA%95%E5%B1%82%E5%8E%9F%E7%90%86/mvcc%E5%BA%95%E5%B1%82%E5%8E%9F%E7%90%86%5C2.png">
+<meta property="og:image" content="http://keepinmemory.github.io/2020/08/14/mvcc%E5%BA%95%E5%B1%82%E5%8E%9F%E7%90%86/1.png">
+<meta property="og:image" content="http://keepinmemory.github.io/2020/08/14/mvcc%E5%BA%95%E5%B1%82%E5%8E%9F%E7%90%86/3.png">
+<meta property="og:image" content="http://keepinmemory.github.io/2020/08/14/mvcc%E5%BA%95%E5%B1%82%E5%8E%9F%E7%90%86/4.png">
+<meta property="article:published_time" content="2020-08-14T06:50:17.000Z">
+<meta property="article:modified_time" content="2020-08-14T08:14:18.149Z">
 <meta property="article:author" content="Xuesong">
-<meta property="article:tag" content="面经">
+<meta property="article:tag" content="MySQL">
 <meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://keepinmemory.github.io/2020/08/14/mvcc%E5%BA%95%E5%B1%82%E5%8E%9F%E7%90%86/mvcc%E5%BA%95%E5%B1%82%E5%8E%9F%E7%90%86%5C2.png">
   
     <link rel="alternative" href="/atom.xml" title="HanBlog" type="application/atom+xml">
   
@@ -153,30 +158,47 @@
             <canvas data-colors="#eaeaea" data-sectionHeight="100" data-contentId="js-content" id="myCanvas1" class="anm-canvas"></canvas>
           </div>
           <div id="js-content" class="content-ll">
-            <article id="post-JVM面经" class="article article-type-post " itemscope itemprop="blogPost">
+            <article id="post-mvcc底层原理" class="article article-type-post " itemscope itemprop="blogPost">
   <div class="article-inner">
     
       <header class="article-header">
         
   
     <h1 class="article-title" itemprop="name">
-      JVM面经
+      mvcc底层原理
     </h1>
   
 
         
-        <a href="/2020/07/05/JVM%E9%9D%A2%E7%BB%8F/" class="archive-article-date">
-  	<time datetime="2020-07-05T01:03:24.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2020-07-05</time>
+        <a href="/2020/08/14/mvcc%E5%BA%95%E5%B1%82%E5%8E%9F%E7%90%86/" class="archive-article-date">
+  	<time datetime="2020-08-14T06:50:17.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2020-08-14</time>
 </a>
         
       </header>
     
     <div class="article-entry" itemprop="articleBody">
       
-        <h3 id="分配担保"><a href="#分配担保" class="headerlink" title="分配担保"></a>分配担保</h3><p>在发生Minor GC之前，虚拟机会先检查老年代最大可用的连续空间是否大于新生代所有对象总空间。如果这个条件成立，那么Minor  GC可以确保是安全的。如果不成立，则虚拟机会查看HandlerPromotionFailure设置是否允许担保失败。如果允许，那么会继续检查老年代最大可用的连续空间是否大于历次晋升到老年代对象的平均大小。如果大于，将尝试着进行一次Monitor GC，尽管这次GC是有风险的。如果小于，或者HandlerPromotionFailure设置不允许冒险，那这时也要改为进行一次Full  GC了。</p>
-<p>上述所说的冒险到底是冒的什么险呢？</p>
-<p>前面提到过，新生代使用复制收集算法，但是为了内存利用率。只使用其中一个Survivor空间来作为轮换备份，因此当出现大量对象在Minor  GC后仍然存活的情况（最极端的情况是内存回收之后，新生代中所有的对象都存活），就需要老年代进行分配担保，把Survivor无法容纳的对象直接进入老年代。老年代要进行这样的担保，前提是老年代本身还有容纳这些对象的剩余空间，一共有多少对象存活下来在实际完成内存回收之前是无法明确知道的，所以只好取之前每一次回收晋升到老年代对象容量的平均大小值作为经验值，与老年代的剩余空间进行比较，决定是否进行Full GC来让老年代腾出更多空间。</p>
-<p>取平均值进行比较其实仍然是一种动态概率的手段，也就是说，如果某次Minor  GC存活后的对象突增，远远高于平均值的话，依然会导致担保失败。如果出现HandlerPromotionFailure失败，那就只好在失败后重新发起一次FULL GC。虽然担保失败时绕的圈子是最大的，但大部分情况下都还是将HandlerPromotionFailure开关打开，避免Full  GC过于频繁。</p>
+        <p>MVCC主要为了提高并发的读写性能，不用加锁就能让多个事务并发读写</p>
+<a id="more"></a>
+
+<p>下面的每个Transaction的序号是从小到大生成的，现在有三个事务，小于100的事务全部已经提交，100-300为未提交事务一直到已创建的最大事务，300以上还没创建所以是未开始事务</p>
+<p>min_id=100,max_id=300</p>
+<p>read-view:[100,200],300</p>
+<p><img src="/2020/08/14/mvcc%E5%BA%95%E5%B1%82%E5%8E%9F%E7%90%86/mvcc%E5%BA%95%E5%B1%82%E5%8E%9F%E7%90%86%5C2.png" alt="2"></p>
+<p><img src="/2020/08/14/mvcc%E5%BA%95%E5%B1%82%E5%8E%9F%E7%90%86/1.png" alt="1"></p>
+<p>事务100执行set c1 = ‘123’会生成一个新记录，让旧记录放在undo回滚日志里，按时间顺序新记录和旧记录形成版本链，蓝色为当前最新的记录</p>
+<p><img src="/2020/08/14/mvcc%E5%BA%95%E5%B1%82%E5%8E%9F%E7%90%86/3.png" alt="3"></p>
+<p>使用上面的read-view[100,200],300得到name查询结果</p>
+<p>trx_id&lt;100的为已提交事务，是结果可见的</p>
+<p>100&lt;=trx_id&lt;=300分为两种情况：一是trx_id在未提交数组中，则事务未提交，仅那个修改的事务可见，其他不可见。二是不在数组中，则事务已提交，结果可见</p>
+<p>trx_id&gt;300的事务还未创建，结果当然不可见</p>
+<p><strong>在RC隔离级别下，是每个SELECT都会获取最新的read view；而在RR隔离级别下，则是当事务中的第一个SELECT请求才创建read view。</strong></p>
+<p>这里是在RR隔离级别下</p>
+<p><strong>session1在select的时候就生成了一份read-view，之后就不变了，因为要保证可重复读，然后根据这个read-view查询当前版本链（版本链只有一份，是会随时间变化的）</strong></p>
+<p><strong>图中session1的三次查询都为lilei300，因为要保证可重复读</strong></p>
+<p><img src="/2020/08/14/mvcc%E5%BA%95%E5%B1%82%E5%8E%9F%E7%90%86/4.png" alt="4"></p>
+<p><strong>session2在select的时候生成一份read-view[200,300]，因为100是&lt;200的且已提交，300是从200一直到最大已创建事务，所以commit了也算进去</strong></p>
+<p><strong>根据这个read-view查，从上到下，因为200在未提交数组中，所以结果不可见，一直到100，100&lt;最小值200，所以结果可见，结果为lilei2</strong></p>
 
       
 
@@ -221,7 +243,7 @@
 		<ul class="article-tag-list">
 			 
         		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">面经</a>
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color1">MySQL</a>
         		</li>
       		
 		</ul>
@@ -277,7 +299,7 @@
     <a class="close js-modal-close" href="javascript:;"><i class="icon icon-close"></i></a>
     <p>扫一扫，分享到微信</p>
     <div class="wx-qrcode">
-      <img src="//pan.baidu.com/share/qrcode?url=http://keepinmemory.github.io/2020/07/05/JVM%E9%9D%A2%E7%BB%8F/" alt="微信分享二维码">
+      <img src="//pan.baidu.com/share/qrcode?url=http://keepinmemory.github.io/2020/08/14/mvcc%E5%BA%95%E5%B1%82%E5%8E%9F%E7%90%86/" alt="微信分享二维码">
     </div>
 </div>
 
@@ -291,18 +313,9 @@
   
 <nav id="article-nav">
   
-    <a href="/2020/07/14/IO%E6%A8%A1%E5%9E%8B/" id="article-nav-newer" class="article-nav-link-wrap">
-      <i class="icon-circle-left"></i>
-      <div class="article-nav-title">
-        
-          IO模型
-        
-      </div>
-    </a>
   
-  
-    <a href="/2020/06/29/HashMap/" id="article-nav-older" class="article-nav-link-wrap">
-      <div class="article-nav-title">HashMap</div>
+    <a href="/2020/08/04/Java%E8%BF%90%E8%A1%8C%E6%97%B6%E6%95%B0%E6%8D%AE%E5%8C%BA/" id="article-nav-older" class="article-nav-link-wrap">
+      <div class="article-nav-title">Java运行时数据区</div>
       <i class="icon-circle-right"></i>
     </a>
   
@@ -432,10 +445,6 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">IO模型</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color4">LeetCode</a>
               </li>
              
@@ -448,11 +457,11 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">JMM</a>
+                <a href="javascript:void(0)" class="js-tag color3">同步</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">同步</a>
+                <a href="javascript:void(0)" class="js-tag color5">IO模型</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -464,7 +473,15 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color4">JMM</a>
+              </li>
+             
+              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color3">Java核心卷</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">集合</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -472,7 +489,7 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">集合</a>
+                <a href="javascript:void(0)" class="js-tag color4">NIO</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -484,15 +501,7 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">NIO</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color4">IOC</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">事务</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -500,11 +509,15 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">SpringMVC</a>
+                <a href="javascript:void(0)" class="js-tag color3">事务</a>
               </li>
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color1">SpringBoot</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color5">SpringMVC</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -516,7 +529,7 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">Java基础</a>
+                <a href="javascript:void(0)" class="js-tag color1">MySQL</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -524,7 +537,11 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">函数式编程</a>
+                <a href="javascript:void(0)" class="js-tag color3">剑指Offer</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color2">Java基础</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -532,11 +549,11 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">设计模式</a>
+                <a href="javascript:void(0)" class="js-tag color1">函数式编程</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">剑指Offer</a>
+                <a href="javascript:void(0)" class="js-tag color5">设计模式</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -548,10 +565,6 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">线程</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color5">sync</a>
               </li>
              
@@ -560,11 +573,15 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">静态</a>
+                <a href="javascript:void(0)" class="js-tag color3">线程</a>
               </li>
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color3">无锁</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">静态</a>
               </li>
              
               <li class="article-tag-list-item">
