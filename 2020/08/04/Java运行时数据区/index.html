@@ -30,7 +30,7 @@
 <meta property="og:image" content="http://keepinmemory.github.io/2020/08/04/Java%E8%BF%90%E8%A1%8C%E6%97%B6%E6%95%B0%E6%8D%AE%E5%8C%BA/10.png">
 <meta property="og:image" content="http://keepinmemory.github.io/2020/08/04/Java%E8%BF%90%E8%A1%8C%E6%97%B6%E6%95%B0%E6%8D%AE%E5%8C%BA/11.png">
 <meta property="article:published_time" content="2020-08-04T02:44:33.000Z">
-<meta property="article:modified_time" content="2020-08-23T00:37:01.469Z">
+<meta property="article:modified_time" content="2020-09-03T10:21:27.537Z">
 <meta property="article:author" content="Xuesong">
 <meta property="article:tag" content="JVM">
 <meta name="twitter:card" content="summary">
@@ -234,8 +234,16 @@
 <p>这里new了一个math对象，math对象的对象头中类型指针指向了方法区的Math类的类元信息，类元信息有各个方法的名称和字节码</p>
 <p>运行到math.compute()的时候，需要去找到compute方法的字节指令码去执行</p>
 <p>math.compute()仅仅是个静态符号，要去对象头指向的类元信息里去找方法的字节码地址</p>
+<p>找到以后将直接引用放到main方法的栈帧的动态链接里</p>
 <p>动态链接的意思就是在程序运行过程中将一系列的静态符号根据对象的对象头找到方法对应的指令码入口地址，把方法入口的地址存到栈帧的动态链接中</p>
-<p>比如在程序运行过程中main栈帧的动态链接里有compute()方法的入口地址（直接引用）</p>
+<ul>
+<li><p>部分符号引用在类加载阶段(解析)的时候就转化为直接引用,这种转化为<strong>静态链接</strong></p>
+<p>将<strong>常量池</strong>中的符号引用转换成地址，它指向该类的方法在方法区中的内存位置</p>
+</li>
+<li><p>部分符号引用在运行期间转化为直接引用,这种转化为<strong>动态链接</strong></p>
+<p>将编译器确定不下来的符号引用转换成地址，例如多态，指向该方法在方法区中的内存位置</p>
+</li>
+</ul>
 <h4 id="方法出口"><a href="#方法出口" class="headerlink" title="方法出口"></a>方法出口</h4><p>compute方法执行完要return c，return给谁，返回到哪里接着执行？要看方法出口</p>
 <p>示例里面compute方法的栈帧里的方法出口就记录了math.compute()的行号，就是程序计数器的值</p>
 <p>返回的时候带着出栈的操作数，返回到main方法栈帧和compute方法的方法出口记录的行号</p>
@@ -262,7 +270,7 @@
 <p><strong>方法区的静态变量如果是引用类型，就会指向堆里的实例</strong></p>
 <p>不仅方法区会有指针指向堆，堆里面的实例也是有指针指向方法区的</p>
 <p><img src="/2020/08/04/Java%E8%BF%90%E8%A1%8C%E6%97%B6%E6%95%B0%E6%8D%AE%E5%8C%BA/9.png" alt="9"></p>
-<p>每个实例对象都有一个对象头+实例数据+填充组成，而对象头又有三部分组成：MarkWord+Klass Pointer+数组长度</p>
+<p><strong>每个实例对象都有一个对象头+实例数据+填充组成，而对象头又有三部分组成：MarkWord+Klass Pointer+数组长度</strong></p>
 <p>这里的Klass Pointer就是类型指针</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Math math = <span class="keyword">new</span> Math();</span><br></pre></td></tr></table></figure>
 
@@ -272,7 +280,7 @@
 <p><strong>堆里对象的对象头的类型指针会指向方法区的类元信息</strong></p>
 <h2 id="本地方法栈"><a href="#本地方法栈" class="headerlink" title="本地方法栈"></a>本地方法栈</h2><p>和虚拟机栈的作用一样，不过服务的是本地native方法</p>
 <h2 id="堆"><a href="#堆" class="headerlink" title="堆"></a>堆</h2><p>堆里面有年轻代、老年代</p>
-<p>年轻代又分伊甸园去、幸存者区</p>
+<p>年轻代又分伊甸园区、幸存者区</p>
 <p>幸存者区分From区和To区</p>
 <p><img src="/2020/08/04/Java%E8%BF%90%E8%A1%8C%E6%97%B6%E6%95%B0%E6%8D%AE%E5%8C%BA/11.png" alt="11"></p>
 <p>如果给堆分配600M，老年代占2/3 400M，年轻代占1/3 200M</p>
@@ -528,7 +536,7 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">LeetCode</a>
+                <a href="javascript:void(0)" class="js-tag color4">AQS</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -536,27 +544,7 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">IO模型</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">AQS</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">面经</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color4">实战Java高并发程序设计</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">同步</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">线程池</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -564,7 +552,23 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">JMM</a>
+                <a href="javascript:void(0)" class="js-tag color3">面经</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color5">IO模型</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color4">LeetCode</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color4">线程池</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">同步</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -576,15 +580,19 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color4">JMM</a>
+              </li>
+             
+              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color4">JVM</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">NIO</a>
+                <a href="javascript:void(0)" class="js-tag color1">MySQL</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">MySQL</a>
+                <a href="javascript:void(0)" class="js-tag color4">NIO</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -600,11 +608,11 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">Jdbc</a>
+                <a href="javascript:void(0)" class="js-tag color3">事务</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">事务</a>
+                <a href="javascript:void(0)" class="js-tag color5">Jdbc</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -616,11 +624,11 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">Synchronized</a>
+                <a href="javascript:void(0)" class="js-tag color2">ThreadLocal</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">ThreadLocal</a>
+                <a href="javascript:void(0)" class="js-tag color3">Synchronized</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -628,7 +636,7 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">剑指Offer</a>
+                <a href="javascript:void(0)" class="js-tag color4">内部类</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -636,11 +644,7 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">内部类</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">设计模式</a>
+                <a href="javascript:void(0)" class="js-tag color3">剑指Offer</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -648,7 +652,15 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color5">设计模式</a>
+              </li>
+             
+              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color3">数组</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">接口</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -660,15 +672,11 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">sync</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color3">线程</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">接口</a>
+                <a href="javascript:void(0)" class="js-tag color5">sync</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -676,11 +684,11 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">无锁</a>
+                <a href="javascript:void(0)" class="js-tag color5">错误处理</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">错误处理</a>
+                <a href="javascript:void(0)" class="js-tag color3">无锁</a>
               </li>
              
               <li class="article-tag-list-item">

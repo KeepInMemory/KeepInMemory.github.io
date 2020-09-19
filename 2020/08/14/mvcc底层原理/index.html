@@ -20,7 +20,7 @@
 <meta property="og:image" content="http://keepinmemory.github.io/2020/08/14/mvcc%E5%BA%95%E5%B1%82%E5%8E%9F%E7%90%86/3.png">
 <meta property="og:image" content="http://keepinmemory.github.io/2020/08/14/mvcc%E5%BA%95%E5%B1%82%E5%8E%9F%E7%90%86/4.png">
 <meta property="article:published_time" content="2020-08-14T06:50:17.000Z">
-<meta property="article:modified_time" content="2020-08-14T08:14:18.149Z">
+<meta property="article:modified_time" content="2020-09-13T09:03:05.685Z">
 <meta property="article:author" content="Xuesong">
 <meta property="article:tag" content="MySQL">
 <meta name="twitter:card" content="summary">
@@ -189,15 +189,16 @@
 <p>事务100执行set c1 = ‘123’会生成一个新记录，让旧记录放在undo回滚日志里，按时间顺序新记录和旧记录形成版本链，蓝色为当前最新的记录</p>
 <p><img src="/2020/08/14/mvcc%E5%BA%95%E5%B1%82%E5%8E%9F%E7%90%86/3.png" alt="3"></p>
 <p>使用上面的read-view[100,200],300得到name查询结果</p>
+<p>查询过程为Select快照读去读取版本链，拿每个版本的事务id和read-view去比较</p>
 <p>trx_id&lt;100的为已提交事务，是结果可见的</p>
 <p>100&lt;=trx_id&lt;=300分为两种情况：一是trx_id在未提交数组中，则事务未提交，仅那个修改的事务可见，其他不可见。二是不在数组中，则事务已提交，结果可见</p>
-<p>trx_id&gt;300的事务还未创建，结果当然不可见</p>
+<p>trx_id&gt;300表示这个版本是生成了raed-view后未来生成的版本，自己是不可见的</p>
 <p><strong>在RC隔离级别下，是每个SELECT都会获取最新的read view；而在RR隔离级别下，则是当事务中的第一个SELECT请求才创建read view。</strong></p>
 <p>这里是在RR隔离级别下</p>
 <p><strong>session1在select的时候就生成了一份read-view，之后就不变了，因为要保证可重复读，然后根据这个read-view查询当前版本链（版本链只有一份，是会随时间变化的）</strong></p>
 <p><strong>图中session1的三次查询都为lilei300，因为要保证可重复读</strong></p>
 <p><img src="/2020/08/14/mvcc%E5%BA%95%E5%B1%82%E5%8E%9F%E7%90%86/4.png" alt="4"></p>
-<p><strong>session2在select的时候生成一份read-view[200,300]，因为100是&lt;200的且已提交，300是从200一直到最大已创建事务，所以commit了也算进去</strong></p>
+<p><strong>session2在select的时候生成一份read-view[200],300，因为100是&lt;200的且已提交，300是从200一直到最大已创建事务，所以commit了也算进去</strong></p>
 <p><strong>根据这个read-view查，从上到下，因为200在未提交数组中，所以结果不可见，一直到100，100&lt;最小值200，所以结果可见，结果为lilei2</strong></p>
 
       
@@ -450,7 +451,7 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">LeetCode</a>
+                <a href="javascript:void(0)" class="js-tag color4">AQS</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -458,27 +459,7 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">IO模型</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">AQS</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">面经</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color4">实战Java高并发程序设计</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">同步</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">线程池</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -486,7 +467,23 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">JMM</a>
+                <a href="javascript:void(0)" class="js-tag color3">面经</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color5">IO模型</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color4">LeetCode</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color4">线程池</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">同步</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -498,15 +495,19 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color4">JMM</a>
+              </li>
+             
+              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color4">JVM</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">NIO</a>
+                <a href="javascript:void(0)" class="js-tag color1">MySQL</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">MySQL</a>
+                <a href="javascript:void(0)" class="js-tag color4">NIO</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -522,11 +523,11 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">Jdbc</a>
+                <a href="javascript:void(0)" class="js-tag color3">事务</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">事务</a>
+                <a href="javascript:void(0)" class="js-tag color5">Jdbc</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -538,11 +539,11 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">Synchronized</a>
+                <a href="javascript:void(0)" class="js-tag color2">ThreadLocal</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">ThreadLocal</a>
+                <a href="javascript:void(0)" class="js-tag color3">Synchronized</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -550,7 +551,7 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">剑指Offer</a>
+                <a href="javascript:void(0)" class="js-tag color4">内部类</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -558,11 +559,7 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">内部类</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">设计模式</a>
+                <a href="javascript:void(0)" class="js-tag color3">剑指Offer</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -570,7 +567,15 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color5">设计模式</a>
+              </li>
+             
+              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color3">数组</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">接口</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -582,15 +587,11 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">sync</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color3">线程</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">接口</a>
+                <a href="javascript:void(0)" class="js-tag color5">sync</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -598,11 +599,11 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">无锁</a>
+                <a href="javascript:void(0)" class="js-tag color5">错误处理</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">错误处理</a>
+                <a href="javascript:void(0)" class="js-tag color3">无锁</a>
               </li>
              
               <li class="article-tag-list-item">
