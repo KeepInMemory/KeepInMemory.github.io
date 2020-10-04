@@ -28,9 +28,10 @@
 <meta property="og:image" content="http://keepinmemory.github.io/2020/08/04/Java%E8%BF%90%E8%A1%8C%E6%97%B6%E6%95%B0%E6%8D%AE%E5%8C%BA/14.png">
 <meta property="og:image" content="http://keepinmemory.github.io/2020/08/04/Java%E8%BF%90%E8%A1%8C%E6%97%B6%E6%95%B0%E6%8D%AE%E5%8C%BA/9.png">
 <meta property="og:image" content="http://keepinmemory.github.io/2020/08/04/Java%E8%BF%90%E8%A1%8C%E6%97%B6%E6%95%B0%E6%8D%AE%E5%8C%BA/10.png">
+<meta property="og:image" content="http://keepinmemory.github.io/2020/08/04/Java%E8%BF%90%E8%A1%8C%E6%97%B6%E6%95%B0%E6%8D%AE%E5%8C%BA/15.png">
 <meta property="og:image" content="http://keepinmemory.github.io/2020/08/04/Java%E8%BF%90%E8%A1%8C%E6%97%B6%E6%95%B0%E6%8D%AE%E5%8C%BA/11.png">
 <meta property="article:published_time" content="2020-08-04T02:44:33.000Z">
-<meta property="article:modified_time" content="2020-09-03T10:21:27.537Z">
+<meta property="article:modified_time" content="2020-09-25T07:08:05.636Z">
 <meta property="article:author" content="Xuesong">
 <meta property="article:tag" content="JVM">
 <meta name="twitter:card" content="summary">
@@ -242,11 +243,14 @@
 </li>
 <li><p>部分符号引用在运行期间转化为直接引用,这种转化为<strong>动态链接</strong></p>
 <p>将编译器确定不下来的符号引用转换成地址，例如多态，指向该方法在方法区中的内存位置</p>
+<p>这里多态体现在了需要知道局部变量表指向的堆的对象究竟是谁</p>
 </li>
 </ul>
 <h4 id="方法出口"><a href="#方法出口" class="headerlink" title="方法出口"></a>方法出口</h4><p>compute方法执行完要return c，return给谁，返回到哪里接着执行？要看方法出口</p>
-<p>示例里面compute方法的栈帧里的方法出口就记录了math.compute()的行号，就是程序计数器的值</p>
+<p>正常退出的情况下，示例里面compute方法的栈帧里的方法出口就记录了math.compute()的行号，就是程序计数器的值</p>
 <p>返回的时候带着出栈的操作数，返回到main方法栈帧和compute方法的方法出口记录的行号</p>
+<p>异常退出的情况下，需要查异常表来确定方法出口地址</p>
+<p>返回以后栈帧出栈，恢复下一个栈帧的状态</p>
 <h2 id="程序计数器"><a href="#程序计数器" class="headerlink" title="程序计数器"></a>程序计数器</h2><p>记录了正在执行的虚拟机字节码指令的地址</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">compute</span><span class="params">()</span></span>;</span><br><span class="line">Code:</span><br><span class="line">   <span class="number">0</span>: iconst_1<span class="comment">//将int类型常量1压入操作数栈 //先读到a=1的右边</span></span><br><span class="line">   <span class="number">1</span>: istore_1<span class="comment">//将int类型值常量1出栈（操作数栈），存入局部变量1（1是第1号位置代表a）//a=1的左边</span></span><br><span class="line">   <span class="number">2</span>: iconst_2<span class="comment">//将int类型常量2压入操作数栈</span></span><br><span class="line">   <span class="number">3</span>: istore_2<span class="comment">//将int类型值存入局部变量2</span></span><br><span class="line">   <span class="number">4</span>: iload_1<span class="comment">//</span></span><br><span class="line">   <span class="number">5</span>: iload_2</span><br><span class="line">   <span class="number">6</span>: iadd</span><br><span class="line">   <span class="number">7</span>: bipush        <span class="number">10</span></span><br><span class="line">   <span class="number">9</span>: imul</span><br><span class="line">  <span class="number">10</span>: istore_3</span><br><span class="line">  <span class="number">11</span>: iload_3</span><br><span class="line">  <span class="number">12</span>: ireturn</span><br></pre></td></tr></table></figure>
 
@@ -260,7 +264,7 @@
 <p>运行时常量池比Class文件常量池具有动态性，System.out.println在Class文件常量池中是System字面量、out字面量、println字面量，而在运行时常量池中就变成了真实的地址</p>
 <p><strong>内部存放运行时常量池+类元信息</strong></p>
 <p><img src="/2020/08/04/Java%E8%BF%90%E8%A1%8C%E6%97%B6%E6%95%B0%E6%8D%AE%E5%8C%BA/14.png" alt="14"></p>
-<p><strong>String常量池是运行时常量池的一部分，JDK7把String常量池+静态变量从方法区移到了堆里，JDK8把永久代方法区改成了元空间</strong></p>
+<p>String常量池是运行时常量池的一部分，JDK7把String常量池+静态变量从方法区移到了堆里，JDK8把永久代方法区改成了元空间</p>
 <p>类元信息包括了类全限定名、修饰符；字段名称、修饰符；方法名称、修饰符、返回值等等</p>
 <p>示例中Math类有两个静态变量</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">int</span> initData = <span class="number">666</span>;</span><br><span class="line"><span class="keyword">public</span> <span class="keyword">static</span> User user = <span class="keyword">new</span> User();</span><br></pre></td></tr></table></figure>
@@ -279,6 +283,7 @@
 <p><strong>栈里的局部变量表的引用类型会指向堆，方法区的引用类型静态变量会指向堆</strong></p>
 <p><strong>堆里对象的对象头的类型指针会指向方法区的类元信息</strong></p>
 <h2 id="本地方法栈"><a href="#本地方法栈" class="headerlink" title="本地方法栈"></a>本地方法栈</h2><p>和虚拟机栈的作用一样，不过服务的是本地native方法</p>
+<p><img src="/2020/08/04/Java%E8%BF%90%E8%A1%8C%E6%97%B6%E6%95%B0%E6%8D%AE%E5%8C%BA/15.png" alt="15"></p>
 <h2 id="堆"><a href="#堆" class="headerlink" title="堆"></a>堆</h2><p>堆里面有年轻代、老年代</p>
 <p>年轻代又分伊甸园区、幸存者区</p>
 <p>幸存者区分From区和To区</p>
@@ -536,6 +541,10 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color4">LeetCode</a>
+              </li>
+             
+              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color3">IO</a>
               </li>
              
@@ -548,19 +557,15 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">IO模型</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">LeetCode</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color4">实战Java高并发程序设计</a>
               </li>
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color3">同步</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color5">IO模型</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -572,15 +577,11 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">Java核心卷</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color4">序列化</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">JMM</a>
+                <a href="javascript:void(0)" class="js-tag color3">Java核心卷</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -588,11 +589,15 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">Mybatis</a>
+                <a href="javascript:void(0)" class="js-tag color4">JMM</a>
               </li>
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color1">MySQL</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">Mybatis</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -604,7 +609,7 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">IOC</a>
+                <a href="javascript:void(0)" class="js-tag color5">Jdbc</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -612,11 +617,11 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">事务</a>
+                <a href="javascript:void(0)" class="js-tag color4">IOC</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">Jdbc</a>
+                <a href="javascript:void(0)" class="js-tag color3">事务</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -636,19 +641,11 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color1">redis</a>
+              </li>
+             
+              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color2">Java基础</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">函数式编程</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">剑指Offer</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">反射</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -656,11 +653,19 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">数组</a>
+                <a href="javascript:void(0)" class="js-tag color1">函数式编程</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">反射</a>
               </li>
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color3">接口</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">剑指Offer</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -669,6 +674,10 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color5">设计模式</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">数组</a>
               </li>
              
               <li class="article-tag-list-item">

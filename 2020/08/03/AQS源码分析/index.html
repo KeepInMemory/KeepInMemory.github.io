@@ -8,17 +8,17 @@
   <link rel="dns-prefetch" href="http://KeepInMemory.github.io">
   <title>AQS源码分析 | HanBlog</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta name="description" content="AQS源码成员AQS维护了一个带头节点和尾节点的双向链表 AQS有Node类型的head和tail，用来记录等待队列的头和尾 volatile int state是锁状态，加锁成功则为1，重入+1 解锁则为0 AQS的核心思想就是申请锁的线程CAS改变state，改变成功获取锁 失败后的线程需要加入到队列的尾部，一旦锁被释放了，AQS就把锁让给队首的第二个node 当然在此基础上有公平锁&#x2F;非公平锁">
+  <meta name="description" content="AQS源码成员AQS维护了一个带头节点和尾节点的双向链表 AQS有Node类型的head和tail，用来记录等待队列的头和尾 volatile int state是锁状态，加锁成功则为1，重入+1 解锁则为0 AQS的核心思想就是申请锁的线程CAS改变state，改变成功获取锁 失败后的线程需要加入到队列的尾部，一旦锁被释放了，AQS就把锁让给队首的第二个node 此基础上有公平锁&#x2F;非公平锁、排他">
 <meta property="og:type" content="article">
 <meta property="og:title" content="AQS源码分析">
 <meta property="og:url" content="http://keepinmemory.github.io/2020/08/03/AQS%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/index.html">
 <meta property="og:site_name" content="HanBlog">
-<meta property="og:description" content="AQS源码成员AQS维护了一个带头节点和尾节点的双向链表 AQS有Node类型的head和tail，用来记录等待队列的头和尾 volatile int state是锁状态，加锁成功则为1，重入+1 解锁则为0 AQS的核心思想就是申请锁的线程CAS改变state，改变成功获取锁 失败后的线程需要加入到队列的尾部，一旦锁被释放了，AQS就把锁让给队首的第二个node 当然在此基础上有公平锁&#x2F;非公平锁">
+<meta property="og:description" content="AQS源码成员AQS维护了一个带头节点和尾节点的双向链表 AQS有Node类型的head和tail，用来记录等待队列的头和尾 volatile int state是锁状态，加锁成功则为1，重入+1 解锁则为0 AQS的核心思想就是申请锁的线程CAS改变state，改变成功获取锁 失败后的线程需要加入到队列的尾部，一旦锁被释放了，AQS就把锁让给队首的第二个node 此基础上有公平锁&#x2F;非公平锁、排他">
 <meta property="og:locale" content="en_US">
 <meta property="og:image" content="http://keepinmemory.github.io/2020/08/03/AQS%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/1.png">
 <meta property="og:image" content="http://keepinmemory.github.io/2020/08/03/AQS%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/2.png">
 <meta property="article:published_time" content="2020-08-03T07:02:01.000Z">
-<meta property="article:modified_time" content="2020-08-30T03:05:50.691Z">
+<meta property="article:modified_time" content="2020-09-29T14:00:29.171Z">
 <meta property="article:author" content="Xuesong">
 <meta property="article:tag" content="AQS">
 <meta name="twitter:card" content="summary">
@@ -181,7 +181,7 @@
 <p>volatile int state是锁状态，加锁成功则为1，重入+1 解锁则为0</p>
 <p>AQS的核心思想就是申请锁的线程CAS改变state，改变成功获取锁</p>
 <p>失败后的线程需要加入到队列的尾部，一旦锁被释放了，AQS就把锁让给队首的第二个node</p>
-<p>当然在此基础上有公平锁/非公平锁、排他锁（Reentrantlock）/共享锁（CountDownLatch/Semaphore）多种实现</p>
+<p>此基础上有公平锁/非公平锁、排他锁（Reentrantlock）/共享锁（CountDownLatch/Semaphore）多种实现</p>
 <a id="more"></a>
 
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * Head of the wait queue, lazily initialized.  Except for</span></span><br><span class="line"><span class="comment"> * initialization, it is modified only via method setHead.  Note:</span></span><br><span class="line"><span class="comment"> * If head exists, its waitStatus is guaranteed not to be</span></span><br><span class="line"><span class="comment"> * CANCELLED.</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="keyword">private</span> <span class="keyword">transient</span> <span class="keyword">volatile</span> Node head;</span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * Tail of the wait queue, lazily initialized.  Modified only via</span></span><br><span class="line"><span class="comment"> * method enq to add new wait node.</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="keyword">private</span> <span class="keyword">transient</span> <span class="keyword">volatile</span> Node tail;</span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * The synchronization state.</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="keyword">private</span> <span class="keyword">volatile</span> <span class="keyword">int</span> state;</span><br></pre></td></tr></table></figure>
@@ -209,7 +209,7 @@
 <p>　　一般来说，自定义同步器要么是独占方法，要么是共享方式，他们也只需实现tryAcquire-tryRelease、tryAcquireShared-tryReleaseShared中的一种即可。但AQS也支持自定义同步器同时实现独占和共享两种方式，如ReentrantReadWriteLock，排他锁用在写上，共享锁用在读上。</p>
 <h2 id="ReentrantLock的实现"><a href="#ReentrantLock的实现" class="headerlink" title="ReentrantLock的实现"></a>ReentrantLock的实现</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">ReentrantLock</span> <span class="keyword">implements</span> <span class="title">Lock</span>, <span class="title">java</span>.<span class="title">io</span>.<span class="title">Serializable</span> </span>&#123;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">long</span> serialVersionUID = <span class="number">7373984872572414699L</span>;</span><br><span class="line">    <span class="comment">/** Synchronizer providing all implementation mechanics */</span></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">final</span> Sync sync;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * Base of synchronization control for this lock. Subclassed</span></span><br><span class="line"><span class="comment">     * into fair and nonfair versions below. Uses AQS state to</span></span><br><span class="line"><span class="comment">     * represent the number of holds on the lock.</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="keyword">abstract</span> <span class="keyword">static</span> <span class="class"><span class="keyword">class</span> <span class="title">Sync</span> <span class="keyword">extends</span> <span class="title">AbstractQueuedSynchronizer</span> </span>&#123;</span><br></pre></td></tr></table></figure>
 
-<p>ReentrantLock内部有AQS的实现Sync对象，又在Sync的基础上实现了子类公平锁和非公平锁</p>
+<p>ReentrantLock内部组合了一个AQS的实现Sync对象，又在Sync的基础上实现了子类公平锁和非公平锁</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">static</span> <span class="keyword">final</span> <span class="class"><span class="keyword">class</span> <span class="title">NonfairSync</span> <span class="keyword">extends</span> <span class="title">Sync</span></span></span><br><span class="line"><span class="class"><span class="title">static</span> <span class="title">final</span> <span class="title">class</span> <span class="title">FairSync</span> <span class="keyword">extends</span> <span class="title">Sync</span></span></span><br></pre></td></tr></table></figure>
 
 <h3 id="加锁过程"><a href="#加锁过程" class="headerlink" title="加锁过程"></a>加锁过程</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">final</span> ReentrantLock lock = <span class="keyword">new</span> ReentrantLock(<span class="keyword">true</span>);</span><br><span class="line"> Thread t1= <span class="keyword">new</span> Thread(<span class="string">"t1"</span>)&#123;</span><br><span class="line">     <span class="meta">@Override</span></span><br><span class="line">     <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span><span class="params">()</span> </span>&#123;</span><br><span class="line">         lock.lock();</span><br><span class="line">         logic();</span><br><span class="line">         lock.unlock();</span><br><span class="line">     &#125;</span><br><span class="line"> &#125;;</span><br><span class="line">t1.start();</span><br></pre></td></tr></table></figure>
@@ -232,8 +232,23 @@
 <p>A释放锁后unpark它后面的node，node被唤醒后把自己设成head，<strong>把node的Thread设置为null</strong></p>
 <p>hasQueuedPredecessors方法判断队列是否被初始化（如果没有初始化显然不需要排队），和是否需要排队（队列如果被初始化了，则自己有可能需要排队，有人领先，先初始化了队列）</p>
 <h3 id="公平锁和非公平锁"><a href="#公平锁和非公平锁" class="headerlink" title="公平锁和非公平锁"></a>公平锁和非公平锁</h3><p><img src="/2020/08/03/AQS%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/2.png" alt="2"></p>
-<p>如果是公平锁就乖乖走正常加锁流程，无一例外</p>
-<p>如果是非公平锁，无脑CAS设置State锁状态，去尝试抢占一次，失败就走正常加锁流程</p>
+<p>公平锁加锁逻辑：</p>
+<ol>
+<li>调用 acquire 方法，将线程放入同步队列中进行等待</li>
+<li>线程在同步队列中成功获取锁，则将自己设为持锁线程后返回</li>
+<li>若同步状态不为0，且当前线程为持锁线程，则执行重入逻辑</li>
+</ol>
+<p>非公平锁加锁逻辑：</p>
+<ol>
+<li>调用 compareAndSetState 方法抢占式加锁，加锁成功则将自己设为持锁线程，并返回</li>
+<li>若加锁失败，则调用 acquire 方法，将线程置于同步队列尾部进行等待</li>
+<li>线程在同步队列中成功获取锁，则将自己设为持锁线程后返回</li>
+<li>若同步状态不为0，且当前线程为持锁线程，则执行重入逻辑</li>
+</ol>
+<p>公平锁和非公平锁的实现区别：</p>
+<p>1.lock方法：公平锁执行acquire加锁逻辑，非公平锁先CAS抢占式加锁，加锁成功则将自己设为持锁线程返回，抢占失败再执行acquire</p>
+<p>2.acquire方法：两者都是调用tryAcquire方法加锁，加锁失败会进行入队park操作</p>
+<p>3.tryAcquire方法：公平锁使用hasQueuedPredecessors方法判断是否有其他线程比当前线程在同步队列中等待的时间更长，如果有则不加锁，让前面的先加锁。如果没有比自己靠前的线程，则CAS抢占式加锁，加锁失败判断是不是重入。非公平锁如果锁为自由状态，CAS去抢占式加锁，加锁失败判断是不是重入。</p>
 
       
 
@@ -485,6 +500,10 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color4">LeetCode</a>
+              </li>
+             
+              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color3">IO</a>
               </li>
              
@@ -497,19 +516,15 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">IO模型</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">LeetCode</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color4">实战Java高并发程序设计</a>
               </li>
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color3">同步</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color5">IO模型</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -521,15 +536,11 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">Java核心卷</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color4">序列化</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">JMM</a>
+                <a href="javascript:void(0)" class="js-tag color3">Java核心卷</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -537,11 +548,15 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">Mybatis</a>
+                <a href="javascript:void(0)" class="js-tag color4">JMM</a>
               </li>
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color1">MySQL</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">Mybatis</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -553,7 +568,7 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">IOC</a>
+                <a href="javascript:void(0)" class="js-tag color5">Jdbc</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -561,11 +576,11 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">事务</a>
+                <a href="javascript:void(0)" class="js-tag color4">IOC</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">Jdbc</a>
+                <a href="javascript:void(0)" class="js-tag color3">事务</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -585,19 +600,11 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color1">redis</a>
+              </li>
+             
+              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color2">Java基础</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">函数式编程</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">剑指Offer</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">反射</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -605,11 +612,19 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">数组</a>
+                <a href="javascript:void(0)" class="js-tag color1">函数式编程</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">反射</a>
               </li>
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color3">接口</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">剑指Offer</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -618,6 +633,10 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color5">设计模式</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">数组</a>
               </li>
              
               <li class="article-tag-list-item">
