@@ -18,7 +18,7 @@
 <meta property="og:image" content="http://keepinmemory.github.io/2020/09/19/Spring%E5%BE%AA%E7%8E%AF%E4%BE%9D%E8%B5%96/1.png">
 <meta property="og:image" content="http://keepinmemory.github.io/2020/09/19/Spring%E5%BE%AA%E7%8E%AF%E4%BE%9D%E8%B5%96/2.png">
 <meta property="article:published_time" content="2020-09-19T05:59:46.000Z">
-<meta property="article:modified_time" content="2020-10-04T08:12:42.952Z">
+<meta property="article:modified_time" content="2020-10-12T02:59:39.729Z">
 <meta property="article:author" content="Xuesong">
 <meta property="article:tag" content="spring">
 <meta name="twitter:card" content="summary">
@@ -195,7 +195,7 @@
 <p>3.填充属性（依赖注入） —-&gt; 单例池找AService —-&gt;找不到 —-&gt;创建AService的Bean</p>
 <p>到这里出现了循环依赖</p>
 <p><img src="/2020/09/19/Spring%E5%BE%AA%E7%8E%AF%E4%BE%9D%E8%B5%96/1.png" alt="1"></p>
-<h4 id="放入缓存"><a href="#放入缓存" class="headerlink" title="放入缓存"></a>放入缓存</h4><p><img src="/2020/09/19/Spring%E5%BE%AA%E7%8E%AF%E4%BE%9D%E8%B5%96/2.png" alt="2"></p>
+<h4 id="加入一级缓存"><a href="#加入一级缓存" class="headerlink" title="加入一级缓存"></a>加入一级缓存</h4><p><img src="/2020/09/19/Spring%E5%BE%AA%E7%8E%AF%E4%BE%9D%E8%B5%96/2.png" alt="2"></p>
 <p>Bean的生命周期-AService</p>
 <p>1.通过配置扫描路径扫描类Class，得到BeanDefinition</p>
 <p>2.通过BeanDefiniton和反射创建对象 —-&gt;将原始对象放到缓存Map&lt;beanName,bean&gt;中</p>
@@ -208,7 +208,7 @@
 <p><strong>问题：如果在AService的BeanPostProcessor后置处理器中返回了一个新的AService对象，那么这个新的对象会被放在单例池中，而赋值给BSerice的AService却是原始对象，会报错，因为IOC容器是单例的但是却有两个AService</strong></p>
 <p><strong>BeanPostProcessor.postProcessBeforeInitialization()的返回值会被放在IOC容器中作为本次初始化的Bean</strong></p>
 <p><strong>同样的道理，BeanPostProcessor因为可以实现AOP功能，也就是在postProcessAfterInitialization中创建代理对象，将代理对象返回放在容器中，所以也会出现两个对象打破单例规则</strong></p>
-<h4 id="提前生成代理对象"><a href="#提前生成代理对象" class="headerlink" title="提前生成代理对象"></a>提前生成代理对象</h4><p>Bean的生命周期-AService</p>
+<h4 id="提前生成代理对象放到缓存"><a href="#提前生成代理对象放到缓存" class="headerlink" title="提前生成代理对象放到缓存"></a>提前生成代理对象放到缓存</h4><p>Bean的生命周期-AService</p>
 <p>1.通过配置扫描路径扫描类Class，得到BeanDefinition</p>
 <p>2.通过BeanDefiniton和反射创建对象 —-&gt;SmartBeanPostProerssor产生代理对象—-&gt;将代理对象放到缓存Map&lt;beanName,bean&gt;中</p>
 <p>3.填充属性（依赖注入） —-&gt; 单例池找BService —-&gt;找不到 —-&gt;在缓存Map中找—-&gt;找不到创建BService</p>
@@ -234,7 +234,7 @@
 <p><strong>使用了懒加载的思想，用到了才会去提前创建代理对象，解决了所有情况都提前产生代理对象的情况，当出现循环依赖的时候才执行lamda表达式，lamda表达式替换了之前的代理对象</strong></p>
 <p><strong>这里的单例池就是一级缓存，缓存Map&lt;beanName,lamda(原始对象)&gt;就是三级缓存</strong></p>
 <p><strong>问题：如果有一个CService和AService也是循环依赖，那么AService需要注入BService的时候，BService在三级缓存中找到了lamda表达式执行了产生了代理对象，注入BService成功了，又需要注入CService，CService也找到了lamda表达式，也执行了一次，产生了两个代理对象，又不是单例了</strong></p>
-<h4 id="二级缓存"><a href="#二级缓存" class="headerlink" title="二级缓存"></a>二级缓存</h4><p>Bean的生命周期-AService</p>
+<h4 id="加入二级缓存"><a href="#加入二级缓存" class="headerlink" title="加入二级缓存"></a>加入二级缓存</h4><p>Bean的生命周期-AService</p>
 <p>1.通过配置扫描路径扫描类Class，得到BeanDefinition</p>
 <p>2.通过BeanDefiniton和反射创建对象 —-&gt;将BeanName和原始对象的关系映射放到Map&lt;beanName,lamda(原始对象)&gt;里</p>
 <p>3.填充属性（依赖注入） —-&gt; 单例池找BService —-&gt;找不到 —-&gt;在缓存Map中找—-&gt;找不到创建BService</p>
@@ -504,19 +504,7 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">LeetCode</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">IO</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color3">面经</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">集合</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -524,15 +512,19 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">同步</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">IO模型</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color4">线程池</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">IO</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">集合</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color4">LeetCode</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -540,7 +532,7 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">序列化</a>
+                <a href="javascript:void(0)" class="js-tag color5">IO模型</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -548,11 +540,23 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color4">JMM</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">同步</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color4">序列化</a>
+              </li>
+             
+              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color4">JVM</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">JMM</a>
+                <a href="javascript:void(0)" class="js-tag color4">NIO</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -564,19 +568,7 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">NIO</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color2">spring</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">Jdbc</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">AOP</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -588,6 +580,14 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color5">Jdbc</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color4">AOP</a>
+              </li>
+             
+              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color1">SpringBoot</a>
               </li>
              
@@ -596,11 +596,11 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">Synchronized</a>
+                <a href="javascript:void(0)" class="js-tag color2">ThreadLocal</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">ThreadLocal</a>
+                <a href="javascript:void(0)" class="js-tag color3">Synchronized</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -612,19 +612,11 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">内部类</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color1">函数式编程</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">反射</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">接口</a>
+                <a href="javascript:void(0)" class="js-tag color4">内部类</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -632,11 +624,11 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">泛型</a>
+                <a href="javascript:void(0)" class="js-tag color5">设计模式</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">设计模式</a>
+                <a href="javascript:void(0)" class="js-tag color3">反射</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -644,15 +636,23 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">接口</a>
+              </li>
+             
+              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color4">红黑树</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">sync</a>
+                <a href="javascript:void(0)" class="js-tag color3">线程</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">线程</a>
+                <a href="javascript:void(0)" class="js-tag color3">泛型</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color5">sync</a>
               </li>
              
               <li class="article-tag-list-item">
